@@ -3,147 +3,189 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;600;700&display=swap">
 <style>
-/* Layout: a lab rig — a rack of flies playing in parallel, one selected fly's brain up close, learning curves below */
+/* Layout: lab notebook — setup, results (scoreboard + curve), the population rack, one fly up close, glossary */
 :root {
-  --bg: #eef0ea; --panel: #f8f9f5; --ink: #1d2320; --muted: #5d6862; --line: #d3d8cf;
-  --food: #c98500; --danger: #c8423b; --steer: #2c6fb3; --learn: #2f8f5b; --instinct: #7a6f9e;
-  --grid: #e3e7df; --spike-bg: #c9cec5;
+  --bg: #eef0ea; --panel: #f9faf6; --sunk: #e6e9e1; --ink: #1c2220; --muted: #5b6660; --line: #d2d7cd;
+  --food: #c47f00; --danger: #c8423b; --steer: #3b5bdb;
+  --g-off: #7a6f9e; --g-hebb: #1f7a99; --g-rpe: #3a8a3c;
   --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #111613; --panel: #171d19; --ink: #e4e9e3; --muted: #93a098; --line: #2b342e;
-  --food: #f0b43c; --danger: #ef6b62; --steer: #6aaef0; --learn: #5cc98b; --instinct: #a99ad8;
-  --grid: #1d241f; --spike-bg: #2a332d; color-scheme: dark } }
+  --bg: #101513; --panel: #161c19; --sunk: #1d2420; --ink: #e3e8e2; --muted: #92a097; --line: #2a332d;
+  --food: #f0b43c; --danger: #ef6b62; --steer: #8aa2ff;
+  --g-off: #ab9de0; --g-hebb: #4fb8d8; --g-rpe: #6fcf6a; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #111613; --panel: #171d19; --ink: #e4e9e3; --muted: #93a098; --line: #2b342e;
-  --food: #f0b43c; --danger: #ef6b62; --steer: #6aaef0; --learn: #5cc98b; --instinct: #a99ad8;
-  --grid: #1d241f; --spike-bg: #2a332d; color-scheme: dark }
-body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
-.wrap { max-width: 1180px; margin: 0 auto; padding-block: 20px 40px;
+  --bg: #101513; --panel: #161c19; --sunk: #1d2420; --ink: #e3e8e2; --muted: #92a097; --line: #2a332d;
+  --food: #f0b43c; --danger: #ef6b62; --steer: #8aa2ff;
+  --g-off: #ab9de0; --g-hebb: #4fb8d8; --g-rpe: #6fcf6a; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-block: 28px 56px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid; gap: 18px; }
-header h1 { font-size: 1.6rem; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
-header p { margin: 4px 0 0; color: var(--muted); max-width: 72ch; }
-.label { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+  display: grid; gap: 22px; }
+h1 { font-size: clamp(1.6rem, 3.5vw, 2.3rem); line-height: 1.2; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+h2 { font-size: 1.05rem; margin: 0; letter-spacing: -0.01em; }
+.lede { margin: 6px 0 0; color: var(--muted); max-width: 70ch; }
+.label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.help { margin: 0; color: var(--muted); font-size: 0.86rem; max-width: 80ch; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 12px; min-width: 0; align-content: start; }
+.phead { display: grid; gap: 2px; }
+.phead .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 canvas { display: block; width: 100%; max-width: 100%; }
-.headrow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.big { font-family: var(--mono); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
-.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-button, select { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 5px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* setup */
+.setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
+.fieldset { display: grid; gap: 4px; }
+.fieldset label { font-size: 0.82rem; color: var(--muted); }
+select, button { font: inherit; font-weight: 600; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; min-height: 42px; }
 button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-button:disabled { opacity: 0.5; cursor: default; }
+button:disabled { opacity: 0.45; cursor: default; }
 button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px solid var(--steer); outline-offset: 2px; }
-.field { display: inline-flex; gap: 8px; align-items: center; color: var(--muted); }
-#status { font-family: var(--mono); color: var(--muted); font-size: 0.85rem; }
+.btns { display: flex; gap: 10px; flex-wrap: wrap; }
+#status { font-family: var(--mono); font-size: 0.82rem; color: var(--muted); }
 
-.summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-@media (max-width: 640px) { .summary { grid-template-columns: minmax(0, 1fr); } }
-.group { display: grid; gap: 2px; padding: 12px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); }
-.group .num { font-family: var(--mono); font-size: 2rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.2; }
-.group .sub { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
-.group.instinct .num { color: var(--instinct); } .group.learn .num { color: var(--learn); }
+/* scoreboard */
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 720px) { .board { grid-template-columns: minmax(0, 1fr); } }
+.gcard { display: grid; gap: 4px; padding: 14px 16px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--gc); min-width: 0; }
+.gcard .big { font-family: var(--mono); font-size: 2.1rem; font-weight: 600; line-height: 1.1; color: var(--gc); font-variant-numeric: tabular-nums; }
+.gcard .sub { font-size: 0.84rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.gcard .what { font-size: 0.84rem; }
+.trend { font-family: var(--mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.g-off { --gc: var(--g-off); } .g-hebb { --gc: var(--g-hebb); } .g-rpe { --gc: var(--g-rpe); }
 
-.rack { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-.fly { display: grid; gap: 4px; padding: 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; text-align: left; font-weight: 400; }
-.fly[aria-pressed="true"] { border-color: var(--steer); box-shadow: 0 0 0 1px var(--steer); }
+#chart { aspect-ratio: 2.6; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
+.sw { display: inline-block; width: 16px; height: 4px; border-radius: 2px; margin-right: 6px; vertical-align: 3px; background: var(--gc); }
+
+/* rack */
+.rack { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--cell, 118px), 1fr)); gap: 8px; }
+.fly { display: grid; gap: 3px; padding: 6px; border-radius: 6px; border: 1px solid var(--line); border-left: 3px solid var(--gc); background: var(--bg); cursor: pointer; text-align: left; font-weight: 400; min-height: 0; }
+.fly[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--steer); }
 .fly canvas { aspect-ratio: 1; border-radius: 3px; }
-.fly .tag { font-family: var(--mono); font-size: 0.72rem; display: flex; justify-content: space-between; gap: 6px; font-variant-numeric: tabular-nums; }
-.pill { font-weight: 600; }
-.pill.instinct { color: var(--instinct); } .pill.learn { color: var(--learn); }
+.fly .tag { font-family: var(--mono); font-size: 0.68rem; display: flex; justify-content: space-between; gap: 4px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; }
+.fly .who { color: var(--gc); font-weight: 600; }
+.rack.compact .fly .tag + .tag { display: none; }
 
-.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); gap: 18px; }
-@media (max-width: 820px) { .detail { grid-template-columns: minmax(0, 1fr); } }
+/* detail */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; }
+@media (max-width: 860px) { .detail { grid-template-columns: minmax(0, 1fr); } }
 #arena { aspect-ratio: 1; }
-#brain { aspect-ratio: 1.75; }
-.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 560px) { .meters { grid-template-columns: minmax(0, 1fr); } }
-.meter { display: grid; gap: 4px; }
-.bar { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) 4.2em; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
-.track { height: 10px; background: var(--grid); border-radius: 2px; overflow: hidden; }
-.fill { height: 100%; width: 0; transition: width 80ms linear; }
-.decision { font-weight: 700; min-height: 1.6em; }
+#brain { aspect-ratio: 1.75; border-radius: 4px; }
+.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 600px) { .meters { grid-template-columns: minmax(0, 1fr); } }
+.meter { display: grid; gap: 4px; align-content: start; }
+.meter .mt { font-size: 0.8rem; font-weight: 600; }
+.meter .md { font-size: 0.76rem; color: var(--muted); line-height: 1.4; }
+.bar { display: grid; grid-template-columns: 1.4em minmax(0, 1fr) 4.4em; align-items: center; gap: 6px; font-family: var(--mono); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.track { height: 10px; background: var(--sunk); border-radius: 3px; overflow: hidden; }
+.fill { height: 100%; width: 0; transition: width 90ms linear; }
+.decision { font-weight: 700; padding: 10px 12px; border-radius: 6px; background: var(--sunk); min-height: 1.6em; }
 
-.lower { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; }
-@media (max-width: 820px) { .lower { grid-template-columns: minmax(0, 1fr); } }
-#chart { aspect-ratio: 2.2; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
-.sw { display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: 3px; }
-#log { font-family: var(--mono); font-size: 0.78rem; height: 260px; overflow-y: auto; margin: 0; padding: 0; list-style: none; display: grid; align-content: start; gap: 2px; font-variant-numeric: tabular-nums; }
-#log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-#log .learn { color: var(--learn); } #log .instinct { color: var(--instinct); }
-.notes { color: var(--muted); font-size: 0.88rem; max-width: 78ch; display: grid; gap: 6px; }
-.notes b { color: var(--ink); }
+.lower { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 860px) { .lower { grid-template-columns: minmax(0, 1fr); } }
+#log { font-family: var(--mono); font-size: 0.76rem; height: 280px; overflow-y: auto; margin: 0; padding: 0; list-style: none; display: grid; align-content: start; gap: 1px; font-variant-numeric: tabular-nums; }
+#log li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--gc); }
+dl.gloss { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 14px; font-size: 0.86rem; }
+dl.gloss dt { font-weight: 700; font-family: var(--mono); font-size: 0.8rem; padding-top: 1px; }
+dl.gloss dd { margin: 0; color: var(--muted); }
+@media (max-width: 520px) { dl.gloss { grid-template-columns: minmax(0, 1fr); } dl.gloss dd { margin-bottom: 6px; } }
 @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
 </style>
 
 <div class="wrap">
   <header>
+    <span class="label">Connectome experiment · FlyWire v783</span>
     <h1>초파리 뇌 스네이크</h1>
-    <p>실제 초파리 배선도(FlyWire)로 만든 뇌 여러 개가 브라우저 안에서 동시에 돌아가며 각자 뱀을 조종합니다. 절반은 본능만, 절반은 도파민식 보상으로 시냅스를 바꾸며 배웁니다.</p>
+    <p class="lede">실제 초파리의 뇌 배선도로 만든 뇌 시뮬레이션이 브라우저 안에서 스네이크를 합니다. 여러 마리를 세 그룹으로 나눠 동시에 돌리고, 학습이 점수를 바꾸는지 비교합니다.</p>
   </header>
 
-  <div class="controls">
-    <button id="run" class="primary" type="button" disabled>실험 시작</button>
-    <label class="field" for="count">초파리 수
-      <select id="count"><option>2</option><option>4</option><option>6</option><option>8</option><option>12</option><option>16</option></select></label>
-    <label class="field" for="pace">속도
-      <select id="pace"><option value="300">천천히</option><option value="0" selected>최대</option></select></label>
-    <button id="restart" type="button" disabled>새 실험</button>
+  <!-- 1. setup -->
+  <section class="panel" aria-labelledby="h-setup">
+    <div class="phead"><h2 id="h-setup">실험 설정</h2>
+      <p class="help">그룹마다 같은 수의 초파리를 만듭니다. 세 그룹은 뇌 배선이 똑같고, 시냅스가 바뀌는 방식만 다릅니다. 초파리 수가 많을수록 통계는 믿을 만해지지만 한 마리당 속도는 느려집니다.</p></div>
+    <div class="setup">
+      <div class="fieldset"><label for="per">그룹당 초파리 수</label>
+        <select id="per"><option>1</option><option>2</option><option>4</option><option>8</option><option>16</option><option>24</option><option>33</option><option>50</option></select></div>
+      <div class="fieldset"><label for="pace">속도</label>
+        <select id="pace"><option value="400">천천히 (관찰용)</option><option value="0" selected>최대 (실험용)</option></select></div>
+      <div class="fieldset"><label for="threads">계산에 쓸 CPU 스레드</label>
+        <select id="threads"></select></div>
+      <div class="btns"><button id="run" class="primary" type="button" disabled>실험 시작</button><button id="restart" type="button" disabled>새 실험</button></div>
+    </div>
     <span id="status">뇌 불러오는 중…</span>
-  </div>
+  </section>
 
-  <div class="summary">
-    <div class="group instinct"><span class="label">본능만 · 학습 끔</span><span class="num" id="gI">–</span><span class="sub" id="gIs">한 판 평균 먹이</span></div>
-    <div class="group learn"><span class="label">학습 켬 · 도파민 보상</span><span class="num" id="gL">–</span><span class="sub" id="gLs">한 판 평균 먹이</span></div>
-  </div>
+  <!-- 2. results -->
+  <section class="board" aria-label="그룹별 성적">
+    <div class="gcard g-off"><span class="label">그룹 1 · 본능</span><span class="what">시냅스 고정. 배선도 그대로의 타고난 반응만 씁니다.</span><span class="big" id="b-off">–</span><span class="sub" id="s-off">한 판 평균 먹이</span><span class="trend" id="t-off"></span></div>
+    <div class="gcard g-hebb"><span class="label">그룹 2 · 학습 A (헤비안)</span><span class="what">함께 발화한 연결을 보상 크기만큼 강화하거나 약화합니다.</span><span class="big" id="b-hebb">–</span><span class="sub" id="s-hebb">한 판 평균 먹이</span><span class="trend" id="t-hebb"></span></div>
+    <div class="gcard g-rpe"><span class="label">그룹 3 · 학습 B (보상 예측 오차)</span><span class="what">예상보다 좋았는지 나빴는지로 배우고, 가끔 다른 쪽도 시도합니다.</span><span class="big" id="b-rpe">–</span><span class="sub" id="s-rpe">한 판 평균 먹이</span><span class="trend" id="t-rpe"></span></div>
+  </section>
 
-  <section class="panel" aria-label="초파리들">
-    <div class="headrow"><span class="label">Flies in parallel · 눌러서 자세히 보기</span><span class="big" id="speed"></span></div>
+  <section class="panel" aria-labelledby="h-curve">
+    <div class="phead"><div class="row"><h2 id="h-curve">학습 곡선</h2><span class="num" id="games"></span></div>
+      <p class="help">가로축은 각 초파리의 몇 번째 판인지, 세로축은 그 판에서 먹은 먹이 수입니다. 선은 그룹 평균의 최근 5판 이동평균입니다. 학습이 효과가 있으면 학습 그룹의 선이 판이 지날수록 본능 선보다 위로 올라갑니다.</p></div>
+    <canvas id="chart" width="1100" height="420"></canvas>
+    <div class="legend"><span class="g-off"><i class="sw"></i>본능</span><span class="g-hebb"><i class="sw"></i>학습 A · 헤비안</span><span class="g-rpe"><i class="sw"></i>학습 B · 보상 예측 오차</span><span>점: 개별 판</span></div>
+  </section>
+
+  <!-- 3. rack -->
+  <section class="panel" aria-labelledby="h-rack">
+    <div class="phead"><div class="row"><h2 id="h-rack">초파리들</h2><span class="num" id="speed"></span></div>
+      <p class="help">한 칸이 초파리 한 마리입니다. 왼쪽 띠 색이 그룹을 나타냅니다. 칸을 누르면 그 초파리의 게임판과 뇌 활동이 아래에 크게 나옵니다.</p></div>
     <div class="rack" id="rack"></div>
   </section>
 
-  <div class="detail">
-    <section class="panel" aria-label="선택한 초파리의 게임판">
-      <div class="headrow"><span class="label" id="selName">Arena</span><span class="big" id="selScore"></span></div>
-      <canvas id="arena" width="600" height="600"></canvas>
-    </section>
-    <section class="panel" aria-label="선택한 초파리의 뇌 활동">
-      <div class="headrow"><span class="label">Brain · spikes, front view</span><span class="big" id="active"></span></div>
-      <canvas id="brain" width="1050" height="600"></canvas>
-      <div class="meters">
-        <div class="meter"><span class="label" style="color:var(--food)">LC10 · 먹이 보임</span>
-          <div class="bar"><span>L</span><div class="track"><div class="fill" id="fL" style="background:var(--food)"></div></div><span id="fLv">0 Hz</span></div>
-          <div class="bar"><span>R</span><div class="track"><div class="fill" id="fR" style="background:var(--food)"></div></div><span id="fRv">0 Hz</span></div></div>
-        <div class="meter"><span class="label" style="color:var(--danger)">LC4·LPLC2 · 다가오는 벽</span>
-          <div class="bar"><span>L</span><div class="track"><div class="fill" id="dL" style="background:var(--danger)"></div></div><span id="dLv">0 Hz</span></div>
-          <div class="bar"><span>R</span><div class="track"><div class="fill" id="dR" style="background:var(--danger)"></div></div><span id="dRv">0 Hz</span></div></div>
-        <div class="meter"><span class="label" style="color:var(--steer)">DNa01·DNa02 · 조향</span>
-          <div class="bar"><span>L</span><div class="track"><div class="fill" id="sL" style="background:var(--steer)"></div></div><span id="sLv">0 Hz</span></div>
-          <div class="bar"><span>R</span><div class="track"><div class="fill" id="sR" style="background:var(--steer)"></div></div><span id="sRv">0 Hz</span></div></div>
+  <!-- 4. one fly up close -->
+  <section class="panel" aria-labelledby="h-detail">
+    <div class="phead"><div class="row"><h2 id="h-detail">선택한 초파리 자세히 보기</h2><span class="num" id="selScore"></span></div>
+      <p class="help">한 수마다 ① 게임이 먹이와 장애물 위치를 눈 뉴런 자극으로 바꾸고 ② 뇌가 200 ms 동안 계산한 뒤 ③ 조향 뉴런이 더 세게 발화한 쪽으로 뱀이 꺾습니다.</p></div>
+    <div class="detail">
+      <div class="fieldset" style="gap:6px"><span class="label" id="selName">Arena 12×12</span><canvas id="arena" width="600" height="600"></canvas>
+        <p class="help">노란 점이 먹이입니다. 하얀 두 점이 있는 칸이 머리이고, 머리가 향한 방향이 앞입니다.</p></div>
+      <div class="fieldset" style="gap:10px">
+        <div class="phead"><div class="row"><span class="label">Brain · spikes in the last move, front view</span><span class="num" id="active"></span></div></div>
+        <canvas id="brain" width="1050" height="600"></canvas>
+        <p class="help">회색 점은 초파리 뇌 전체 뉴런의 위치(앞에서 본 모습), 진한 점은 직전 한 수 동안 발화한 뉴런입니다. 주황은 먹이를 보는 시각 뉴런, 빨강은 다가오는 물체를 보는 시각 뉴런, 파란 원은 조향 뉴런입니다.</p>
+        <div class="meters">
+          <div class="meter"><span class="mt" style="color:var(--food)">눈 입력 · 먹이</span><span class="md">LC10 뉴런 자극 세기. 먹이가 가깝고 그쪽에 있을수록 셉니다.</span>
+            <div class="bar"><span>L</span><div class="track"><div class="fill" id="fL" style="background:var(--food)"></div></div><span id="fLv">0 Hz</span></div>
+            <div class="bar"><span>R</span><div class="track"><div class="fill" id="fR" style="background:var(--food)"></div></div><span id="fRv">0 Hz</span></div></div>
+          <div class="meter"><span class="mt" style="color:var(--danger)">눈 입력 · 장애물</span><span class="md">LC4·LPLC2 뉴런 자극 세기. 바로 옆 칸이 벽이나 몸통이면 켜집니다.</span>
+            <div class="bar"><span>L</span><div class="track"><div class="fill" id="dL" style="background:var(--danger)"></div></div><span id="dLv">0 Hz</span></div>
+            <div class="bar"><span>R</span><div class="track"><div class="fill" id="dR" style="background:var(--danger)"></div></div><span id="dRv">0 Hz</span></div></div>
+          <div class="meter"><span class="mt" style="color:var(--steer)">뇌 출력 · 조향</span><span class="md">DNa01·DNa02 뉴런 발화율. 더 센 쪽으로 꺾고, 차이가 20 Hz 미만이면 직진합니다.</span>
+            <div class="bar"><span>L</span><div class="track"><div class="fill" id="sL" style="background:var(--steer)"></div></div><span id="sLv">0 Hz</span></div>
+            <div class="bar"><span>R</span><div class="track"><div class="fill" id="sR" style="background:var(--steer)"></div></div><span id="sRv">0 Hz</span></div></div>
+        </div>
+        <div class="decision" id="decision">실험을 시작하면 여기에 뇌의 결정이 나옵니다.</div>
       </div>
-      <div class="decision" id="decision">대기 중</div>
-    </section>
-  </div>
+    </div>
+  </section>
 
   <div class="lower">
-    <section class="panel" aria-label="학습 곡선">
-      <div class="headrow"><span class="label">Learning curve · n번째 판의 그룹 평균 먹이</span><span class="big" id="games"></span></div>
-      <canvas id="chart" width="900" height="410"></canvas>
-      <div class="legend"><span><i class="sw" style="background:var(--instinct)"></i>본능만</span><span><i class="sw" style="background:var(--learn)"></i>학습 켬</span><span>선: 최근 5판 이동평균 · 점: 각 판</span></div>
-    </section>
-    <section class="panel" aria-label="실험 기록">
-      <span class="label">Run log · 끝난 판</span>
+    <section class="panel" aria-labelledby="h-log">
+      <div class="phead"><h2 id="h-log">끝난 판 기록</h2><p class="help">판이 끝날 때마다 한 줄씩 쌓입니다. 시냅스 %는 학습으로 바뀐 조향 시냅스의 전체 세기입니다(배선도 원래 값 = 100%).</p></div>
       <ol id="log"></ol>
     </section>
-  </div>
-
-  <div class="notes">
-    <p><b>병렬 실행.</b> 초파리마다 Web Worker 하나가 자기 뇌 사본을 돌립니다. 짝수 번은 본능만, 홀수 번은 학습 켬이고, 먹이 위치를 정하는 난수는 짝끼리 같게 시작합니다. 컴퓨터 코어 수보다 많이 띄우면 한 마리당 속도가 느려집니다.</p>
-    <p><b>뇌.</b> FlyWire v783 커넥톰 13만 8,639개 뉴런 중, 전체 뇌로 게임을 돌렸을 때 한 번이라도 발화한 <span id="nsub">-</span>개와 그 사이 연결을 그대로 옮겼습니다. 발화하지 않는 뉴런은 다른 뉴런에 영향을 주지 않으므로 이 부분 회로는 전체 뇌와 거의 같은 계산을 합니다. 뉴런 모델과 값은 Shiu et al. 2024(Nature)와 같고, 한 수마다 뇌 시간 200 ms를 계산합니다.</p>
-    <p><b>눈과 핸들.</b> 먹이는 같은 쪽 LC10(작은 물체 감지)을, 벽·몸통은 LC4·LPLC2(다가오는 물체 감지)를 자극합니다. 마지막 120 ms 동안 DNa01·DNa02가 더 많이 발화한 쪽으로 꺾습니다(차이 20 Hz 미만이면 직진). 먹이 쪽으로 돌고 벽 반대쪽으로 피하는 방향은 배선도에서 나온 결과입니다.</p>
-    <p><b>학습.</b> 조향 뉴런으로 들어오는 흥분성 시냅스가 보상에 따라 바뀝니다. 직전 수에서 함께 발화한 시냅스를 먹이 +1, 가까워짐 +0.1, 멀어짐 −0.1, 충돌 −1 신호로 강화하거나 약화합니다. 초파리의 도파민 학습을 단순화한 규칙이며, 실제 초파리에서 이 시냅스들이 이렇게 배운다는 근거는 없습니다.</p>
+    <section class="panel" aria-labelledby="h-gloss">
+      <div class="phead"><h2 id="h-gloss">용어 설명</h2></div>
+      <dl class="gloss">
+        <dt>커넥톰</dt><dd>뉴런 사이의 연결 지도. 여기서는 FlyWire v783(뉴런 13만 8,639개, 연결 1,500만 쌍)을 씁니다.</dd>
+        <dt>LIF 모델</dt><dd>뉴런을 전압이 쌓이다 문턱을 넘으면 발화하는 단순한 전기 회로로 보는 모델. 값은 Shiu et al. 2024(Nature)와 같습니다.</dd>
+        <dt>부분 회로</dt><dd>전체 뇌로 게임을 돌렸을 때 한 번이라도 발화한 <span id="nsub">-</span>개 뉴런만 옮겼습니다. 발화하지 않는 뉴런은 다른 뉴런에 영향을 주지 않아서 계산 결과가 거의 같습니다.</dd>
+        <dt>LC10</dt><dd>작은 물체를 감지하는 시각 뉴런. 자극하면 같은 쪽으로 돕니다(배선도에서 나온 결과).</dd>
+        <dt>LC4·LPLC2</dt><dd>다가오는 물체를 감지하는 시각 뉴런. 자극하면 반대쪽으로 피합니다.</dd>
+        <dt>DNa01·DNa02</dt><dd>뇌에서 몸으로 방향 전환 명령을 보내는 하강 뉴런. 이 게임의 핸들입니다.</dd>
+        <dt>시냅스 학습</dt><dd>조향 뉴런으로 들어오는 흥분성 시냅스 680개만 바뀝니다. 먹이 +1, 가까워짐 +0.1, 멀어짐 −0.1, 충돌 −1이 보상입니다.</dd>
+        <dt>헤비안 (A)</dt><dd>직전에 함께 발화한 연결 × 보상만큼 바꿉니다. 거의 항상 강해지는 쪽으로 흐릅니다.</dd>
+        <dt>보상 예측 오차 (B)</dt><dd>도파민 뉴런처럼 "예상보다 얼마나 좋았나"로 배웁니다. 꺾을 확률을 뇌 출력에서 정해 가끔 다른 선택도 하고, 결과가 나쁘면 그 선택을 밀어준 입력만 약하게 합니다.</dd>
+        <dt>주의</dt><dd>두 학습 규칙 모두 초파리 학습을 단순화한 것입니다. 실제 초파리에서 이 시냅스들이 이렇게 바뀐다는 근거는 없습니다.</dd>
+      </dl>
+    </section>
   </div>
 </div>
 
@@ -171,28 +213,38 @@ button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px so
     };
   }
 
+  // Decode the network once per data object: CSR connectivity, groups, plastic synapse list.
+  function decode(data) {
+    const d = { n: data.n };
+    d.indptr = b64(data.indptr, Int32Array);
+    d.post = b64(data.post, Uint16Array);
+    d.syn = b64(data.syn, Int16Array);           // signed synapse counts
+    d.groups = {};
+    for (const k in data.groups) d.groups[k] = Uint16Array.from(data.groups[k]);
+    d.w0 = new Float32Array(d.syn.length);
+    for (let k = 0; k < d.w0.length; k++) d.w0[k] = d.syn[k] * W_SYN;
+    // plastic synapses: excitatory inputs onto the steering neurons
+    d.side = new Uint8Array(d.n); // 1 = left steering neuron, 2 = right
+    for (const i of d.groups.steer_left) d.side[i] = 1;
+    for (const i of d.groups.steer_right) d.side[i] = 2;
+    const pk = [], pre = [];
+    for (let j = 0; j < d.n; j++)
+      for (let k = d.indptr[j]; k < d.indptr[j + 1]; k++)
+        if (d.side[d.post[k]] && d.syn[k] > 0) { pk.push(k); pre.push(j); }
+    d.plastic = Int32Array.from(pk);
+    d.plasticPre = Int32Array.from(pre);
+    return d;
+  }
+
   class Brain {
-    constructor(data, seed = 1, dt = 0.1) {
-      this.n = data.n;
-      this.indptr = b64(data.indptr, Int32Array);
-      this.post = b64(data.post, Uint16Array);
-      this.syn = b64(data.syn, Int16Array);           // signed synapse counts
-      this.groups = {};
-      for (const k in data.groups) this.groups[k] = Uint16Array.from(data.groups[k]);
-      this.w = new Float32Array(this.syn.length);
-      for (let k = 0; k < this.w.length; k++) this.w[k] = this.syn[k] * W_SYN;
-      this.w0 = this.w.slice();
-      // plastic synapses: excitatory inputs onto the steering neurons
-      const steer = new Uint8Array(this.n);
-      for (const i of this.groups.steer_left) steer[i] = 1;
-      for (const i of this.groups.steer_right) steer[i] = 1;
-      const pk = [], pre = [];
-      for (let j = 0; j < this.n; j++)
-        for (let k = this.indptr[j]; k < this.indptr[j + 1]; k++)
-          if (steer[this.post[k]] && this.syn[k] > 0) { pk.push(k); pre.push(j); }
-      this.plastic = Int32Array.from(pk);
-      this.plasticPre = Int32Array.from(pre);
-      this.elig = new Float32Array(pk.length);
+    // ownWeights=false shares the (never modified) weights with other brains built from the
+    // same data object, so many instinct-only flies in one worker cost almost no memory.
+    constructor(data, seed = 1, dt = 0.1, ownWeights = true) {
+      if (!data._shared) data._shared = decode(data);
+      Object.assign(this, data._shared);
+      this.w = ownWeights ? this.w0.slice() : this.w0;
+      this.elig = new Float32Array(this.plastic.length);
+      this.baseline = 0;
       this.dt = dt;
       this.dv = Math.exp(-dt / T_MBR);
       this.dg = Math.exp(-dt / TAU);
@@ -212,7 +264,7 @@ button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px so
       this.pending = Array.from({ length: this.nDly }, () => []);
       this.t = 0;
     }
-    resetLearning() { this.w.set(this.w0); this.elig.fill(0); }
+    resetLearning() { if (this.w !== this.w0) this.w.set(this.w0); this.elig.fill(0); this.baseline = 0; }
     // stim: array of [rateHz, Uint16Array indices]
     run(ms, stim) {
       const { n, v, g, rfc, indptr, post, w, count, isStim } = this;
@@ -258,6 +310,20 @@ button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px so
       for (let m = 0; m < plastic.length; m++) {
         const k = plastic[m];
         w[k] = Math.min(4 * w0[k], Math.max(0, w[k] + lr * r * elig[m] * W_SYN));
+      }
+    }
+    updateEligibilityRPE(decay, m) {
+      const { plastic, plasticPre, post, count, elig, side } = this;
+      const gL = (m.turn === -1 ? 1 : 0) - m.pL, gR = (m.turn === 1 ? 1 : 0) - m.pR;
+      for (let q = 0; q < plastic.length; q++) {
+        elig[q] = elig[q] * decay + count[plasticPre[q]] * (side[post[plastic[q]]] === 1 ? gL : gR);
+      }
+    }
+    rewardRPE(delta, lr) {
+      const { plastic, elig, w, w0 } = this;
+      for (let q = 0; q < plastic.length; q++) {
+        const k = plastic[q];
+        w[k] = Math.min(4 * w0[k], Math.max(0, w[k] + lr * delta * elig[q] * W_SYN));
       }
     }
     weightChange() {
@@ -328,7 +394,10 @@ button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px so
   const CFG = { STEP_MS: 200, READ_MS: 120, MAX_RATE: 150, TURN_THRESHOLD: 20 };
 
   // One snake move: senses -> brain -> turn. Returns everything the UI shows.
-  function brainMove(brain, snake) {
+  // stochastic=true: the turn is sampled from the steering difference (behavioural variability),
+  // used by the reward-prediction-error rule so it can try alternatives and learn from them.
+  const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+  function brainMove(brain, snake, stochastic = false) {
     const s = snake.senses();
     const stim = [];
     for (const k of ["food_left", "food_right", "danger_left", "danger_right"])
@@ -339,20 +408,42 @@ button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px so
     brain.run(CFG.READ_MS, stim);
     const hz = (ix) => { let c = 0; for (const i of ix) c += brain.count[i] - early[i]; return c / (CFG.READ_MS / 1000); };
     const L = hz(brain.groups.steer_left), R = hz(brain.groups.steer_right);
-    const turn = R - L > CFG.TURN_THRESHOLD ? 1 : L - R > CFG.TURN_THRESHOLD ? -1 : 0;
-    return { senses: s, L, R, turn };
+    let turn, pL, pR;
+    if (stochastic) {
+      pL = sigmoid((L - R - CFG.TURN_THRESHOLD) / LEARN.TEMP);
+      pR = sigmoid((R - L - CFG.TURN_THRESHOLD) / LEARN.TEMP);
+      const u = brain.rand();
+      turn = u < pL ? -1 : u < pL + pR ? 1 : 0;
+    } else {
+      turn = R - L > CFG.TURN_THRESHOLD ? 1 : L - R > CFG.TURN_THRESHOLD ? -1 : 0;
+      pL = turn === -1 ? 1 : 0; pR = turn === 1 ? 1 : 0;
+    }
+    return { senses: s, L, R, turn, pL, pR };
   }
 
-  // brainMove + the outcome + (optionally) the reward update. Same rule everywhere.
-  const LEARN = { LR: 0.6, ELIG_DECAY: 0.5, R_EAT: 1, R_CRASH: -1, R_CLOSER: 0.1, R_FARTHER: -0.1 };
+  // Learning rules (learn = "off" | "hebb" | "rpe"):
+  //  hebb: eligibility = pre x post spikes, weight change = reward x eligibility (first version)
+  //  rpe:  dopamine-like reward prediction error (reward - running average) times
+  //        pre spikes x (chosen side - probability of choosing it), so a crash after turning
+  //        left weakens exactly the inputs that pushed it left in that situation.
+  const LEARN = { LR: 0.6, ELIG_DECAY: 0.5, R_EAT: 1, R_CRASH: -1, R_CLOSER: 0.1, R_FARTHER: -0.1,
+    RPE_LR: 0.6, RPE_DECAY: 0.6, R_ALIVE: 0.02, BASELINE: 0.05, TEMP: 6 };
   function playMove(brain, snake, learn) {
-    const m = brainMove(brain, snake);
-    if (learn) brain.updateEligibility(LEARN.ELIG_DECAY);
+    if (learn === true) learn = "hebb";
+    if (!learn) learn = "off";
+    const m = brainMove(brain, snake, learn === "rpe");
+    if (learn === "hebb") brain.updateEligibility(LEARN.ELIG_DECAY);
+    if (learn === "rpe") brain.updateEligibilityRPE(LEARN.RPE_DECAY, m);
     const d0 = snake.foodDist();
     m.res = snake.step(m.turn);
     m.reward = m.res === "eat" ? LEARN.R_EAT : m.res === "crash" ? LEARN.R_CRASH
       : snake.foodDist() < d0 ? LEARN.R_CLOSER : LEARN.R_FARTHER;
-    if (learn) brain.reward(m.reward, LEARN.LR);
+    if (learn === "hebb") brain.reward(m.reward, LEARN.LR);
+    if (learn === "rpe") {
+      const r = m.reward + (m.res === "move" ? LEARN.R_ALIVE : 0);
+      brain.rewardRPE(r - brain.baseline, LEARN.RPE_LR);
+      brain.baseline += LEARN.BASELINE * (r - brain.baseline);
+    }
     return m;
   }
 
@@ -361,28 +452,31 @@ button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px so
 })(this);
 </script>
 <script id="workersrc" type="text/plain">
-let brain, snake, rand, learn = false, id = 0, running = false, detail = false, pace = 0, game = 1, looping = false;
-const { Brain, Snake, playMove, mulberry32, CFG } = self.FlyBrain;
-function newGame() { snake = new Snake(12, rand); brain.reset(); brain.elig.fill(0); }
-function state(m) {
-  return { type: "move", id, game, learn, body: snake.body, food: snake.food, heading: snake.heading,
-    alive: snake.alive, score: snake.score, moves: snake.moves, weight: brain.weightChange(), m };
+// One worker hosts several flies and plays them in turn; they share the decoded network.
+const { Brain, Snake, playMove, mulberry32 } = self.FlyBrain;
+let net, flies = [], running = false, looping = false, pace = 0, detailId = -1;
+function snap(f, m) {
+  return { type: "move", id: f.id, game: f.game, body: f.snake.body, food: f.snake.food, heading: f.snake.heading,
+    alive: f.snake.alive, score: f.snake.score, moves: f.snake.moves, weight: f.brain.weightChange(), m };
 }
+function newGame(f) { f.snake = new Snake(12, f.rand); f.brain.reset(); f.brain.elig.fill(0); }
 async function loop() {
   if (looping) return; looping = true;
   while (running) {
-    const t0 = performance.now();
-    const m = playMove(brain, snake, learn);
-    const msg = state(m);
-    msg.ms = performance.now() - t0;
-    if (detail) {
-      const c = new Uint8Array(brain.n);
-      for (let i = 0; i < brain.n; i++) c[i] = Math.min(255, brain.count[i]);
-      msg.counts = c; self.postMessage(msg, [c.buffer]);
-    } else self.postMessage(msg);
-    if (!snake.alive || snake.moves >= 300) {
-      self.postMessage({ type: "game", id, learn, game, score: snake.score, moves: snake.moves, weight: brain.weightChange() });
-      game++; newGame();
+    for (const f of flies) {
+      if (!running) break;
+      const t0 = performance.now();
+      const m = playMove(f.brain, f.snake, f.learn);
+      const msg = snap(f, m); msg.ms = performance.now() - t0;
+      if (f.id === detailId) {
+        const c = new Uint8Array(f.brain.n);
+        for (let i = 0; i < c.length; i++) c[i] = Math.min(255, f.brain.count[i]);
+        msg.counts = c; self.postMessage(msg, [c.buffer]);
+      } else self.postMessage(msg);
+      if (!f.snake.alive || f.snake.moves >= 300) {
+        self.postMessage({ type: "game", id: f.id, game: f.game, score: f.snake.score, moves: f.snake.moves, weight: f.brain.weightChange() });
+        f.game++; newGame(f);
+      }
     }
     await new Promise((r) => setTimeout(r, pace));
   }
@@ -391,118 +485,137 @@ async function loop() {
 self.onmessage = (e) => {
   const d = e.data;
   if (d.type === "init") {
-    id = d.id; learn = d.learn;
-    brain = new Brain(JSON.parse(d.net), d.seed);
-    rand = mulberry32(d.foodSeed);
-    newGame();
-    self.postMessage(Object.assign(state(null), { type: "ready" }));
+    net = JSON.parse(d.net);
+    for (const s of d.flies) {
+      const f = { id: s.id, learn: s.learn, game: 1, brain: new Brain(net, s.seed, 0.1, s.learn !== "off"), rand: mulberry32(s.foodSeed) };
+      newGame(f); flies.push(f);
+      self.postMessage(Object.assign(snap(f, null), { type: "ready" }));
+    }
   } else if (d.type === "run") { running = true; pace = d.pace; loop(); }
   else if (d.type === "pause") running = false;
   else if (d.type === "pace") pace = d.pace;
-  else if (d.type === "detail") detail = d.on;
+  else if (d.type === "detail") detailId = d.id;
 };
 </script>
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
   const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-  const netText = $("net").textContent;
-  const meta = JSON.parse(netText);
+  const netText = $("net").textContent, meta = JSON.parse(netText);
   const workerUrl = URL.createObjectURL(new Blob([$("brainsrc").textContent, "\n", $("workersrc").textContent], { type: "text/javascript" }));
+  const GROUPS = [
+    { key: "off", name: "본능", cls: "g-off" },
+    { key: "hebb", name: "학습 A", cls: "g-hebb" },
+    { key: "rpe", name: "학습 B", cls: "g-rpe" },
+  ];
+  const gcol = (k) => css("--g-" + k);
   const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
-  let flies = [], selected = 0, running = false, results = [], heat = new Uint8Array(meta.n), heatT = 0, heatMs = 1000, lastDetail = null, bgImg = null;
+  let flies = [], workers = [], selected = 0, running = false, results = [], bgImg = null;
+  let heat = new Uint8Array(meta.n), heatT = 0, heatMs = 1000, lastDetail = null;
   const cores = navigator.hardwareConcurrency || 4;
-  $("count").value = String([2, 4, 6, 8, 12, 16].reduce((b, v) => (v <= Math.max(2, cores) ? v : b), 2));
+  for (let t = 1; t <= cores; t++) {
+    const o = document.createElement("option"); o.value = t; o.textContent = `${t}${t === cores ? " (전부)" : ""}`; $("threads").appendChild(o);
+  }
+  $("threads").value = String(Math.max(1, cores - 1));
+  $("per").value = cores >= 12 ? "8" : cores >= 6 ? "4" : "2";
   $("nsub").textContent = meta.n.toLocaleString();
 
-  // ---------- workers ----------
   function setup() {
-    flies.forEach((f) => f.worker.terminate());
-    const n = +$("count").value;
-    results = []; selected = 0; heat = new Uint8Array(meta.n); lastDetail = null;
-    $("log").innerHTML = "";
+    workers.forEach((w) => w.terminate());
+    running = false; $("run").textContent = "실험 시작";
+    const per = +$("per").value, total = per * GROUPS.length;
+    const nW = Math.min(+$("threads").value, total);
+    results = []; selected = 0; heat = new Uint8Array(meta.n); lastDetail = null; $("log").innerHTML = "";
     const rack = $("rack"); rack.innerHTML = "";
-    flies = [];
-    let ready = 0;
-    $("run").disabled = true; $("status").textContent = `뇌 ${n}개 만드는 중…`;
-    for (let i = 0; i < n; i++) {
-      const learn = i % 2 === 1, pair = i >> 1;
+    rack.classList.toggle("compact", total > 30);
+    rack.style.setProperty("--cell", total > 60 ? "74px" : total > 30 ? "92px" : "118px");
+    flies = []; workers = [];
+    const assign = Array.from({ length: nW }, () => []);
+    for (let p = 0; p < per; p++) for (const g of GROUPS) {
+      const id = flies.length;
       const card = document.createElement("button");
-      card.type = "button"; card.className = "fly"; card.setAttribute("aria-pressed", i === 0 ? "true" : "false");
-      card.innerHTML = `<canvas width="180" height="180"></canvas><span class="tag"><span class="pill ${learn ? "learn" : "instinct"}">${learn ? "학습" : "본능"} #${pair + 1}</span><span class="sc">–</span></span><span class="tag"><span class="gm">게임 1</span><span class="wt"></span></span>`;
-      card.onclick = () => select(i);
+      card.type = "button"; card.className = "fly " + g.cls; card.setAttribute("aria-pressed", id === 0 ? "true" : "false");
+      card.innerHTML = `<canvas width="120" height="120"></canvas><span class="tag"><span class="who">${g.name} ${p + 1}</span><span class="sc">0</span></span><span class="tag"><span class="gm">1판</span><span class="wt"></span></span>`;
+      card.onclick = () => select(id);
       rack.appendChild(card);
-      const worker = new Worker(workerUrl);
-      const f = { id: i, learn, pair, worker, card, st: null, msTotal: 0, moves: 0 };
-      worker.onmessage = (e) => onMsg(f, e.data);
-      worker.onerror = (e) => { $("status").textContent = `오류: ${e.message}`; };
-      worker.postMessage({ type: "init", id: i, learn, net: netText, seed: 1000 + i, foodSeed: 77 + pair });
-      worker.postMessage({ type: "detail", on: i === 0 });
+      const f = { id, g, pair: p, card, st: null, moves: 0, dirty: false, w: id % nW };
       flies.push(f);
+      // same food sequence for the three flies of one pair, so groups face the same games
+      assign[f.w].push({ id, learn: g.key, seed: 1000 + id, foodSeed: 77 + p });
     }
-    function onMsg(f, d) {
+    let ready = 0;
+    $("run").disabled = true; $("restart").disabled = true;
+    $("status").textContent = `초파리 ${total}마리 뇌 만드는 중 (스레드 ${nW}개)…`;
+    for (let w = 0; w < nW; w++) {
+      const worker = new Worker(workerUrl);
+      worker.onmessage = (e) => onMsg(e.data);
+      worker.onerror = (e) => { $("status").textContent = `오류: ${e.message}`; };
+      worker.postMessage({ type: "init", net: netText, flies: assign[w] });
+      workers.push(worker);
+    }
+    workers[0].postMessage({ type: "detail", id: 0 });
+    function onMsg(d) {
+      const f = flies[d.id];
       if (d.type === "ready") {
-        f.st = d; drawMini(f);
-        if (++ready === flies.length) { $("run").disabled = false; $("restart").disabled = false; $("status").textContent = `준비됨 · 초파리 ${n}마리 · 뉴런 ${meta.n.toLocaleString()}개씩`; drawSelected(); }
+        f.st = d; f.dirty = true;
+        if (++ready === flies.length) {
+          $("run").disabled = false; $("restart").disabled = false;
+          $("status").textContent = `준비됨 · 초파리 ${total}마리 · 스레드 ${nW}개 · 한 마리당 뉴런 ${meta.n.toLocaleString()}개`;
+        }
       } else if (d.type === "move") {
-        f.st = d; f.msTotal += d.ms; f.moves++;
-        if (d.counts && f.id === selected) { heat = d.counts; heatT = performance.now(); heatMs = Math.max(250, d.ms * 1.5); lastDetail = d; }
-        f.dirty = true;
+        f.st = d; f.moves++; f.dirty = true;
+        if (d.counts && d.id === selected) { heat = d.counts; heatT = performance.now(); heatMs = Math.max(250, d.ms * 2); lastDetail = d; }
       } else if (d.type === "game") {
-        results.push({ learn: d.learn, game: d.game, score: d.score, moves: d.moves, id: f.id });
-        const li = document.createElement("li"); li.className = d.learn ? "learn" : "instinct";
-        li.textContent = `${d.learn ? "학습" : "본능"} #${f.pair + 1} 게임 ${String(d.game).padStart(3)} · 먹이 ${String(d.score).padStart(2)} · ${String(d.moves).padStart(3)}수 · 시냅스 ${(d.weight * 100).toFixed(0)}%`;
-        $("log").prepend(li); while ($("log").children.length > 400) $("log").lastChild.remove();
-        summary(); drawChart();
+        results.push({ g: f.g.key, game: d.game, score: d.score, moves: d.moves });
+        const li = document.createElement("li"); li.className = f.g.cls;
+        li.textContent = `${f.g.name} ${String(f.pair + 1).padStart(2)} · ${String(d.game).padStart(3)}판 · 먹이 ${String(d.score).padStart(2)} · ${String(d.moves).padStart(3)}수` + (f.g.key === "off" ? "" : ` · 시냅스 ${(d.weight * 100).toFixed(0)}%`);
+        $("log").prepend(li); while ($("log").children.length > 500) $("log").lastChild.remove();
+        chartDirty = true;
       }
     }
-    summary(); drawChart();
+    chartDirty = true;
   }
 
-  function select(i) {
-    flies[selected].worker.postMessage({ type: "detail", on: false });
+  function select(id) {
     flies[selected].card.setAttribute("aria-pressed", "false");
-    selected = i; heat = new Uint8Array(meta.n); lastDetail = null;
-    flies[i].worker.postMessage({ type: "detail", on: true });
-    flies[i].card.setAttribute("aria-pressed", "true");
-    drawSelected();
+    selected = id; heat = new Uint8Array(meta.n); lastDetail = null;
+    flies[id].card.setAttribute("aria-pressed", "true");
+    workers.forEach((w) => w.postMessage({ type: "detail", id }));
+    $("h-detail").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   }
 
   // ---------- drawing ----------
-  function drawSnake(cv, st, gridLines) {
+  function drawSnake(cv, st, color, big) {
     const x = cv.getContext("2d"), s = cv.width / 12;
     x.fillStyle = css("--panel"); x.fillRect(0, 0, cv.width, cv.height);
-    if (gridLines) {
-      x.strokeStyle = css("--grid"); x.lineWidth = 1;
+    if (big) {
+      x.strokeStyle = css("--sunk"); x.lineWidth = 1;
       for (let i = 0; i <= 12; i++) { x.beginPath(); x.moveTo(i * s, 0); x.lineTo(i * s, cv.height); x.stroke(); x.beginPath(); x.moveTo(0, i * s); x.lineTo(cv.width, i * s); x.stroke(); }
     }
     if (!st) return;
     x.fillStyle = css("--food");
     x.beginPath(); x.arc((st.food[0] + 0.5) * s, (st.food[1] + 0.5) * s, s * 0.34, 0, 7); x.fill();
-    const col = st.learn ? css("--learn") : css("--instinct");
     st.body.forEach(([bx, by], i) => {
-      x.globalAlpha = i === 0 ? 1 : 0.5 + 0.4 * (1 - i / st.body.length);
-      x.fillStyle = st.alive ? col : css("--danger");
-      const g = Math.max(1, s * 0.08); x.fillRect(bx * s + g, by * s + g, s - 2 * g, s - 2 * g);
+      x.globalAlpha = i === 0 ? 1 : 0.45 + 0.45 * (1 - i / st.body.length);
+      x.fillStyle = st.alive ? color : css("--danger");
+      const gap = Math.max(1, s * 0.08); x.fillRect(bx * s + gap, by * s + gap, s - 2 * gap, s - 2 * gap);
     });
     x.globalAlpha = 1;
-    if (gridLines) {
-      const [hx, hy] = st.body[0], d = DIRS[st.heading];
-      x.fillStyle = css("--panel");
-      for (const side of [-1, 1]) {
-        x.beginPath(); x.arc((hx + 0.5 + d[0] * 0.2 - d[1] * side * 0.2) * s, (hy + 0.5 + d[1] * 0.2 + d[0] * side * 0.2) * s, s * 0.08, 0, 7); x.fill();
-      }
+    const [hx, hy] = st.body[0], d = DIRS[st.heading];
+    x.fillStyle = css("--panel");
+    for (const side of [-1, 1]) {
+      x.beginPath(); x.arc((hx + 0.5 + d[0] * 0.2 - d[1] * side * 0.2) * s, (hy + 0.5 + d[1] * 0.2 + d[0] * side * 0.2) * s, s * 0.09, 0, 7); x.fill();
     }
   }
   function drawMini(f) {
-    drawSnake(f.card.querySelector("canvas"), f.st, false);
+    drawSnake(f.card.querySelector("canvas"), f.st, gcol(f.g.key), false);
     if (!f.st) return;
     f.card.querySelector(".sc").textContent = `먹이 ${f.st.score}`;
-    f.card.querySelector(".gm").textContent = `게임 ${f.st.game}`;
-    f.card.querySelector(".wt").textContent = f.learn ? `시냅스 ${(f.st.weight * 100).toFixed(0)}%` : "";
+    f.card.querySelector(".gm").textContent = `${f.st.game}판`;
+    f.card.querySelector(".wt").textContent = f.g.key === "off" ? "" : `${(f.st.weight * 100).toFixed(0)}%`;
   }
   function setBar(id, hz, max) { $(id).style.width = Math.min(100, (hz / max) * 100) + "%"; $(id + "v").textContent = Math.round(hz) + " Hz"; }
-  function brainXY(p, W, H) { return [20 + p[0] / 1000 * (W - 40), 20 + p[1] / 1000 * (H - 40)]; }
+  const brainXY = (p, W, H) => [24 + p[0] / 1000 * (W - 48), 24 + p[1] / 1000 * (H - 48)];
   const groupOf = new Array(meta.n).fill(null);
   for (const k of ["food_left", "food_right"]) for (const i of meta.groups[k]) groupOf[i] = "--food";
   for (const k of ["danger_left", "danger_right"]) for (const i of meta.groups[k]) groupOf[i] = "--danger";
@@ -510,13 +623,12 @@ self.onmessage = (e) => {
     const c = $("brain"), x = c.getContext("2d"), W = c.width, H = c.height;
     if (!bgImg) {
       const o = document.createElement("canvas"); o.width = W; o.height = H;
-      const ox = o.getContext("2d"); ox.fillStyle = css("--spike-bg");
+      const ox = o.getContext("2d"); ox.fillStyle = css("--line");
       for (const p of meta.bg) { const [a, b] = brainXY(p, W, H); ox.fillRect(a, b, 2, 2); }
       bgImg = o;
     }
     x.fillStyle = css("--panel"); x.fillRect(0, 0, W, H); x.drawImage(bgImg, 0, 0);
     const cols = { "--food": css("--food"), "--danger": css("--danger") }, ink = css("--ink");
-    // last move's spikes; fade toward a dim afterimage until the next move arrives
     const fade = Math.max(0.3, 1 - (performance.now() - heatT) / heatMs);
     let na = 0;
     for (let i = 0; i < meta.n; i++) {
@@ -527,22 +639,22 @@ self.onmessage = (e) => {
     }
     x.globalAlpha = 1;
     x.font = "600 20px " + css("--mono"); x.textAlign = "center";
-    for (const [k, lab] of [["steer_left", "DN L"], ["steer_right", "DN R"]]) {
+    for (const [k, lab] of [["steer_left", "조향 L"], ["steer_right", "조향 R"]]) {
       let sx = 0, sy = 0, hs = 0;
       for (const i of meta.groups[k]) { const [a, b] = brainXY(meta.pos[i], W, H); sx += a; sy += b; hs += heat[i]; }
       sx /= meta.groups[k].length; sy /= meta.groups[k].length;
       x.fillStyle = css("--steer"); x.globalAlpha = fade * Math.min(1, hs / 40);
       x.beginPath(); x.arc(sx, sy, 16, 0, 7); x.fill(); x.globalAlpha = 1;
       x.strokeStyle = css("--steer"); x.lineWidth = 3; x.beginPath(); x.arc(sx, sy, 16, 0, 7); x.stroke();
-      x.fillStyle = ink; x.fillText(lab, sx, sy + 40);
+      x.fillStyle = ink; x.fillText(lab, sx, sy + 42);
     }
-    $("active").textContent = `${na.toLocaleString()} / ${meta.n_full.toLocaleString()} neurons spiked`;
+    $("active").textContent = `${na.toLocaleString()}개 발화 / 전체 ${meta.n_full.toLocaleString()}개`;
   }
   function drawSelected() {
     const f = flies[selected]; if (!f) return;
-    drawSnake($("arena"), f.st, true);
-    $("selName").textContent = `${f.learn ? "학습" : "본능"} #${f.pair + 1} · Arena 12×12`;
-    if (f.st) $("selScore").textContent = `게임 ${f.st.game} · 먹이 ${f.st.score}`;
+    drawSnake($("arena"), f.st, gcol(f.g.key), true);
+    $("selName").textContent = `${f.g.name} ${f.pair + 1} · 게임판 12×12`;
+    if (f.st) $("selScore").textContent = `${f.st.game}판째 · 먹이 ${f.st.score}`;
     const m = lastDetail && lastDetail.m;
     if (m) {
       const R = 150;
@@ -550,62 +662,68 @@ self.onmessage = (e) => {
       setBar("dL", m.senses.danger_left * R, 160); setBar("dR", m.senses.danger_right * R, 160);
       setBar("sL", m.L, 300); setBar("sR", m.R, 300);
       const word = ["왼쪽으로 꺾음", "직진", "오른쪽으로 꺾음"][m.turn + 1];
-      const out = m.res === "eat" ? " → 먹이!" : m.res === "crash" ? " → 충돌" : "";
-      $("decision").textContent = `뇌의 결정: ${word}${out}  (조향 L ${Math.round(m.L)} Hz / R ${Math.round(m.R)} Hz)`;
+      const out = m.res === "eat" ? " → 먹이를 먹음" : m.res === "crash" ? " → 부딪힘" : "";
+      $("decision").textContent = `뇌의 결정: ${word}${out}`;
     }
     drawBrain();
   }
 
   const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
   function summary() {
-    for (const [learn, el, sub] of [[false, "gI", "gIs"], [true, "gL", "gLs"]]) {
-      const r = results.filter((q) => q.learn === learn);
-      $(el).textContent = r.length ? mean(r.map((q) => q.score)).toFixed(2) : "–";
-      $(sub).textContent = r.length ? `한 판 평균 먹이 · ${r.length}판 · 평균 ${mean(r.map((q) => q.moves)).toFixed(0)}수 생존` : "한 판 평균 먹이 · 아직 끝난 판 없음";
+    for (const g of GROUPS) {
+      const r = results.filter((q) => q.g === g.key);
+      $("b-" + g.key).textContent = r.length ? mean(r.map((q) => q.score)).toFixed(2) : "–";
+      $("s-" + g.key).textContent = r.length ? `한 판 평균 먹이 · ${r.length}판 · 평균 ${mean(r.map((q) => q.moves)).toFixed(0)}수 생존` : "한 판 평균 먹이 · 아직 끝난 판 없음";
+      const early = r.filter((q) => q.game <= 5), maxG = Math.max(0, ...r.map((q) => q.game));
+      const late = r.filter((q) => q.game > Math.max(5, maxG - 5));
+      $("t-" + g.key).textContent = early.length && late.length ? `1–5판 ${mean(early.map((q) => q.score)).toFixed(2)} → 최근 5판 ${mean(late.map((q) => q.score)).toFixed(2)}` : "";
     }
     $("games").textContent = `${results.length}판 끝남`;
   }
   function drawChart() {
-    const c = $("chart"), x = c.getContext("2d"), W = c.width, H = c.height, L = 40, B = 30, T = 10;
+    const c = $("chart"), x = c.getContext("2d"), W = c.width, H = c.height, L = 46, B = 34, T = 12;
     x.fillStyle = css("--panel"); x.fillRect(0, 0, W, H);
     const maxG = Math.max(10, ...results.map((r) => r.game));
     const maxS = Math.max(4, ...results.map((r) => r.score));
-    const px = (g) => L + ((g - 0.5) / maxG) * (W - L - 10), py = (s) => H - B - (s / maxS) * (H - B - T);
-    x.strokeStyle = css("--grid"); x.fillStyle = css("--muted"); x.font = "16px " + css("--mono"); x.lineWidth = 1;
-    const step = Math.ceil(maxS / 4);
+    const px = (g) => L + ((g - 0.5) / maxG) * (W - L - 12), py = (s) => H - B - (s / maxS) * (H - B - T);
+    x.strokeStyle = css("--sunk"); x.fillStyle = css("--muted"); x.font = "17px " + css("--mono"); x.lineWidth = 1;
+    const step = Math.ceil(maxS / 5);
     x.textAlign = "right";
-    for (let v = 0; v <= maxS; v += step) { x.beginPath(); x.moveTo(L, py(v)); x.lineTo(W, py(v)); x.stroke(); x.fillText(v, L - 8, py(v) + 5); }
+    for (let v = 0; v <= maxS; v += step) { x.beginPath(); x.moveTo(L, py(v)); x.lineTo(W, py(v)); x.stroke(); x.fillText(v, L - 10, py(v) + 6); }
     x.textAlign = "center";
-    const gs = Math.max(1, Math.ceil(maxG / 8));
-    for (let g = 1; g <= maxG; g += gs) x.fillText(g, px(g), H - 8);
-    for (const learn of [false, true]) {
-      const col = learn ? css("--learn") : css("--instinct");
-      const r = results.filter((q) => q.learn === learn);
-      x.fillStyle = col; x.globalAlpha = 0.35;
-      for (const q of r) { x.beginPath(); x.arc(px(q.game) + (learn ? 4 : -4), py(q.score), 3, 0, 7); x.fill(); }
+    const gs = Math.max(1, Math.ceil(maxG / 10));
+    for (let g = 1; g <= maxG; g += gs) x.fillText(`${g}판`, px(g), H - 8);
+    GROUPS.forEach((G, gi) => {
+      const col = gcol(G.key), r = results.filter((q) => q.g === G.key);
+      x.fillStyle = col; x.globalAlpha = 0.28;
+      const off = (gi - 1) * 4;
+      for (const q of r) { x.beginPath(); x.arc(px(q.game) + off, py(q.score), 3, 0, 7); x.fill(); }
       x.globalAlpha = 1;
       const per = [];
       for (let g = 1; g <= maxG; g++) { const s = r.filter((q) => q.game === g); if (s.length) per.push([g, mean(s.map((q) => q.score))]); }
       if (per.length > 1) {
-        x.strokeStyle = col; x.lineWidth = 3; x.beginPath();
+        x.strokeStyle = col; x.lineWidth = 3.5; x.beginPath();
         per.forEach(([g], i) => {
-          const win = per.slice(Math.max(0, i - 4), i + 1);
-          const y = py(mean(win.map((w) => w[1])));
+          const y = py(mean(per.slice(Math.max(0, i - 4), i + 1).map((w) => w[1])));
           i ? x.lineTo(px(g), y) : x.moveTo(px(g), y);
         });
         x.stroke();
+        const [lg] = per[per.length - 1];
+        x.beginPath(); x.arc(px(lg), py(mean(per.slice(-5).map((w) => w[1]))), 5, 0, 7); x.fillStyle = col; x.fill();
       }
-    }
+    });
+    if (!results.length) { x.fillStyle = css("--muted"); x.textAlign = "center"; x.fillText("판이 끝나면 여기에 점수가 찍힙니다", W / 2, H / 2); }
   }
 
   // ---------- render loop ----------
-  let lastT = performance.now(), lastMoves = 0;
+  let chartDirty = true, lastT = performance.now(), lastMoves = 0;
   function frame(t) {
     for (const f of flies) if (f.dirty) { drawMini(f); f.dirty = false; }
-    if (flies[selected]) drawSelected();
+    drawSelected();
+    if (chartDirty) { summary(); drawChart(); chartDirty = false; }
     if (t - lastT > 1000) {
       const mv = flies.reduce((s, f) => s + f.moves, 0);
-      $("speed").textContent = running ? `${((mv - lastMoves) / ((t - lastT) / 1000)).toFixed(1)} 수/초 전체` : "";
+      $("speed").textContent = running ? `전체 ${((mv - lastMoves) / ((t - lastT) / 1000)).toFixed(1)}수/초 · 한 마리당 ${((mv - lastMoves) / ((t - lastT) / 1000) / Math.max(1, flies.length)).toFixed(2)}수/초` : "";
       lastMoves = mv; lastT = t;
     }
     requestAnimationFrame(frame);
@@ -614,13 +732,14 @@ self.onmessage = (e) => {
 
   $("run").onclick = () => {
     running = !running;
-    $("run").textContent = running ? "일시정지" : "실험 계속";
-    for (const f of flies) f.worker.postMessage(running ? { type: "run", pace: +$("pace").value } : { type: "pause" });
+    $("run").textContent = running ? "일시정지" : "계속";
+    workers.forEach((w) => w.postMessage(running ? { type: "run", pace: +$("pace").value } : { type: "pause" }));
   };
-  $("pace").onchange = () => { for (const f of flies) f.worker.postMessage({ type: "pace", pace: +$("pace").value }); };
-  $("restart").onclick = () => { running = false; $("run").textContent = "실험 시작"; setup(); };
-  $("count").onchange = () => { running = false; $("run").textContent = "실험 시작"; setup(); };
-  const redraw = () => { bgImg = null; flies.forEach(drawMini); drawSelected(); drawChart(); };
+  $("pace").onchange = () => workers.forEach((w) => w.postMessage({ type: "pace", pace: +$("pace").value }));
+  $("restart").onclick = setup;
+  $("per").onchange = setup;
+  $("threads").onchange = setup;
+  const redraw = () => { bgImg = null; flies.forEach(drawMini); chartDirty = true; };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
   new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   setup();

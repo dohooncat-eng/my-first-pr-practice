@@ -21,28 +21,38 @@
     };
   }
 
+  // Decode the network once per data object: CSR connectivity, groups, plastic synapse list.
+  function decode(data) {
+    const d = { n: data.n };
+    d.indptr = b64(data.indptr, Int32Array);
+    d.post = b64(data.post, Uint16Array);
+    d.syn = b64(data.syn, Int16Array);           // signed synapse counts
+    d.groups = {};
+    for (const k in data.groups) d.groups[k] = Uint16Array.from(data.groups[k]);
+    d.w0 = new Float32Array(d.syn.length);
+    for (let k = 0; k < d.w0.length; k++) d.w0[k] = d.syn[k] * W_SYN;
+    // plastic synapses: excitatory inputs onto the steering neurons
+    d.side = new Uint8Array(d.n); // 1 = left steering neuron, 2 = right
+    for (const i of d.groups.steer_left) d.side[i] = 1;
+    for (const i of d.groups.steer_right) d.side[i] = 2;
+    const pk = [], pre = [];
+    for (let j = 0; j < d.n; j++)
+      for (let k = d.indptr[j]; k < d.indptr[j + 1]; k++)
+        if (d.side[d.post[k]] && d.syn[k] > 0) { pk.push(k); pre.push(j); }
+    d.plastic = Int32Array.from(pk);
+    d.plasticPre = Int32Array.from(pre);
+    return d;
+  }
+
   class Brain {
-    constructor(data, seed = 1, dt = 0.1) {
-      this.n = data.n;
-      this.indptr = b64(data.indptr, Int32Array);
-      this.post = b64(data.post, Uint16Array);
-      this.syn = b64(data.syn, Int16Array);           // signed synapse counts
-      this.groups = {};
-      for (const k in data.groups) this.groups[k] = Uint16Array.from(data.groups[k]);
-      this.w = new Float32Array(this.syn.length);
-      for (let k = 0; k < this.w.length; k++) this.w[k] = this.syn[k] * W_SYN;
-      this.w0 = this.w.slice();
-      // plastic synapses: excitatory inputs onto the steering neurons
-      const steer = new Uint8Array(this.n);
-      for (const i of this.groups.steer_left) steer[i] = 1;
-      for (const i of this.groups.steer_right) steer[i] = 1;
-      const pk = [], pre = [];
-      for (let j = 0; j < this.n; j++)
-        for (let k = this.indptr[j]; k < this.indptr[j + 1]; k++)
-          if (steer[this.post[k]] && this.syn[k] > 0) { pk.push(k); pre.push(j); }
-      this.plastic = Int32Array.from(pk);
-      this.plasticPre = Int32Array.from(pre);
-      this.elig = new Float32Array(pk.length);
+    // ownWeights=false shares the (never modified) weights with other brains built from the
+    // same data object, so many instinct-only flies in one worker cost almost no memory.
+    constructor(data, seed = 1, dt = 0.1, ownWeights = true) {
+      if (!data._shared) data._shared = decode(data);
+      Object.assign(this, data._shared);
+      this.w = ownWeights ? this.w0.slice() : this.w0;
+      this.elig = new Float32Array(this.plastic.length);
+      this.baseline = 0;
       this.dt = dt;
       this.dv = Math.exp(-dt / T_MBR);
       this.dg = Math.exp(-dt / TAU);
@@ -62,7 +72,7 @@
       this.pending = Array.from({ length: this.nDly }, () => []);
       this.t = 0;
     }
-    resetLearning() { this.w.set(this.w0); this.elig.fill(0); }
+    resetLearning() { if (this.w !== this.w0) this.w.set(this.w0); this.elig.fill(0); this.baseline = 0; }
     // stim: array of [rateHz, Uint16Array indices]
     run(ms, stim) {
       const { n, v, g, rfc, indptr, post, w, count, isStim } = this;
@@ -108,6 +118,20 @@
       for (let m = 0; m < plastic.length; m++) {
         const k = plastic[m];
         w[k] = Math.min(4 * w0[k], Math.max(0, w[k] + lr * r * elig[m] * W_SYN));
+      }
+    }
+    updateEligibilityRPE(decay, m) {
+      const { plastic, plasticPre, post, count, elig, side } = this;
+      const gL = (m.turn === -1 ? 1 : 0) - m.pL, gR = (m.turn === 1 ? 1 : 0) - m.pR;
+      for (let q = 0; q < plastic.length; q++) {
+        elig[q] = elig[q] * decay + count[plasticPre[q]] * (side[post[plastic[q]]] === 1 ? gL : gR);
+      }
+    }
+    rewardRPE(delta, lr) {
+      const { plastic, elig, w, w0 } = this;
+      for (let q = 0; q < plastic.length; q++) {
+        const k = plastic[q];
+        w[k] = Math.min(4 * w0[k], Math.max(0, w[k] + lr * delta * elig[q] * W_SYN));
       }
     }
     weightChange() {
@@ -178,7 +202,10 @@
   const CFG = { STEP_MS: 200, READ_MS: 120, MAX_RATE: 150, TURN_THRESHOLD: 20 };
 
   // One snake move: senses -> brain -> turn. Returns everything the UI shows.
-  function brainMove(brain, snake) {
+  // stochastic=true: the turn is sampled from the steering difference (behavioural variability),
+  // used by the reward-prediction-error rule so it can try alternatives and learn from them.
+  const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+  function brainMove(brain, snake, stochastic = false) {
     const s = snake.senses();
     const stim = [];
     for (const k of ["food_left", "food_right", "danger_left", "danger_right"])
@@ -189,20 +216,42 @@
     brain.run(CFG.READ_MS, stim);
     const hz = (ix) => { let c = 0; for (const i of ix) c += brain.count[i] - early[i]; return c / (CFG.READ_MS / 1000); };
     const L = hz(brain.groups.steer_left), R = hz(brain.groups.steer_right);
-    const turn = R - L > CFG.TURN_THRESHOLD ? 1 : L - R > CFG.TURN_THRESHOLD ? -1 : 0;
-    return { senses: s, L, R, turn };
+    let turn, pL, pR;
+    if (stochastic) {
+      pL = sigmoid((L - R - CFG.TURN_THRESHOLD) / LEARN.TEMP);
+      pR = sigmoid((R - L - CFG.TURN_THRESHOLD) / LEARN.TEMP);
+      const u = brain.rand();
+      turn = u < pL ? -1 : u < pL + pR ? 1 : 0;
+    } else {
+      turn = R - L > CFG.TURN_THRESHOLD ? 1 : L - R > CFG.TURN_THRESHOLD ? -1 : 0;
+      pL = turn === -1 ? 1 : 0; pR = turn === 1 ? 1 : 0;
+    }
+    return { senses: s, L, R, turn, pL, pR };
   }
 
-  // brainMove + the outcome + (optionally) the reward update. Same rule everywhere.
-  const LEARN = { LR: 0.6, ELIG_DECAY: 0.5, R_EAT: 1, R_CRASH: -1, R_CLOSER: 0.1, R_FARTHER: -0.1 };
+  // Learning rules (learn = "off" | "hebb" | "rpe"):
+  //  hebb: eligibility = pre x post spikes, weight change = reward x eligibility (first version)
+  //  rpe:  dopamine-like reward prediction error (reward - running average) times
+  //        pre spikes x (chosen side - probability of choosing it), so a crash after turning
+  //        left weakens exactly the inputs that pushed it left in that situation.
+  const LEARN = { LR: 0.6, ELIG_DECAY: 0.5, R_EAT: 1, R_CRASH: -1, R_CLOSER: 0.1, R_FARTHER: -0.1,
+    RPE_LR: 0.6, RPE_DECAY: 0.6, R_ALIVE: 0.02, BASELINE: 0.05, TEMP: 6 };
   function playMove(brain, snake, learn) {
-    const m = brainMove(brain, snake);
-    if (learn) brain.updateEligibility(LEARN.ELIG_DECAY);
+    if (learn === true) learn = "hebb";
+    if (!learn) learn = "off";
+    const m = brainMove(brain, snake, learn === "rpe");
+    if (learn === "hebb") brain.updateEligibility(LEARN.ELIG_DECAY);
+    if (learn === "rpe") brain.updateEligibilityRPE(LEARN.RPE_DECAY, m);
     const d0 = snake.foodDist();
     m.res = snake.step(m.turn);
     m.reward = m.res === "eat" ? LEARN.R_EAT : m.res === "crash" ? LEARN.R_CRASH
       : snake.foodDist() < d0 ? LEARN.R_CLOSER : LEARN.R_FARTHER;
-    if (learn) brain.reward(m.reward, LEARN.LR);
+    if (learn === "hebb") brain.reward(m.reward, LEARN.LR);
+    if (learn === "rpe") {
+      const r = m.reward + (m.res === "move" ? LEARN.R_ALIVE : 0);
+      brain.rewardRPE(r - brain.baseline, LEARN.RPE_LR);
+      brain.baseline += LEARN.BASELINE * (r - brain.baseline);
+    }
     return m;
   }
 
