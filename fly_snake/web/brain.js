@@ -193,6 +193,19 @@
     return { senses: s, L, R, turn };
   }
 
-  const api = { Brain, Snake, brainMove, mulberry32, CFG };
+  // brainMove + the outcome + (optionally) the reward update. Same rule everywhere.
+  const LEARN = { LR: 0.6, ELIG_DECAY: 0.5, R_EAT: 1, R_CRASH: -1, R_CLOSER: 0.1, R_FARTHER: -0.1 };
+  function playMove(brain, snake, learn) {
+    const m = brainMove(brain, snake);
+    if (learn) brain.updateEligibility(LEARN.ELIG_DECAY);
+    const d0 = snake.foodDist();
+    m.res = snake.step(m.turn);
+    m.reward = m.res === "eat" ? LEARN.R_EAT : m.res === "crash" ? LEARN.R_CRASH
+      : snake.foodDist() < d0 ? LEARN.R_CLOSER : LEARN.R_FARTHER;
+    if (learn) brain.reward(m.reward, LEARN.LR);
+    return m;
+  }
+
+  const api = { Brain, Snake, brainMove, playMove, mulberry32, CFG, LEARN };
   if (typeof module !== "undefined") module.exports = api; else root.FlyBrain = api;
 })(this);
