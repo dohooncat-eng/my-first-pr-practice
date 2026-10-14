@@ -1,7 +1,9 @@
 // Parallel learning batch:
-//   node tools/batch.js <seeds> <games> [threads] [modes=off,hebb,rpe] [KEY=value ...]
+//   node tools/batch.js <seeds> <games> [threads] [modes=off,hebb,rpe] [KEY=value ...] [--save=dir] [--load=file]
 // Every seed is played once per learning mode with the same snake RNG, one job per worker thread.
 // KEY=value overrides LEARN constants in web/brain.js, e.g. RPE_LR=0.05.
+// --save=dir writes each learner's synapses to dir/<mode>_seed<N>.json; --load=file starts learners from one,
+// so training can continue across runs (the page can load the same files).
 const { Worker, isMainThread, parentPort, workerData } = require("worker_threads");
 const fs = require("fs");
 const os = require("os");
@@ -23,9 +25,13 @@ if (isMainThread) {
   const seeds = +(process.argv[2] || 8), games = +(process.argv[3] || 50);
   const threads = +(process.argv[4] || os.cpus().length);
   const modes = (process.argv[5] || "off,hebb,rpe").split(",");
-  const overrides = Object.fromEntries(process.argv.slice(6).map((a) => a.split("=")).map(([k, v]) => [k, +v]));
+  const extra = process.argv.slice(6);
+  const flag = (name) => (extra.find((a) => a.startsWith(`--${name}=`)) || "").split("=").slice(1).join("=") || null;
+  const overrides = Object.fromEntries(extra.filter((a) => !a.startsWith("--")).map((a) => a.split("=")).map(([k, v]) => [k, +v]));
+  const save = flag("save"), load = flag("load");
+  if (save) fs.mkdirSync(save, { recursive: true });
   const jobs = [];
-  for (let s = 1; s <= seeds; s++) for (const learn of modes) jobs.push({ seed: s, learn, games, overrides });
+  for (let s = 1; s <= seeds; s++) for (const learn of modes) jobs.push({ seed: s, learn, games, overrides, save, load });
   const results = [];
   let next = 0, running = 0;
   const t0 = Date.now();
@@ -70,15 +76,20 @@ if (isMainThread) {
   launch();
 } else {
   const { Brain, Snake, playMove, mulberry32, LEARN } = require("../web/brain.js");
-  const { seed, learn, games, overrides } = workerData;
+  const { seed, learn, games, overrides, save, load } = workerData;
   Object.assign(LEARN, overrides);
   const net = loadNet();
   const brain = new Brain(net, seed), rand = mulberry32(seed + 100);
+  if (load && learn !== "off") brain.importLearning(JSON.parse(fs.readFileSync(load)));
   const scores = [], moves = [];
   for (let g = 0; g < games; g++) {
     const s = new Snake(12, rand); brain.reset(); brain.elig.fill(0);
     while (s.alive && s.moves < 300) playMove(brain, s, learn);
     scores.push(s.score); moves.push(s.moves);
+  }
+  if (save && learn !== "off") {
+    const out = Object.assign(brain.exportLearning(), { mode: learn, seed, games, recentMean: mean(scores.slice(-20)) });
+    fs.writeFileSync(path.join(save, `${learn}_seed${seed}.json`), JSON.stringify(out));
   }
   parentPort.postMessage({ seed, learn, scores, moves, weight: brain.weightChange() });
 }

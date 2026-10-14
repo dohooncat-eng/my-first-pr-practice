@@ -32,6 +32,15 @@ node tools/batch.js 16 60 16 off,rpe RPE_LR=0.3 TEMP=8   # 그룹과 학습 값 
 ```
 결과는 `tools/batch_results.json`에도 저장됩니다.
 
+### 3. 배운 뇌를 저장하고 이어서 학습하기
+학습한 시냅스는 저장해 두었다가 다음 실행에서 이어서 학습할 수 있습니다.
+```bash
+node tools/batch.js 16 200 16 rpe --save=brains            # 16마리 × 200판 학습, brains/rpe_seed1.json … 저장
+node tools/batch.js 16 200 16 rpe --load=brains/rpe_seed3.json --save=brains2   # 가장 잘한 뇌에서 다시 출발
+```
+각 파일의 `recentMean`이 마지막 20판 평균 먹이입니다. 브라우저 화면의 **파일에서 불러오기**로 같은 파일을 열면
+학습 그룹이 그 뇌에서 출발하는 모습을 볼 수 있습니다. 화면의 **가장 잘 배운 뇌 저장**은 브라우저 안에 저장합니다.
+
 ## 브라우저 실험 화면 (`web/fly_snake.html`)
 전체 뇌로 게임을 돌리며 한 번이라도 발화한 뉴런 14,055개와 그 사이 연결 143만 쌍을 브라우저로 옮겼습니다.
 발화하지 않는 뉴런은 다른 뉴런에 영향을 주지 않으므로 이 부분 회로는 게임 중 전체 뇌와 같은 계산을 합니다

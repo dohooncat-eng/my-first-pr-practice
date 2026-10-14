@@ -134,6 +134,17 @@
         w[k] = Math.min(4 * w0[k], Math.max(0, w[k] + lr * delta * elig[q] * W_SYN));
       }
     }
+    // learned state = the plastic weights (+ the reward baseline), so learning can be saved and continued
+    exportLearning() {
+      return { plastic: this.plastic.length, baseline: this.baseline,
+        w: Array.from(this.plastic, (k) => +this.w[k].toFixed(5)) };
+    }
+    importLearning(saved) {
+      if (!saved || saved.plastic !== this.plastic.length) throw new Error("저장된 뇌가 이 네트워크와 맞지 않습니다");
+      if (this.w === this.w0) this.w = this.w0.slice();
+      this.plastic.forEach((k, q) => { this.w[k] = saved.w[q]; });
+      this.baseline = saved.baseline || 0;
+    }
     weightChange() {
       let s = 0, s0 = 0;
       for (const k of this.plastic) { s += this.w[k]; s0 += this.w0[k]; }

@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>초파리 뇌 스네이크</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,6 +46,13 @@ button:disabled { opacity: 0.45; cursor: default; }
 button:focus-visible, select:focus-visible, .fly:focus-visible { outline: 2px solid var(--steer); outline-offset: 2px; }
 .btns { display: flex; gap: 10px; flex-wrap: wrap; }
 #status { font-family: var(--mono); font-size: 0.82rem; color: var(--muted); }
+.saved { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.check { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--g-rpe); }
+.filebtn { font-weight: 600; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; display: inline-flex; align-items: center; min-height: 42px; }
+.filebtn:focus-within { outline: 2px solid var(--steer); outline-offset: 2px; }
+.filebtn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+code { font-family: var(--mono); font-size: 0.85em; }
 
 /* scoreboard */
 .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -116,6 +124,16 @@ dl.gloss dd { margin: 0; color: var(--muted); }
       <div class="btns"><button id="run" class="primary" type="button" disabled>실험 시작</button><button id="restart" type="button" disabled>새 실험</button></div>
     </div>
     <span id="status">뇌 불러오는 중…</span>
+    <div class="saved">
+      <div class="phead"><h2 style="font-size:0.95rem">배운 뇌 이어서 학습하기</h2>
+        <p class="help">학습은 판이 끝나도 이어지지만, 페이지를 닫으면 사라집니다. <b>가장 잘 배운 뇌 저장</b>을 누르면 그룹마다 최근 10판 성적이 가장 좋은 초파리의 시냅스를 이 브라우저에 저장합니다. 다음 실험에서 <b>저장한 뇌로 시작</b>을 켜면 학습 그룹 전원이 그 시냅스에서 출발합니다. <code>node tools/batch.js … --save=폴더</code>로 만든 파일도 불러올 수 있습니다.</p></div>
+      <div class="btns">
+        <button id="saveBest" type="button" disabled>가장 잘 배운 뇌 저장</button>
+        <label class="check" for="useSaved"><input id="useSaved" type="checkbox"> 저장한 뇌로 시작</label>
+        <label class="filebtn" for="loadFile">파일에서 불러오기<input id="loadFile" type="file" accept=".json,application/json"></label>
+      </div>
+      <span id="savedInfo" class="help"></span>
+    </div>
   </section>
 
   <!-- 2. results -->
@@ -228,6 +246,7 @@ self.onmessage = (e) => {
     net = JSON.parse(d.net);
     for (const s of d.flies) {
       const f = { id: s.id, learn: s.learn, game: 1, brain: new Brain(net, s.seed, 0.1, s.learn !== "off"), rand: mulberry32(s.foodSeed) };
+      if (s.start) f.brain.importLearning(s.start);
       newGame(f); flies.push(f);
       self.postMessage(Object.assign(snap(f, null), { type: "ready" }));
     }
@@ -235,6 +254,10 @@ self.onmessage = (e) => {
   else if (d.type === "pause") running = false;
   else if (d.type === "pace") pace = d.pace;
   else if (d.type === "detail") detailId = d.id;
+  else if (d.type === "export") {
+    const f = flies.find((q) => q.id === d.id);
+    self.postMessage({ type: "learning", id: d.id, data: Object.assign(f.brain.exportLearning(), { mode: f.learn }) });
+  }
 };
 </script>
 <script>
@@ -281,7 +304,8 @@ self.onmessage = (e) => {
       const f = { id, g, pair: p, card, st: null, moves: 0, dirty: false, w: id % nW };
       flies.push(f);
       // same food sequence for the three flies of one pair, so groups face the same games
-      assign[f.w].push({ id, learn: g.key, seed: 1000 + id, foodSeed: 77 + p });
+      const start = g.key !== "off" && $("useSaved").checked ? savedBrains[g.key] : null;
+      assign[f.w].push({ id, learn: g.key, seed: 1000 + id, foodSeed: 77 + p, start });
     }
     let ready = 0;
     $("run").disabled = true; $("restart").disabled = true;
@@ -299,13 +323,19 @@ self.onmessage = (e) => {
       if (d.type === "ready") {
         f.st = d; f.dirty = true;
         if (++ready === flies.length) {
-          $("run").disabled = false; $("restart").disabled = false;
+          $("run").disabled = false; $("restart").disabled = false; $("saveBest").disabled = false;
           $("status").textContent = `준비됨 · 초파리 ${total}마리 · 스레드 ${nW}개 · 한 마리당 뉴런 ${meta.n.toLocaleString()}개`;
         }
       } else if (d.type === "move") {
         f.st = d; f.moves++; f.dirty = true;
         if (d.counts && d.id === selected) { heat = d.counts; heatT = performance.now(); heatMs = Math.max(250, d.ms * 2); lastDetail = d; }
+      } else if (d.type === "learning") {
+        const key = d.data.mode, recent = f.recent ? f.recent.slice(-10) : [];
+        d.data.recentMean = recent.length ? mean(recent) : null;
+        d.data.savedAt = new Date().toISOString();
+        savedBrains[key] = d.data; persist(); showSaved();
       } else if (d.type === "game") {
+        (f.recent = f.recent || []).push(d.score);
         results.push({ g: f.g.key, game: d.game, score: d.score, moves: d.moves });
         const li = document.createElement("li"); li.className = f.g.cls;
         li.textContent = `${f.g.name} ${String(f.pair + 1).padStart(2)} · ${String(d.game).padStart(3)}판 · 먹이 ${String(d.score).padStart(2)} · ${String(d.moves).padStart(3)}수` + (f.g.key === "off" ? "" : ` · 시냅스 ${(d.weight * 100).toFixed(0)}%`);
@@ -315,6 +345,41 @@ self.onmessage = (e) => {
     }
     chartDirty = true;
   }
+
+  // ---------- saved brains (localStorage + files from tools/batch.js --save) ----------
+  let savedBrains = {};
+  try { savedBrains = JSON.parse(localStorage.getItem("flysnake.brains") || "{}"); } catch (e) { savedBrains = {}; }
+  function persist() { try { localStorage.setItem("flysnake.brains", JSON.stringify(savedBrains)); } catch (e) { /* storage blocked: keep in memory */ } }
+  function showSaved() {
+    const parts = ["hebb", "rpe"].filter((k) => savedBrains[k]).map((k) => {
+      const b = savedBrains[k], name = GROUPS.find((g) => g.key === k).name;
+      const perf = b.recentMean != null ? ` · 저장 당시 최근 평균 먹이 ${(+b.recentMean).toFixed(2)}` : "";
+      return `${name}: 저장됨${perf}`;
+    });
+    $("savedInfo").textContent = parts.length ? parts.join("   ·   ") : "저장한 뇌가 아직 없습니다.";
+  }
+  showSaved();
+  $("saveBest").onclick = () => {
+    for (const key of ["hebb", "rpe"]) {
+      const cands = flies.filter((f) => f.g.key === key && f.recent && f.recent.length);
+      if (!cands.length) continue;
+      const best = cands.reduce((a, b) => (mean(a.recent.slice(-10)) >= mean(b.recent.slice(-10)) ? a : b));
+      workers[best.w].postMessage({ type: "export", id: best.id });
+    }
+    if (!flies.some((f) => f.g.key !== "off" && f.recent && f.recent.length)) $("savedInfo").textContent = "학습 그룹에서 끝난 판이 생기면 저장할 수 있습니다.";
+  };
+  $("loadFile").onchange = async () => {
+    const file = $("loadFile").files[0]; if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      if (data.plastic !== meta.plastic && meta.plastic !== undefined) throw new Error("다른 네트워크용 파일입니다");
+      const key = data.mode === "hebb" ? "hebb" : "rpe";
+      savedBrains[key] = data; persist(); showSaved();
+      $("useSaved").checked = true;
+      $("savedInfo").textContent += "  ·  불러옴. 새 실험을 누르면 적용됩니다.";
+    } catch (e) { $("savedInfo").textContent = `불러오지 못했습니다: ${e.message}. tools/batch.js --save로 만든 .json 파일을 고르세요.`; }
+    $("loadFile").value = "";
+  };
 
   function select(id) {
     flies[selected].card.setAttribute("aria-pressed", "false");
@@ -479,6 +544,7 @@ self.onmessage = (e) => {
   $("restart").onclick = setup;
   $("per").onchange = setup;
   $("threads").onchange = setup;
+  $("useSaved").onchange = setup;
   const redraw = () => { bgImg = null; flies.forEach(drawMini); chartDirty = true; };
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw);
   new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
