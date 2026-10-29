@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="iheali-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#e0445a" stop-opacity="0.3"/>
+    <stop offset="0.55" stop-color="#e0445a" stop-opacity="0.135"/>
+    <stop offset="1" stop-color="#e0445a" stop-opacity="0"/>
+  </radialGradient>
+    
+    <linearGradient id="iheali-leaf" x1="24" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b9ec8e"/>
+      <stop offset="0.45" stop-color="#6cbc5e"/>
+      <stop offset="1" stop-color="#2f6b45"/>
+    </linearGradient>
+    
+    <linearGradient id="iheali-leafd" x1="24" y1="8" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b9ec8e"/>
+      <stop offset="0.45" stop-color="#4e9a52"/>
+      <stop offset="1" stop-color="#1f4f35"/>
+    </linearGradient>
+    <radialGradient id="iheali-berry" cx="0.35" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#ffb3b3"/>
+      <stop offset="0.4" stop-color="#ff5e6e"/>
+      <stop offset="0.8" stop-color="#e0445a"/>
+      <stop offset="1" stop-color="#8a1f33"/>
+    </radialGradient>
+    <linearGradient id="iheali-twine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ead09a"/>
+      <stop offset="1" stop-color="#a87c45"/>
+    </linearGradient></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#iheali-back)"/>
+  <g transform="translate(32 32) scale(1.04) translate(-32 -32)">
+    <g stroke="#0a1110" stroke-width="3" stroke-linecap="round">
+      <path d="M32 44 L27 58 M32 44 L32 59 M32 44 L37 58" fill="none"/>
+    </g>
+    <g stroke="#7aa448" stroke-width="1.7999999999999998" stroke-linecap="round">
+      <path d="M32 44 L27 58 M32 44 L32 59 M32 44 L37 58" fill="none"/>
+    </g>
+    <g transform="rotate(-38 32 43)">
+      <path d="M32 41 C23.5 31 23 17 32 5 C41 17 40.5 31 32 41 Z" fill="url(#iheali-leafd)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M32 39 L32 11" stroke="#1f4f35" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    <g transform="rotate(38 32 43)">
+      <path d="M32 41 C23.5 31 23 17 32 5 C41 17 40.5 31 32 41 Z" fill="url(#iheali-leafd)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M32 39 L32 11" stroke="#1f4f35" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    <g transform="translate(0 -1)">
+      <path d="M32 41 C23.5 31 23 17 32 5 C41 17 40.5 31 32 41 Z" fill="url(#iheali-leaf)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M32 39 L32 10" stroke="#2f6b45" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>
+      <path d="M29.2 30 C27.6 23 28 16 30.6 10.4" fill="none" stroke="#e6ffd0" stroke-width="1.5" stroke-linecap="round" opacity="0.75"/>
+    </g>
+    
+    <circle cx="23.5" cy="37" r="5.4" fill="url(#iheali-berry)" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+    <circle cx="21.61" cy="34.948" r="1.5120000000000002" fill="#ffffff" opacity="0.9"/>
+    
+    <circle cx="40.5" cy="36" r="5.4" fill="url(#iheali-berry)" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+    <circle cx="38.61" cy="33.948" r="1.5120000000000002" fill="#ffffff" opacity="0.9"/>
+    
+    <circle cx="32" cy="41.5" r="5.8" fill="url(#iheali-berry)" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+    <circle cx="29.97" cy="39.296" r="1.624" fill="#ffffff" opacity="0.9"/>
+    <rect x="25.5" y="44.5" width="13" height="5.4" rx="2.4" fill="url(#iheali-twine)" stroke="#0a1110" stroke-width="2.25"/>
+    <path d="M28.5 45 L30.5 50 M33.5 45 L35.5 50" stroke="#7a5426" stroke-width="1" opacity="0.8"/></g>
+</svg>

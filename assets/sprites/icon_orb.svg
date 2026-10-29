@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="iorb-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#c8f05a" stop-opacity="0.22"/>
+    <stop offset="0.55" stop-color="#c8f05a" stop-opacity="0.099"/>
+    <stop offset="1" stop-color="#c8f05a" stop-opacity="0"/>
+  </radialGradient>
+    <radialGradient id="iorb-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fbffd0" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#e2ff80" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#c8f05a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="iorb-ball" cx="0.38" cy="0.36" r="0.72">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#f4ffa8"/>
+      <stop offset="0.75" stop-color="#c2ec4e"/>
+      <stop offset="1" stop-color="#6f9e26"/>
+    </radialGradient>
+    <radialGradient id="iorb-core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fffdf0"/>
+      <stop offset="0.4" stop-color="#ffb547" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+    </radialGradient></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#iorb-back)"/>
+  
+    <circle cx="32" cy="32" r="18.5" fill="none" stroke="#d8ff7a" stroke-width="1.2" opacity="0.18"/>
+    <path d="M14.62 25.67 A18.5 18.5 0 0 1 29.43 13.68" fill="none" stroke="#d8ff7a" stroke-width="2" stroke-linecap="round" opacity="0.3"/><path d="M18.69 19.15 A18.5 18.5 0 0 1 29.43 13.68" fill="none" stroke="#e6ff94" stroke-width="3.6" stroke-linecap="round" opacity="0.45"/><path d="M25.07 14.85 A18.5 18.5 0 0 1 30.07 13.60" fill="none" stroke="#f4ffc0" stroke-width="5.2" stroke-linecap="round" opacity="0.6"/><path d="M46.17 20.11 A18.5 18.5 0 0 1 49.15 38.93" fill="none" stroke="#d8ff7a" stroke-width="2" stroke-linecap="round" opacity="0.3"/><path d="M49.78 26.90 A18.5 18.5 0 0 1 49.15 38.93" fill="none" stroke="#e6ff94" stroke-width="3.6" stroke-linecap="round" opacity="0.45"/><path d="M50.32 34.57 A18.5 18.5 0 0 1 48.90 39.52" fill="none" stroke="#f4ffc0" stroke-width="5.2" stroke-linecap="round" opacity="0.6"/><path d="M35.21 50.22 A18.5 18.5 0 0 1 17.42 43.39" fill="none" stroke="#d8ff7a" stroke-width="2" stroke-linecap="round" opacity="0.3"/><path d="M27.52 49.95 A18.5 18.5 0 0 1 17.42 43.39" fill="none" stroke="#e6ff94" stroke-width="3.6" stroke-linecap="round" opacity="0.45"/><path d="M20.61 46.58 A18.5 18.5 0 0 1 17.03 42.87" fill="none" stroke="#f4ffc0" stroke-width="5.2" stroke-linecap="round" opacity="0.6"/>
+    <circle cx="32" cy="32" r="8" fill="url(#iorb-core)"/>
+    <circle cx="32" cy="32" r="2.6" fill="#fffdf0"/>
+    
+      <circle cx="32.00" cy="13.50" r="11.5" fill="url(#iorb-halo)"/>
+      <circle cx="32.00" cy="13.50" r="6.4" fill="url(#iorb-ball)" stroke="#0a1110" stroke-width="2.4"/>
+      <ellipse cx="30.20" cy="11.50" rx="2" ry="1.5" fill="#ffffff"/>
+      <circle cx="48.02" cy="41.25" r="11.5" fill="url(#iorb-halo)"/>
+      <circle cx="48.02" cy="41.25" r="6.4" fill="url(#iorb-ball)" stroke="#0a1110" stroke-width="2.4"/>
+      <ellipse cx="46.22" cy="39.25" rx="2" ry="1.5" fill="#ffffff"/>
+      <circle cx="15.98" cy="41.25" r="11.5" fill="url(#iorb-halo)"/>
+      <circle cx="15.98" cy="41.25" r="6.4" fill="url(#iorb-ball)" stroke="#0a1110" stroke-width="2.4"/>
+      <ellipse cx="14.18" cy="39.25" rx="2" ry="1.5" fill="#ffffff"/>
+</svg>

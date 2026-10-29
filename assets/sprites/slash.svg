@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+<defs>
+    <radialGradient id="slash-fill" cx="128" cy="128" r="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0.7" stop-color="#7fd4ff" stop-opacity="0"/>
+      <stop offset="0.8" stop-color="#7fd4ff" stop-opacity="0.55"/>
+      <stop offset="0.9" stop-color="#cdeeff" stop-opacity="0.95"/>
+      <stop offset="0.97" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </radialGradient>
+    <linearGradient id="slash-fade" x1="0" y1="26" x2="0" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.26" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="0.74" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <mask id="slash-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="256" height="256">
+      <rect x="0" y="0" width="256" height="256" fill="url(#slash-fade)"/>
+    </mask>
+    <filter id="slash-wide" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="slash-glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="slash-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.6"/></filter>
+  </defs>
+  <g mask="url(#slash-mask)">
+    <path d="M184 31 A112 112 0 0 1 184 225 A208 208 0 0 0 184 31 Z" fill="#7fd4ff" opacity="0.45" filter="url(#slash-wide)"/>
+    <path d="M184 31 A112 112 0 0 1 184 225 A208 208 0 0 0 184 31 Z" fill="#bfe9ff" opacity="0.7" filter="url(#slash-glow)"/>
+    <path d="M184 31 A112 112 0 0 1 184 225 A208 208 0 0 0 184 31 Z" fill="url(#slash-fill)"/>
+    <path d="M184 31 A112 112 0 0 1 184 225 A150 150 0 0 0 184 31 Z" fill="#ffffff" opacity="0.6" filter="url(#slash-soft)"/>
+    <path d="M181 35 A107 107 0 0 1 181 221" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M196 74 A80 80 0 0 1 196 182" fill="none" stroke="#dff4ff" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+  </g>
+  <g fill="#ffffff">
+    <path d="M236 100 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2 z"/>
+    <path d="M226 170 l1.5 4.5 l4.5 1.5 l-4.5 1.5 l-1.5 4.5 l-1.5 -4.5 l-4.5 -1.5 l4.5 -1.5 z" opacity="0.85"/>
+    <circle cx="245" cy="138" r="1.8"/>
+    <circle cx="214" cy="66" r="1.5" fill="#7fd4ff"/>
+  </g>
+</svg>

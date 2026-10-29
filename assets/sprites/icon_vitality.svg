@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ivit-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#e0445a" stop-opacity="0.28"/>
+    <stop offset="0.55" stop-color="#e0445a" stop-opacity="0.12600000000000003"/>
+    <stop offset="1" stop-color="#e0445a" stop-opacity="0"/>
+  </radialGradient>
+    <radialGradient id="ivit-fill" cx="24" cy="20" r="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb0ba"/>
+      <stop offset="0.35" stop-color="#ff6476"/>
+      <stop offset="0.7" stop-color="#e0445a"/>
+      <stop offset="1" stop-color="#8a1f33"/>
+    </radialGradient>
+    <clipPath id="ivit-clip"><path d="M32 54 C18 44 8.5 35 8.5 24 C8.5 15.5 14.6 10 22 10 C27 10 30.4 13 32 17 C33.6 13 37 10 42 10 C49.4 10 55.5 15.5 55.5 24 C55.5 35 46 44 32 54 Z"/></clipPath></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#ivit-back)"/>
+  
+    <path d="M32 54 C18 44 8.5 35 8.5 24 C8.5 15.5 14.6 10 22 10 C27 10 30.4 13 32 17 C33.6 13 37 10 42 10 C49.4 10 55.5 15.5 55.5 24 C55.5 35 46 44 32 54 Z" fill="url(#ivit-fill)"/>
+    <g clip-path="url(#ivit-clip)">
+      <ellipse cx="46" cy="40" rx="20" ry="22" fill="#7a1a2e" opacity="0.45"/>
+    </g>
+    <path d="M32 54 C18 44 8.5 35 8.5 24 C8.5 15.5 14.6 10 22 10 C27 10 30.4 13 32 17 C33.6 13 37 10 42 10 C49.4 10 55.5 15.5 55.5 24 C55.5 35 46 44 32 54 Z" fill="none" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="19.5" cy="20.5" rx="5" ry="3.2" transform="rotate(-38 19.5 20.5)" fill="#ffffff" opacity="0.9"/>
+    <circle cx="26" cy="15.6" r="1.6" fill="#ffffff" opacity="0.85"/>
+    <path d="M51 6 l1.4 4 l4 1.4 l-4 1.4 l-1.4 4 l-1.4 -4 l-4 -1.4 l4 -1.4 z" fill="#ece4d2"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ihaste-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffb547" stop-opacity="0.24"/>
+    <stop offset="0.55" stop-color="#ffb547" stop-opacity="0.108"/>
+    <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+  </radialGradient>
+    <linearGradient id="ihaste-wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe7a6"/>
+      <stop offset="0.45" stop-color="#ffb547"/>
+      <stop offset="1" stop-color="#9a5f20"/>
+    </linearGradient>
+    <linearGradient id="ihaste-sand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff1c4"/>
+      <stop offset="0.5" stop-color="#ffe2a0"/>
+      <stop offset="1" stop-color="#ffb547"/>
+    </linearGradient></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#ihaste-back)"/>
+  
+    <path d="M22.5 14 C22.5 24 30.4 27.6 30.4 32 C30.4 36.4 22.5 40 22.5 50 L41.5 50 C41.5 40 33.6 36.4 33.6 32 C33.6 27.6 41.5 24 41.5 14 Z" fill="#7fd4ff" fill-opacity="0.22"/>
+    <path d="M24.4 18.5 C26.4 25.6 30.8 28.6 31.3 31.2 L32.7 31.2 C33.2 28.6 37.6 25.6 39.6 18.5 Z" fill="url(#ihaste-sand)"/>
+    <path d="M32 31 L32 45" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round"/>
+    <path d="M23.4 50 C25.4 44.6 29 42.4 32 42.4 C35 42.4 38.6 44.6 40.6 50 Z" fill="url(#ihaste-sand)"/>
+    <path d="M22.5 14 C22.5 24 30.4 27.6 30.4 32 C30.4 36.4 22.5 40 22.5 50 L41.5 50 C41.5 40 33.6 36.4 33.6 32 C33.6 27.6 41.5 24 41.5 14 Z" fill="none" stroke="#0a1110" stroke-width="2.55" stroke-linejoin="round"/>
+    <path d="M25.6 16.5 C25.8 21 27.6 24 29.4 26" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+    <path d="M25.6 47.5 C26 45.6 26.8 44.2 27.8 43.2" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+    <rect x="17" y="12" width="4.4" height="40" rx="2" fill="url(#ihaste-wood)" stroke="#0a1110" stroke-width="2.25"/>
+    <rect x="42.6" y="12" width="4.4" height="40" rx="2" fill="url(#ihaste-wood)" stroke="#0a1110" stroke-width="2.25"/>
+    <rect x="13.5" y="7" width="37" height="7" rx="2.6" fill="url(#ihaste-wood)" stroke="#0a1110" stroke-width="3"/>
+    <rect x="13.5" y="50" width="37" height="7" rx="2.6" fill="url(#ihaste-wood)" stroke="#0a1110" stroke-width="3"/>
+    <path d="M17 9.6 L40 9.6" stroke="#fff6da" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
+</svg>

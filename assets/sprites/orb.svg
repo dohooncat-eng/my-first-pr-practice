@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<defs>
+  <radialGradient id="orb-halo" cx="24" cy="27" r="22" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fdffe0" stop-opacity="1"/>
+    <stop offset="0.22" stop-color="#ecff8c" stop-opacity="0.75"/>
+    <stop offset="0.55" stop-color="#c8f05a" stop-opacity="0.28"/>
+    <stop offset="1" stop-color="#b8f04a" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="orb-abd" cx="23" cy="31" r="10" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fffff0"/>
+    <stop offset="0.35" stop-color="#f4ff9a"/>
+    <stop offset="0.75" stop-color="#c2ec4e"/>
+    <stop offset="1" stop-color="#6f9e26"/>
+  </radialGradient>
+  <linearGradient id="orb-wing" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+    <stop offset="1" stop-color="#7fd4ff" stop-opacity="0.35"/>
+  </linearGradient></defs>
+  <circle cx="24" cy="26" r="22" fill="url(#orb-halo)"/>
+  <ellipse cx="24" cy="29.5" rx="7.6" ry="9" fill="url(#orb-abd)" stroke="#0a1110" stroke-width="1.6"/>
+  <path d="M18.6 27.5 Q24 29.6 29.4 27.5 M19.2 31.6 Q24 33.4 28.8 31.6" fill="none" stroke="#fffde0" stroke-width="0.9" opacity="0.7"/>
+  <g stroke="#1d2a24" stroke-width="1" stroke-opacity="0.6">
+    <ellipse cx="15.6" cy="17.4" rx="8.4" ry="4.2" transform="rotate(-26 15.6 17.4)" fill="url(#orb-wing)"/>
+    <ellipse cx="32.4" cy="17.4" rx="8.4" ry="4.2" transform="rotate(26 32.4 17.4)" fill="url(#orb-wing)"/>
+    <ellipse cx="16.8" cy="22.4" rx="6" ry="2.9" transform="rotate(16 16.8 22.4)" fill="url(#orb-wing)" opacity="0.85"/>
+    <ellipse cx="31.2" cy="22.4" rx="6" ry="2.9" transform="rotate(-16 31.2 22.4)" fill="url(#orb-wing)" opacity="0.85"/>
+  </g>
+  <ellipse cx="24" cy="18.8" rx="3.8" ry="3.3" fill="#2c3526" stroke="#0a1110" stroke-width="1.5"/>
+  <circle cx="24" cy="13.8" r="2.9" fill="#1c231a" stroke="#0a1110" stroke-width="1.3"/>
+  <circle cx="22.7" cy="13.3" r="0.85" fill="#7fd4ff"/>
+  <circle cx="25.3" cy="13.3" r="0.85" fill="#7fd4ff"/>
+  <path d="M23 11.4 Q20.4 7.4 17.2 6.6 M25 11.4 Q27.6 7.4 30.8 6.6" fill="none" stroke="#0a1110" stroke-width="1.1" stroke-linecap="round"/>
+  <circle cx="17.2" cy="6.6" r="1.1" fill="#ffb547"/>
+  <circle cx="30.8" cy="6.6" r="1.1" fill="#ffb547"/>
+  <ellipse cx="23.4" cy="31" rx="3.4" ry="4.4" fill="#ffffff" opacity="0.95"/>
+</svg>
