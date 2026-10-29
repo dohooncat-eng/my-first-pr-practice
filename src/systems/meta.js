@@ -13,21 +13,25 @@
       champLv: { keeper: 0, knight: 0, witch: 0, hunter: 0 },
       cleared: {},
       best: {},
-      settings: { sfx: 0.7, music: 0.5, shake: true, numbers: true, fps: false, quality: 'auto', speed2x: false },
+      settings: { sfx: 0.7, music: 0.5, shake: true, numbers: true, fps: false, quality: 'auto', speed: 1 },
       lastDifficulty: 'normal',
       crystals: 0,
       gacha: { pulls: 0, pity: 0, items: {}, tickets2: 0, freeDay: -1 },
       purchases: {},
       noAds: false,
-      speedMode: false, // 2배속 구매 여부
+      speedMode: false, // 배속(2·3배) 구매 여부
       pass: { until: -1, lastClaim: -1 },
       runsSinceAd: 0,
       coupons: {},
     };
   }
 
-  // 2배속: 샀고 켜 두었을 때만
-  G.speedOn = function () { return !!(G.meta.speedMode && G.meta.settings.speed2x); };
+  // 배속: 샀을 때만 settings.speed(1·2·3배)를 쓴다
+  G.SPEEDS = [1, 2, 3];
+  G.speedMul = function () {
+    const s = G.meta.settings.speed;
+    return G.meta.speedMode && G.SPEEDS.indexOf(s) !== -1 ? s : 1;
+  };
 
   // 재화 한도
   G.CURRENCY_MAX = { gold: 9999999, crystals: 99999 };
@@ -81,6 +85,9 @@
       Object.assign(m.cleared, saved.cleared);
       Object.assign(m.best, saved.best);
       Object.assign(m.settings, saved.settings);
+      // 예전 저장(2배속 켜고 끄기)을 배속 단계로 옮긴다
+      if (saved.settings && saved.settings.speed == null) m.settings.speed = saved.settings.speed2x ? 2 : 1;
+      delete m.settings.speed2x;
       if (G.difficultyById && saved.lastDifficulty) m.lastDifficulty = G.difficultyById(saved.lastDifficulty).id;
       m.crystals = Math.min(G.CURRENCY_MAX.crystals, Math.max(0, num(saved.crystals, 0)));
       Object.assign(m.coupons, saved.coupons);

@@ -236,8 +236,8 @@
   }
 
   function update(dt) {
-    // 2배속: 판 시간과 적 등장만 빨라지고, 움직임·공격은 그대로
-    const tdt = G.speedOn() ? dt * 2 : dt;
+    // 배속: 판 시간과 적 등장만 빨라지고, 움직임·공격은 그대로
+    const tdt = dt * G.speedMul();
     game.time += tdt;
     const p = game.player;
     G.updatePlayer(game, dt);

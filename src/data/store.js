@@ -29,8 +29,8 @@
         grant: { crystals: 500, noAds: true },
       },
       {
-        id: 'speed_mode', kind: 'speed', name: '2배속', art: 'store_speed', price: 3000, limit: 1,
-        desc: '판 시간이 2배로 흘러 10분이면 끝납니다. 적도 2배로 몰려오지만 움직임은 그대로. 일시정지 화면에서 켜고 끕니다.',
+        id: 'speed_mode', kind: 'speed', name: '배속 (2배·3배)', art: 'store_speed', price: 3000, limit: 1,
+        desc: '판 시간이 2배·3배로 흘러 10분 판이 5분·3분 20초면 끝납니다. 적도 그만큼 몰려오지만 움직임은 그대로. 일시정지 화면에서 1배 → 2배 → 3배로 바꿉니다.',
         grant: { speedMode: true },
       },
       {

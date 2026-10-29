@@ -3042,3 +3042,209 @@ ul.odds-rules {
   .lobby-tab svg { width: 25px; height: 25px; }
   .lobby-gacha small { display: none; }
 }
+/* ---------- 게임 UI 층: 웹 티를 지우고 엔진 게임 같은 손맛 ---------- */
+/* 길게 눌러 메뉴·그림 끌기·스크롤바·탭 하이라이트 없이 */
+*, *::before, *::after { -webkit-touch-callout: none; }
+img, svg { -webkit-user-drag: none; }
+input, textarea { -webkit-user-select: text; user-select: text; }
+.screen { scrollbar-width: none; overscroll-behavior: contain; }
+.screen::-webkit-scrollbar { display: none; }
+/* 화면 안쪽 목록은 가는 금빛 막대만 */
+.screen * { scrollbar-width: thin; scrollbar-color: rgba(199, 171, 98, 0.45) transparent; }
+.screen *::-webkit-scrollbar { width: 4px; height: 4px; }
+.screen *::-webkit-scrollbar-track { background: transparent; }
+.screen *::-webkit-scrollbar-thumb { background: rgba(199, 171, 98, 0.45); border-radius: 2px; }
+button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* 폰에서는 키보드 단축키 표시를 숨긴다 */
+@media (hover: none) and (pointer: coarse) {
+  kbd, .card-key { display: none !important; }
+}
+
+/* 키보드 선택: 웹 테두리 대신 빛나는 금빛 프레임 */
+.btn:focus-visible, .back-btn:focus-visible, .tab:focus-visible, .pause-btn:focus-visible,
+.stage-card:focus-visible, .champ-pick:focus-visible, .lobby-tab:focus-visible, .lobby-diff:focus-visible {
+  outline: 2px solid #ffe3a0;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(255, 181, 71, 0.28), 0 0 18px rgba(255, 181, 71, 0.35);
+}
+
+/* 입체 버튼: 아래 두꺼운 테두리가 받침, 누르면 내려앉는다 */
+.btn {
+  position: relative;
+  border-radius: 11px;
+  border-width: 1px 1px 4px;
+  letter-spacing: 0.01em;
+  transition: transform 0.08s ease, filter 0.12s ease;
+}
+.btn-primary {
+  border-color: #ffeab0 #f0c066 #8e5d25;
+  background: linear-gradient(180deg, #fff1bb 0%, #f5c467 48%, #e39b3c 100%);
+  color: #31210d;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 2px rgba(255, 255, 255, 0.55), 0 0 22px rgba(255, 189, 73, 0.22), 0 4px 0 rgba(4, 8, 6, 0.6);
+}
+.btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #fff6d0 0%, #f8cf7c 48%, #eaa748 100%); transform: none; }
+.btn-ghost {
+  border-color: rgba(199, 171, 98, 0.42) rgba(199, 171, 98, 0.3) #06100c;
+  background: linear-gradient(180deg, #27443a 0%, #183029 55%, #10221c 100%);
+  color: #f1e9d4;
+  box-shadow: inset 0 1px rgba(255, 227, 165, 0.14), 0 3px 0 rgba(4, 8, 6, 0.55);
+}
+.btn-ghost:hover:not(:disabled) { border-color: rgba(230, 188, 102, 0.7) rgba(230, 188, 102, 0.5) #06100c; filter: brightness(1.1); }
+.btn-ghost[aria-pressed="true"] { background: linear-gradient(180deg, #6a5427 0%, #4a3a1b 100%); color: #ffe7b0; }
+.btn-quiet { background: rgba(9, 15, 13, 0.55); box-shadow: none; color: var(--dim); }
+.btn-danger {
+  border-color: #ff8f9c #d84a60 #6b1424;
+  background: linear-gradient(180deg, #e2566b 0%, #b8304a 100%);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 3px 0 rgba(4, 8, 6, 0.55);
+}
+.btn:active:not(:disabled) { transform: translateY(3px); filter: brightness(0.92); box-shadow: inset 0 2px rgba(0, 0, 0, 0.2); }
+.btn:disabled { filter: saturate(0.3); }
+
+.back-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(199, 171, 98, 0.45);
+  border-bottom: 3px solid #06100c;
+  background: linear-gradient(180deg, #27443a, #12261f);
+  color: #ffe3a0;
+  box-shadow: inset 0 1px rgba(255, 227, 165, 0.14);
+}
+.back-btn:active { transform: translateY(2px); }
+
+/* 메뉴 화면: 숲 그림이 깔린 배경, 위에 붙는 헤더 띠 */
+.screen-menu {
+  --head-pad: max(14px, env(safe-area-inset-top, 0px));
+  padding-top: var(--head-pad);
+  background:
+    linear-gradient(180deg, rgba(6, 13, 11, 0.86) 0%, rgba(6, 13, 11, 0.94) 40%, #07100d 100%),
+    url("assets/sprites/title_art.svg") center / cover no-repeat,
+    #07100d;
+}
+.screen-menu .menu-head {
+  position: sticky;
+  top: calc(-1 * var(--head-pad));
+  z-index: 6;
+  margin-top: calc(-1 * var(--head-pad));
+  padding: var(--head-pad) 0 12px;
+  background: #0b1915;
+  border-bottom: 1px solid rgba(199, 171, 98, 0.35);
+  box-shadow: 0 0 0 100vmax #0b1915, 0 8px 10px -8px rgba(0, 0, 0, 0.7);
+  clip-path: inset(0 -100vmax -16px);
+}
+.menu-title h2 { font-size: 30px; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6); }
+.menu-title .eyebrow { color: #e6bc66; }
+
+/* 카드·패널: 금빛 실선이 두른 판 */
+.panel {
+  border: 1px solid rgba(199, 171, 98, 0.5);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(24, 44, 37, 0.97) 0%, rgba(9, 18, 15, 0.97) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5), inset 0 1px rgba(255, 227, 165, 0.18), 0 24px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.panel-title { text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6); }
+.stage-card, .champ-pick, .card {
+  border-color: rgba(199, 171, 98, 0.3);
+  border-radius: 14px;
+  box-shadow: inset 0 1px rgba(255, 227, 165, 0.1), 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+.stage-card:active, .champ-pick:active, .card:active { transform: scale(0.98); }
+
+/* 탭: 알약 모양 토글 */
+.tabs { padding: 4px; border-radius: 12px; background: #06100c; border: 1px solid rgba(199, 171, 98, 0.25); }
+.tab { border-radius: 9px; font-family: var(--font-display); font-weight: 400; font-size: 15px; }
+.tab[aria-selected="true"] { background: linear-gradient(180deg, #5d4a24, #3d3018); color: #ffe7b0; box-shadow: inset 0 1px rgba(255, 227, 165, 0.25); }
+
+/* 재화 칩 */
+.gold-chip {
+  min-height: 36px;
+  padding: 0 14px 0 8px;
+  box-sizing: border-box;
+  border-color: rgba(199, 171, 98, 0.5);
+  background: linear-gradient(180deg, #10241d, #071511);
+  box-shadow: inset 0 1px rgba(255, 227, 165, 0.12);
+}
+
+/* 게임 중 일시정지 단추 */
+.pause-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid rgba(230, 188, 102, 0.75);
+  background: radial-gradient(circle at 50% 35%, #2b4a3f, #0b1915 70%);
+  color: #ffe3a0;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+.pause-btn:active { transform: translateY(2px); box-shadow: none; }
+
+/* 판 끝·일시정지 단추는 폭을 나눠 꽉 채운다 */
+.end-panel .row .btn, .pause-actions .btn { flex: 1 1 auto; justify-content: center; }
+
+/* 화면 전환: 열릴 때 살짝 떠오르며 */
+.screen:not([hidden]) { animation: screen-in 0.22s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.screen-menu:not([hidden]) > .menu-wrap { animation: screen-rise 0.28s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+.screen:not([hidden]) > .panel { animation: panel-pop 0.26s cubic-bezier(0.2, 0.9, 0.3, 1.15) both; }
+@keyframes screen-in { from { opacity: 0; } }
+@keyframes screen-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes panel-pop { from { opacity: 0; transform: scale(0.94); } }
+
+/* 알림 점: 오늘 무료 뽑기가 있을 때 */
+.has-dot { position: relative; }
+.has-dot::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff4d5e;
+  border: 2px solid #0b1915;
+  box-shadow: 0 0 8px rgba(255, 77, 94, 0.7);
+}
+
+/* 시작할 때의 엔진식 로딩 화면 */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 24px;
+  background: radial-gradient(ellipse at 50% 45%, #17302a 0%, #07100d 70%);
+  transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+}
+.splash.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash img { width: min(78vw, 420px); height: auto; filter: drop-shadow(0 0 24px rgba(255, 170, 70, 0.4)); animation: splash-glow 2.4s ease-in-out infinite alternate; }
+.splash-bar {
+  width: min(70vw, 320px);
+  height: 12px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid rgba(199, 171, 98, 0.6);
+  background: #06100c;
+}
+.splash-bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #e39b3c, #ffe3a0);
+  box-shadow: 0 0 10px rgba(255, 189, 73, 0.6);
+  transition: width 0.2s ease;
+}
+.splash p { font: 600 13px/1 var(--font-body); color: #c4cbb8; letter-spacing: 0.08em; }
+@keyframes splash-glow { from { filter: drop-shadow(0 0 14px rgba(255, 170, 70, 0.25)); } to { filter: drop-shadow(0 0 30px rgba(255, 170, 70, 0.55)); } }
+
+/* 움직임 줄이기: 전환·장식 움직임을 끈다 */
+html.reduce-motion .screen, html.reduce-motion .screen > *, html.reduce-motion .splash img { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .screen, .screen > *, .splash img { animation: none !important; }
+}

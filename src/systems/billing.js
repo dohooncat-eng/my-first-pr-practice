@@ -28,7 +28,7 @@
     if (g.gold) { out.gold = g.gold; G.addCurrency('gold', g.gold); }
     if (g.tickets2) { out.tickets2 = g.tickets2; m.gacha.tickets2 += g.tickets2; }
     if (g.noAds) { out.noAds = true; m.noAds = true; }
-    if (g.speedMode) { out.speedMode = true; m.speedMode = true; m.settings.speed2x = true; }
+    if (g.speedMode) { out.speedMode = true; m.speedMode = true; m.settings.speed = 2; }
     if (g.passDays) {
       // 오늘부터 30일(이미 쓰는 중이면 이어서 30일). 오늘 몫은 바로 받을 수 있다.
       const today = G.dayNumber();

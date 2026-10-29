@@ -32,9 +32,11 @@
     const t = G.curveTime(game), m = t / 60; // 20분 곡선 위의 위치
 
     // 1초에 나오는 적 수(보통): 처음엔 적게, 중반에 가파르게, 후반엔 완만하게(S자).
-    // 0분 0.5 → 2분 1.9 → 4분 4.6 → 6분 8.3 → 8분 13 → 10분 18 → 15분 31 → 20분 43마리, 마지막 2분은 더 몰려온다
+    // 0분 0.5 → 2분 1.9 → 4분 4.6 → 6분 8.3 → 8분 13 → 10분 18 → 15분 31 → 20분 43마리(× crowd), 마지막 2분은 더 몰려온다
+    // 짧은 판은 곡선을 빨리 지나가므로 1초에 그만큼 더 내보내, 한 판에 만나는 적 수를 20분 판과 맞춘다. 그 위에 1.4배.
     const diff = game.difficulty;
-    const rate = (0.5 + m * 0.3 + m * m * 0.2 - m * m * m * 0.0055 + (m >= 18 ? 3 : 0)) * diff.spawn;
+    const crowd = 1.4 * G.WIN_TIME / G.runTime(game);
+    const rate = (0.5 + m * 0.3 + m * m * 0.2 - m * m * m * 0.0055 + (m >= 18 ? 3 : 0)) * diff.spawn * crowd;
     if (game.enemies.length < G.MAX_ENEMIES) d.acc += rate * dt;
     while (d.acc >= 1) {
       d.acc -= 1;
@@ -60,7 +62,7 @@
     if (t >= d.nextSwarm) {
       d.nextSwarm += 90;
       // 빠른 적 떼가 사방에서 원을 그리며 조여 온다
-      const count = Math.round(Math.min(120, (12 + Math.floor(m * 5)) * diff.spawn));
+      const count = Math.round(Math.min(160, (18 + Math.floor(m * 7)) * diff.spawn));
       const r = game.viewRadius + 20;
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2;

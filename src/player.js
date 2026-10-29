@@ -125,8 +125,7 @@
 
   G.gainXp = function (game, value) {
     const p = game.player;
-    // 짧은 판은 곡선을 빨리 지나가 적을 덜 잡으므로, 그만큼 경험치를 더 준다
-    p.xp += value * game.xpMul * p.stats.xpMul * G.WIN_TIME / G.runTime(game);
+    p.xp += value * game.xpMul * p.stats.xpMul;
     while (p.xp >= p.xpNext) {
       p.xp -= p.xpNext;
       p.level++;

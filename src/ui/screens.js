@@ -132,6 +132,8 @@
   function renderTitle() {
     refreshGold();
     $('screen-title').classList.toggle('reduce-motion', !!meta().settings.reducedMotion);
+    document.documentElement.classList.toggle('reduce-motion', !!meta().settings.reducedMotion);
+    $('btn-gacha').classList.toggle('has-dot', !!(G.gachaFreeAvailable && G.gachaFreeAvailable()));
     const stages = G.STAGES.filter((st) => G.isStageUnlocked(st.id));
     const st = stages.find((s) => s.id === pickedStage) || stages[0];
     if (!st) { $('btn-new').disabled = true; return; }
@@ -827,7 +829,7 @@
     if (g.gold) parts.push('금화 ' + fmtNum(g.gold));
     if (g.tickets2) parts.push('★★ 확정 뽑기권 ' + g.tickets2 + '장');
     if (g.noAds) parts.push('광고 제거');
-    if (g.speedMode) parts.push('2배속 (일시정지 화면에서 켜고 끕니다)');
+    if (g.speedMode) parts.push('배속 2배·3배 (일시정지 화면에서 바꿉니다)');
     if (g.passDays) parts.push('등불 축복 ' + g.passDays + '일');
     return '받은 것: ' + parts.join(' · ');
   }
@@ -1493,8 +1495,8 @@
   function renderSpeedBtn() {
     const b = $('btn-speed');
     const owned = !!meta().speedMode;
-    b.textContent = !owned ? '2배속 (상점)' : G.speedOn() ? '2배속 켜짐' : '2배속 꺼짐';
-    b.setAttribute('aria-pressed', owned && G.speedOn() ? 'true' : 'false');
+    b.textContent = !owned ? '배속 (상점)' : '배속 ×' + G.speedMul();
+    b.setAttribute('aria-pressed', owned && G.speedMul() > 1 ? 'true' : 'false');
   }
 
   function showPause(g) {
@@ -1667,6 +1669,9 @@
   G.ui = {
     init(g) {
       game = g;
+      // 앱처럼: 길게 눌러 뜨는 메뉴와 그림 끌기를 막는다(글자 입력칸은 그대로)
+      document.addEventListener('contextmenu', (e) => { if (!e.target.closest('input, textarea')) e.preventDefault(); });
+      document.addEventListener('dragstart', (e) => e.preventDefault());
       // 로고 그림이 없으면 글자 로고로
       const logo = $('logo-img');
       const markLogo = () => $('logo').classList.toggle('has-img', !!(logo.complete && logo.naturalWidth));
@@ -1712,7 +1717,7 @@
       $('btn-speed').addEventListener('click', () => {
         sfx('click');
         if (!meta().speedMode) { openStore('pause'); return; }
-        settingsObj().speed2x = !G.speedOn();
+        settingsObj().speed = G.SPEEDS[(G.SPEEDS.indexOf(G.speedMul()) + 1) % G.SPEEDS.length];
         G.saveMeta();
         renderSpeedBtn();
       });
@@ -1744,7 +1749,11 @@
       loaded = !!done;
       const btn = $('btn-new');
       btn.disabled = !done;
-      $('new-label').textContent = done ? '전투 시작' : '등불을 켜는 중 ' + Math.round((progress || 0) * 100) + '%';
+      const pct = Math.round((done ? 1 : progress || 0) * 100);
+      $('new-label').textContent = done ? '전투 시작' : '등불을 켜는 중 ' + pct + '%';
+      $('splash-fill').style.width = pct + '%';
+      $('splash-text').textContent = done ? '준비 완료' : '등불을 켜는 중 ' + pct + '%';
+      if (done) setTimeout(() => $('splash').classList.add('is-done'), 250);
       $('btn-continue').disabled = !done;
       if (done) {
         renderTitle();

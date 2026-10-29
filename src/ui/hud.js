@@ -55,6 +55,16 @@
     }
   }
 
+  // 금테 두른 어두운 알약(시간·금화 칩)
+  function pill(ctx, x, y, w, h) {
+    G.roundRect(ctx, x, y, w, h, h / 2);
+    ctx.fillStyle = 'rgba(7, 18, 14, 0.82)';
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(214, 180, 104, 0.55)';
+    ctx.stroke();
+  }
+
   function smallLevel(ctx, x, y, size, text, color) {
     ctx.font = '11px ' + FONT_DISPLAY;
     ctx.textAlign = 'right';
@@ -73,17 +83,21 @@
     const narrow = w < 720;
 
     // 경험치 막대 (화면 맨 위 전체)
-    ctx.fillStyle = 'rgba(5, 9, 8, 0.92)';
-    ctx.fillRect(0, T, w, 10);
+    ctx.fillStyle = 'rgba(5, 9, 8, 0.94)';
+    ctx.fillRect(0, T, w, 12);
+    ctx.fillStyle = 'rgba(214, 180, 104, 0.6)';
+    ctx.fillRect(0, T + 12, w, 1.5);
     const ratio = G.clamp(p.xp / p.xpNext, 0, 1);
     const xg = ctx.createLinearGradient(0, 0, w, 0);
     xg.addColorStop(0, '#2c6f9a');
     xg.addColorStop(1, '#9fe4ff');
     ctx.fillStyle = xg;
-    ctx.fillRect(0, T + 1, w * ratio, 7);
+    ctx.fillRect(0, T + 2, w * ratio, 8);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+    ctx.fillRect(0, T + 2, w * ratio, 2);
     if (ratio > 0) {
       ctx.globalCompositeOperation = 'lighter';
-      G.drawGlow(ctx, 'rgba(160, 230, 255, 0.9)', w * ratio, T + 4, 14 + (game.gemSparkle || 0) * 60, 0.8);
+      G.drawGlow(ctx, 'rgba(160, 230, 255, 0.9)', w * ratio, T + 6, 14 + (game.gemSparkle || 0) * 60, 0.8);
       ctx.globalCompositeOperation = 'source-over';
     }
 
@@ -91,32 +105,58 @@
     ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
     ctx.shadowBlur = 6;
 
-    // 레벨
+    // 레벨: 금테 원형 배지
+    const bx0 = L + 22, by0 = T + 42;
+    ctx.beginPath();
+    ctx.arc(bx0, by0, 22, 0, Math.PI * 2);
+    ctx.fillStyle = '#10261e';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#e6bc66';
+    ctx.stroke();
+    ctx.shadowBlur = 0;
     ctx.textBaseline = 'alphabetic';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#a3aea7';
-    ctx.font = '600 11px ' + FONT_BODY;
-    ctx.fillText('LEVEL', L, T + 30);
-    ctx.fillStyle = '#ece4d2';
-    ctx.font = '30px ' + FONT_DISPLAY;
-    ctx.fillText(String(p.level), L, T + 60);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#e6bc66';
+    ctx.font = '600 9px ' + FONT_BODY;
+    ctx.fillText('LV', bx0, by0 - 8);
+    ctx.fillStyle = '#fff3d6';
+    ctx.font = (p.level >= 100 ? 15 : 20) + 'px ' + FONT_DISPLAY;
+    ctx.fillText(String(p.level), bx0, by0 + 12);
 
     // 버틴 시간 / 목표 시간, 처치 수, 금화
     const win = G.runTime(game);
     ctx.textAlign = 'center';
-    ctx.font = (narrow ? 30 : 34) + 'px ' + FONT_DISPLAY;
-    ctx.fillStyle = game.time >= win - 60 ? '#ffd27a' : '#ece4d2';
-    ctx.fillText(G.formatTime(game.time) + (G.speedOn() ? '  ×2' : ''), w / 2, T + 50);
+    ctx.font = (narrow ? 26 : 30) + 'px ' + FONT_DISPLAY;
+    const timeText = G.formatTime(game.time);
+    const tw = ctx.measureText(timeText).width + 36;
+    ctx.shadowBlur = 0;
+    pill(ctx, w / 2 - tw / 2, T + 20, tw, narrow ? 36 : 40);
+    ctx.fillStyle = game.time >= win - 60 ? '#ffd27a' : '#fff3d6';
+    ctx.fillText(timeText, w / 2, T + (narrow ? 48 : 51));
+    const mul = G.speedMul();
+    if (mul > 1) {
+      const sx = w / 2 + tw / 2 + 4;
+      G.roundRect(ctx, sx, T + 27, 34, 22, 6);
+      ctx.fillStyle = '#f5c467';
+      ctx.fill();
+      ctx.fillStyle = '#31210d';
+      ctx.font = '15px ' + FONT_DISPLAY;
+      ctx.fillText('×' + mul, sx + 17, T + 44);
+    }
+    ctx.shadowBlur = 6;
     ctx.font = '600 12px ' + FONT_BODY;
     ctx.fillStyle = '#a3aea7';
     const line = '/ ' + G.formatTime(win) + '  ·  처치 ' + game.kills.toLocaleString('ko-KR');
-    ctx.fillText(line, w / 2, T + 70);
+    ctx.fillText(line, w / 2, T + 72);
     ctx.restore();
 
     // 금화 (레벨 오른쪽)
     const gold = Math.floor(game.runGold || 0);
     const coin = G.art && G.art.get('coin');
-    const gx = L + 54, gy = T + 44;
+    const gx = L + 50, gy = T + 33;
+    ctx.font = '14px ' + FONT_DISPLAY;
+    pill(ctx, gx - 4, gy - 4, ctx.measureText(String(gold)).width + 34, 24);
     if (coin) ctx.drawImage(coin.img, gx, gy, 16, 16);
     else {
       ctx.fillStyle = '#ffcf5a';
@@ -217,19 +257,37 @@
     if (st && st.active && game.state === 'playing') {
       const Rr = G.input.STICK_RADIUS;
       ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(236, 228, 210, 0.22)';
-      ctx.fillStyle = 'rgba(9, 15, 13, 0.3)';
+      ctx.strokeStyle = 'rgba(214, 180, 104, 0.45)';
+      ctx.fillStyle = 'rgba(7, 18, 14, 0.38)';
       ctx.beginPath();
       ctx.arc(st.ox, st.oy, Rr, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+      // 네 방향 눈금
+      ctx.fillStyle = 'rgba(214, 180, 104, 0.5)';
+      for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2;
+        const cx = st.ox + Math.cos(a) * (Rr - 9), cy = st.oy + Math.sin(a) * (Rr - 9);
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 5, cy + Math.sin(a) * 5);
+        ctx.lineTo(cx + Math.cos(a + 2.2) * 5, cy + Math.sin(a + 2.2) * 5);
+        ctx.lineTo(cx + Math.cos(a - 2.2) * 5, cy + Math.sin(a - 2.2) * 5);
+        ctx.fill();
+      }
       let dx = st.x - st.ox, dy = st.y - st.oy;
       const l = Math.hypot(dx, dy);
       if (l > Rr) { dx = (dx / l) * Rr; dy = (dy / l) * Rr; }
-      ctx.fillStyle = 'rgba(255, 181, 71, 0.55)';
+      const kx = st.ox + dx, ky = st.oy + dy;
+      const kg = ctx.createRadialGradient(kx - 6, ky - 7, 2, kx, ky, 24);
+      kg.addColorStop(0, '#fff1bb');
+      kg.addColorStop(0.55, '#f0b552');
+      kg.addColorStop(1, '#9a6328');
+      ctx.fillStyle = kg;
+      ctx.globalAlpha = 0.85;
       ctx.beginPath();
-      ctx.arc(st.ox + dx, st.oy + dy, 20, 0, Math.PI * 2);
+      ctx.arc(kx, ky, 24, 0, Math.PI * 2);
       ctx.fill();
+      ctx.globalAlpha = 1;
     }
   };
 })(window.G);
