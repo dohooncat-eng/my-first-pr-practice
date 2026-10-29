@@ -13,6 +13,7 @@
     list.push(item);
   }
 
+  G.fxPush = push;
   G.fxList = function (w, name) { return w.state[name] || (w.state[name] = []); };
 
   // ---------- 번개 ----------
