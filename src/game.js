@@ -122,12 +122,10 @@
   function openLevelUp() {
     game.state = 'levelup';
     G.input.clear();
-    if (G.sfx) G.sfx.play('levelup');
     const choices = G.buildChoices(game, game.player.stats.choices);
     G.ui.showLevelUp(game, choices, (c) => {
       G.applyChoice(game, c);
       game.pendingLevelUps--;
-      if (G.sfx) G.sfx.play('select');
       continueAfterModal();
     });
   }
@@ -136,7 +134,6 @@
     game.state = 'chest';
     G.input.clear();
     game.pendingChests--;
-    if (G.sfx) G.sfx.play('chest');
     const result = G.openChest(game);
     G.ui.showChest(game, result, continueAfterModal);
   }
@@ -151,7 +148,6 @@
       gold: settle.gold, isBest: settle.isBest,
       stageId: game.stage.id, championId: p.champion, newlyUnlocked: settle.newlyUnlocked,
     });
-    if (G.sfx) G.sfx.play(win ? 'evolve' : 'hurt');
   }
 
   function update(dt) {

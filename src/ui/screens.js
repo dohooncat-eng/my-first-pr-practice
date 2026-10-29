@@ -34,6 +34,14 @@
 
   function iconUrl(key) { return G.spriteUrl('icon_' + key); }
 
+  // 한국어 조사: 마지막 글자의 받침으로 을/를, 으로/로를 고른다
+  function batchim(word) {
+    const code = word.charCodeAt(word.length - 1) - 0xac00;
+    return code >= 0 && code <= 11171 ? code % 28 : 0;
+  }
+  function eulReul(word) { return word + (batchim(word) ? '을' : '를'); }
+  function euroRo(word) { const b = batchim(word); return word + (b && b !== 8 ? '으로' : '로'); }
+
   function fmtNum(n) { return Math.floor(n || 0).toLocaleString('ko-KR'); }
 
   function pips(level, max, cls) {
@@ -135,7 +143,7 @@
       if (!unlocked) {
         const lock = el('span', 'stage-lock');
         lock.innerHTML = LOCK_SVG;
-        lock.appendChild(el('span', '', G.STAGES[i - 1].name + '을(를) 깨면 열립니다'));
+        lock.appendChild(el('span', '', eulReul(G.STAGES[i - 1].name) + ' 깨면 열립니다'));
         body.appendChild(lock);
       } else if (best) {
         const champ = G.CHAMPIONS[best.champion];
@@ -190,7 +198,7 @@
       body.appendChild(el('span', 'champ-desc', ch.desc));
       const weapon = el('span', 'champ-weapon');
       weapon.appendChild(img(iconUrl(ch.weapon), '', 22, ''));
-      weapon.appendChild(el('span', '', G.WEAPONS[ch.weapon].name + '로 시작'));
+      weapon.appendChild(el('span', '', euroRo(G.WEAPONS[ch.weapon].name) + ' 시작'));
       body.appendChild(weapon);
       body.appendChild(el('span', 'champ-trait', ch.trait));
       const ab = el('span', 'champ-ability');

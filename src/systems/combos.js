@@ -24,7 +24,7 @@
 
   G.comboResultInfo = function (c) {
     const def = c.type === 'fusion' ? G.FUSIONS[c.result] : G.WEAPONS[c.result];
-    return { key: c.result, name: def.name, desc: def.desc, type: c.type, typeLabel: G.COMBO_TYPE_LABEL[c.type] };
+    return { key: c.result, result: c.result, name: def.name, desc: def.desc, type: c.type, typeLabel: G.COMBO_TYPE_LABEL[c.type] };
   };
 
   G.applyCombo = function (game, c) {
@@ -48,7 +48,6 @@
     G.announce(game, info.typeLabel + '! ' + info.name);
     G.burst(game, p.x, p.y, 'rgba(255, 210, 120, 0.95)', 46, 320, true);
     G.addShake(game, 6);
-    if (G.sfx) G.sfx.play('evolve');
     return info;
   };
 
