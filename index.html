@@ -250,6 +250,14 @@
         <span>전체 화면</span>
         <button id="set-fullscreen" class="btn btn-ghost btn-small" type="button">전체 화면으로</button>
       </div>
+      <form id="set-coupon" class="set-row set-coupon" autocomplete="off">
+        <label for="coupon-input">쿠폰 코드</label>
+        <div class="coupon-wrap">
+          <input id="coupon-input" class="coupon-input" type="text" maxlength="20" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="코드 입력" aria-describedby="coupon-msg">
+          <button id="coupon-btn" class="btn btn-primary btn-small" type="submit">사용</button>
+        </div>
+        <p id="coupon-msg" class="coupon-msg" role="status" aria-live="polite"></p>
+      </form>
       <div class="set-row set-danger">
         <span>저장 데이터</span>
         <button id="set-reset" class="btn btn-danger btn-small" type="button">모두 지우기</button>

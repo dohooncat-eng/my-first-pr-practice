@@ -40,6 +40,7 @@
     return code >= 0 && code <= 11171 ? code % 28 : 0;
   }
   function eulReul(word) { return word + (batchim(word) ? '을' : '를'); }
+  function iGa(word) { return word + (batchim(word) ? '이' : '가'); }
   function euroRo(word) { const b = batchim(word); return word + (b && b !== 8 ? '으로' : '로'); }
 
   function fmtNum(n) { return Math.floor(n || 0).toLocaleString('ko-KR'); }
@@ -233,6 +234,8 @@
         lock.innerHTML = LOCK_SVG;
         lock.appendChild(el('span', '', eulReul(G.STAGES[i - 1].name) + ' 깨면 열립니다'));
         body.appendChild(lock);
+        const names = G.stageUnlockNames ? G.stageUnlockNames(st.id) : [];
+        if (names.length) body.appendChild(el('span', 'stage-unlocks', '열면 무기·패시브 ' + names.length + '개 (' + names.join(', ') + ')'));
       } else if (diffLocked) {
         const lock = el('span', 'stage-lock stage-lock-diff');
         lock.innerHTML = LOCK_SVG;
@@ -244,6 +247,9 @@
           ' · 처치 ' + fmtNum(best.kills) + (champ ? ' · ' + champ.name : '')));
       } else {
         body.appendChild(el('span', 'stage-best', '아직 기록 없음'));
+      }
+      if (stageOpen && st.unlocks && st.unlocks.length) {
+        body.appendChild(el('span', 'stage-unlocks is-open', '이 스테이지에서 열린 무기·패시브 ' + st.unlocks.length + '개'));
       }
       btn.appendChild(body);
       if (unlocked) {
@@ -930,6 +936,8 @@
   function openSettings(from) {
     settingsFrom = from || 'title';
     renderSettings();
+    $('coupon-msg').textContent = '';
+    $('coupon-input').value = '';
     show('settings');
     $('set-sfx').focus({ preventScroll: true });
   }
@@ -975,6 +983,28 @@
         if (document.fullscreenElement) document.exitFullscreen().then(done, done);
         else document.documentElement.requestFullscreen().then(done, done);
       } catch (e) { /* 전체 화면을 쓸 수 없는 환경 */ }
+    });
+    // 쿠폰 코드
+    const couponInput = $('coupon-input');
+    // 입력 중 키가 게임 단축키(이동·디버그 등)로 새지 않게 (Esc는 화면 뒤로가기에 맡긴다)
+    couponInput.addEventListener('keydown', (e) => { if (e.key !== 'Escape') e.stopPropagation(); });
+    $('set-coupon').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const msg = $('coupon-msg');
+      const code = couponInput.value;
+      if (!code.trim()) { msg.textContent = '쿠폰 코드를 입력하세요'; msg.dataset.state = 'error'; return; }
+      const r = G.redeemCoupon ? G.redeemCoupon(code) : { ok: false, reason: 'invalid' };
+      if (r.ok) {
+        sfx('coin');
+        msg.textContent = '금화 ' + Number(r.gold).toLocaleString('ko-KR') + ' · 별빛 결정 ' + Number(r.crystals).toLocaleString('ko-KR') + '가 되었습니다';
+        msg.dataset.state = 'ok';
+        couponInput.value = '';
+        refreshGold();
+      } else {
+        sfx('click');
+        msg.textContent = r.reason === 'used' ? '이미 사용한 쿠폰입니다' : '없는 쿠폰 코드입니다';
+        msg.dataset.state = 'error';
+      }
     });
     $('set-reset').addEventListener('click', () => {
       confirmDialog('저장 데이터를 모두 지울까요?', '금화, 별빛 결정, 해금한 챔피언, 업그레이드, 뽑기로 얻은 강화, 기록, 이어하기가 모두 사라지고 되돌릴 수 없습니다. 구매 기록은 구글 플레이 앱에서 복원할 수 있습니다.', '모두 지우기', () => {
@@ -1324,7 +1354,10 @@
       sec.appendChild(head);
       const ul = el('ul', 'combo-list');
       groups[type].forEach((s) => {
-        const li = el('li', 'combo-row' + (s.ready ? ' is-ready' : '') + (s.done ? ' is-done' : ''));
+        // 아직 열리지 않은 재료가 있으면 잠김 표시
+        const lockedPart = G.isItemUnlocked ? s.parts.find((pt) => !G.isItemUnlocked(pt.kind, pt.key)) : null;
+        const lockStage = lockedPart && G.ITEM_UNLOCK_STAGE ? G.stageById(G.ITEM_UNLOCK_STAGE[lockedPart.kind + ':' + lockedPart.key]) : null;
+        const li = el('li', 'combo-row' + (s.ready ? ' is-ready' : '') + (s.done ? ' is-done' : '') + (lockStage ? ' is-locked' : ''));
         const parts = el('span', 'combo-parts');
         s.parts.forEach((pt, i) => {
           if (i > 0) parts.appendChild(el('span', 'combo-plus', '+'));
@@ -1340,8 +1373,15 @@
         const res = el('span', 'combo-result');
         res.appendChild(img(iconUrl(s.result.key), '', 34, ''));
         const rb = el('span', 'combo-result-body');
-        rb.appendChild(el('span', 'combo-result-name', s.result.name));
-        rb.appendChild(el('span', 'combo-result-desc', s.ready ? '조건 충족 · 다음 상자에서 조합' : s.done ? '완성' : s.result.desc));
+        const nameRow = el('span', 'combo-result-name', s.result.name);
+        if (lockStage) {
+          const badge = el('span', 'combo-lock');
+          badge.innerHTML = LOCK_SVG;
+          badge.setAttribute('aria-label', '잠김');
+          nameRow.appendChild(badge);
+        }
+        rb.appendChild(nameRow);
+        rb.appendChild(el('span', 'combo-result-desc', lockStage ? iGa(lockStage.name) + ' 열리면' : s.ready ? '조건 충족 · 다음 상자에서 조합' : s.done ? '완성' : s.result.desc));
         res.appendChild(rb);
         li.appendChild(res);
         ul.appendChild(li);
@@ -1482,6 +1522,8 @@
   function onKeyDown(e) {
     if (!game) return;
     const tag = e.target && e.target.tagName;
+    // 글자 입력칸: Esc(뒤로)만 화면이 처리하고 나머지 키는 입력칸이 쓴다
+    if (tag === 'INPUT' && e.target.type === 'text' && e.key !== 'Escape') return;
     if (e.key === 'Escape') {
       // 화면이 처리한 Esc는 게임 쪽(일시정지 토글)으로 넘기지 않는다
       if (back()) { e.preventDefault(); e.stopPropagation(); }

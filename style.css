@@ -2822,3 +2822,53 @@ ul.odds-rules {
   .prod-exchange .prod-art-ex { grid-row: span 1; }
   .crystal-big, .coin-big { width: 22px; height: 22px; }
 }
+
+/* ---------- 4차: 쿠폰 · 스테이지 해금 · 조합 잠김 ---------- */
+.settings .set-row.set-coupon { flex-wrap: wrap; row-gap: 8px; }
+.coupon-wrap { display: flex; gap: 8px; flex: 1 1 220px; max-width: 320px; justify-content: flex-end; }
+.coupon-input {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(9, 15, 13, 0.8);
+  color: var(--bone);
+  font: 600 15px/1 var(--font-body, inherit);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.coupon-input::placeholder { color: var(--dim); letter-spacing: 0; text-transform: none; }
+.coupon-input:focus-visible { outline: 2px solid var(--lamp); outline-offset: 1px; }
+.coupon-msg { flex-basis: 100%; margin: 0; min-height: 0; font-size: 13px; font-weight: 600; text-align: right; }
+.coupon-msg:empty { display: none; }
+.coupon-msg[data-state="ok"] { color: #8affb0; }
+.coupon-msg[data-state="error"] { color: #ff9a8a; }
+
+.stage-unlocks {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #d9c08a;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.stage-unlocks.is-open { color: var(--dim); }
+
+.combo-row.is-locked { opacity: 0.62; }
+.combo-row.is-locked .combo-part img { filter: grayscale(1) brightness(0.6); }
+.combo-lock { display: inline-flex; vertical-align: -3px; margin-left: 6px; color: var(--dim); }
+.combo-lock svg { width: 14px; height: 14px; }
+
+.end-unlock { overflow-wrap: anywhere; line-height: 1.45; }
+
+.gold-chip { white-space: nowrap; min-width: 0; }
+@media (max-width: 400px) {
+  .gold-chip { gap: 6px; padding: 5px 9px; font-size: 14px; }
+  .settings .set-coupon .coupon-wrap { max-width: none; flex: 1 1 100%; }
+  .coupon-msg { text-align: left; }
+}
