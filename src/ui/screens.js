@@ -11,6 +11,7 @@
   let shopFrom = null;
   let pickedStage = null;
   let pickedChampion = null;
+  let championFrom = 'stage';
   let loaded = false;
 
   // ---------- 작은 도우미 ----------
@@ -130,19 +131,47 @@
 
   function renderTitle() {
     refreshGold();
+    $('screen-title').classList.toggle('reduce-motion', !!meta().settings.reducedMotion);
+    const stages = G.STAGES.filter((st) => G.isStageUnlocked(st.id));
+    const st = stages.find((s) => s.id === pickedStage) || stages[0];
+    if (!st) { $('btn-new').disabled = true; return; }
+    pickedStage = st.id;
+    let diff = pickedDiff();
+    if (!diffOpen(st.id, diff.id)) diff = G.difficultyById('normal');
+    game.pickedDifficulty = diff.id;
+    $('lobby-stage-name').textContent = st.name;
+    $('lobby-stage-thumb').src = G.spriteUrl(st.thumb);
+    $('lobby-rewards').textContent = '금화 ' + diff.gold + '배 · 클리어 결정 ' + diff.crystals;
+    const box = $('lobby-difficulties');
+    box.textContent = '';
+    G.DIFFICULTIES.forEach((d) => {
+      const open = diffOpen(st.id, d.id);
+      const b = el('button', 'lobby-diff' + (d.id === diff.id ? ' is-picked' : '') + (d.id !== 'normal' ? ' is-bonus' : ''));
+      b.type = 'button';
+      b.disabled = !open;
+      b.setAttribute('aria-pressed', String(d.id === diff.id));
+      b.title = d.desc + (open ? '' : ' · ' + G.difficultyLockText(st.id, d.id));
+      if (!open) b.innerHTML = LOCK_SVG;
+      b.appendChild(el('span', '', d.name + ' · ' + G.difficultyById(d.id).time / 60 + '분'));
+      b.appendChild(el('small', '', '금화 ' + d.gold + '배'));
+      b.addEventListener('click', () => {
+        game.pickedDifficulty = d.id;
+        G.meta.lastDifficulty = d.id;
+        G.saveMeta();
+        sfx('click');
+        renderTitle();
+        box.querySelector('[aria-pressed="true"]').focus({ preventScroll: true });
+      });
+      box.appendChild(b);
+    });
     const summary = G.savedRunSummary ? G.savedRunSummary() : null;
     const cont = $('btn-continue');
-    const btnNew = $('btn-new');
     if (summary && loaded) {
       cont.hidden = false;
       $('continue-info').textContent = summary.stageName + ' · ' + summary.championName + ' · ' +
         G.formatTime(summary.time) + ' · Lv ' + summary.level;
-      btnNew.classList.remove('btn-primary');
-      btnNew.classList.add('btn-ghost');
     } else {
       cont.hidden = true;
-      btnNew.classList.add('btn-primary');
-      btnNew.classList.remove('btn-ghost');
     }
   }
 
@@ -157,7 +186,7 @@
 
   // 어느 스테이지에서든 열린 난이도인지 (위쪽 난이도 버튼)
   function diffOpenAnywhere(diffId) {
-    return G.STAGES.some((st) => diffOpen(st.id, diffId));
+    return G.STAGES.some((st) => G.isStageUnlocked(st.id) && diffOpen(st.id, diffId));
   }
 
   function pickedDiff() {
@@ -209,6 +238,7 @@
     const diff = pickedDiff();
     G.STAGES.forEach((st, i) => {
       const stageOpen = G.isStageUnlocked ? G.isStageUnlocked(st.id) : i === 0;
+      if (!stageOpen) return; // 아직 열리지 않은 스테이지는 미리 보여주지 않는다
       const diffLocked = stageOpen && !diffOpen(st.id, diff.id);
       const unlocked = stageOpen && !diffLocked;
       const btn = el('button', 'stage-card' + (unlocked ? '' : ' is-locked') + (diffLocked ? ' is-difflocked' : ''));
@@ -229,14 +259,7 @@
       body.appendChild(el('span', 'stage-name', st.name));
       body.appendChild(el('span', 'stage-desc', st.desc));
       const best = m.best && (m.best[st.id + ':' + diff.id] || (diff.id === 'normal' && m.best[st.id] && !m.best[st.id].difficulty ? m.best[st.id] : null));
-      if (!stageOpen) {
-        const lock = el('span', 'stage-lock');
-        lock.innerHTML = LOCK_SVG;
-        lock.appendChild(el('span', '', eulReul(G.STAGES[i - 1].name) + ' 깨면 열립니다'));
-        body.appendChild(lock);
-        const names = G.stageUnlockNames ? G.stageUnlockNames(st.id) : [];
-        if (names.length) body.appendChild(el('span', 'stage-unlocks', '열면 무기·패시브 ' + names.length + '개 (' + names.join(', ') + ')'));
-      } else if (diffLocked) {
+      if (diffLocked) {
         const lock = el('span', 'stage-lock stage-lock-diff');
         lock.innerHTML = LOCK_SVG;
         lock.appendChild(el('span', '', diff.name + ' 잠김 · ' + (G.difficultyLockText(st.id, diff.id) || '')));
@@ -256,7 +279,7 @@
         btn.addEventListener('click', () => {
           sfx('select');
           pickedStage = st.id;
-          openChampion();
+          openChampion('stage');
         });
       }
       list.appendChild(btn);
@@ -269,7 +292,8 @@
     show('stage');
     const first = document.querySelector('#stage-list .stage-card:not([disabled])');
     const prev = pickedStage && $('stage-' + pickedStage);
-    (prev && !prev.disabled ? prev : first).focus({ preventScroll: true });
+    const target = prev && !prev.disabled ? prev : first;
+    if (target) target.focus({ preventScroll: true });
   }
 
   // ---------- 챔피언 선택 ----------
@@ -345,7 +369,8 @@
     $('champion-pick').textContent = st.name + (diff.id === 'normal' ? '' : ' ' + diff.name) + ' · ' + ch.name;
   }
 
-  function openChampion() {
+  function openChampion(from) {
+    championFrom = from || 'stage';
     renderChampions();
     show('champion');
     const b = $('champ-' + pickedChampion);
@@ -1447,7 +1472,7 @@
           nameRow.appendChild(badge);
         }
         rb.appendChild(nameRow);
-        rb.appendChild(el('span', 'combo-result-desc', lockStage ? iGa(lockStage.name) + ' 열리면' : s.ready ? '조건 충족 · 다음 상자에서 조합' : s.done ? '완성' : s.result.desc));
+        rb.appendChild(el('span', 'combo-result-desc', lockStage ? '다음 스테이지에서 열립니다' : s.ready ? '조건 충족 · 다음 상자에서 조합' : s.done ? '완성' : s.result.desc));
         res.appendChild(rb);
         li.appendChild(res);
         ul.appendChild(li);
@@ -1499,7 +1524,7 @@
     screen.classList.toggle('is-win', !!r.win);
     const st = G.stageById ? G.stageById(r.stageId) : G.STAGES[0];
     const dName = r.difficultyId && r.difficultyId !== 'normal' && G.difficultyById ? ' ' + G.difficultyById(r.difficultyId).name : '';
-    $('end-eyebrow').textContent = st.name + dName + ' · ' + (r.win ? '20:00 생존' : G.formatTime(r.time) + '에 쓰러짐');
+    $('end-eyebrow').textContent = st.name + dName + ' · ' + (r.win ? G.formatTime(r.time) + ' 생존' : G.formatTime(r.time) + '에 쓰러짐');
     $('end-title').textContent = r.win ? '새벽이 밝았습니다' : '등불이 꺼졌습니다';
     $('end-time').textContent = G.formatTime(r.time);
     $('end-level').textContent = r.level;
@@ -1514,7 +1539,7 @@
     // 첫 클리어 별빛 결정, 광고 보고 금화 2배
     const cr = r.crystals || 0;
     $('end-crystals').hidden = !cr;
-    $('end-crystals-text').textContent = cr ? '+' + fmtNum(cr) + ' 별빛 결정 (첫 클리어)' : '';
+    $('end-crystals-text').textContent = cr ? '+' + fmtNum(cr) + (r.firstClear ? ' 별빛 결정 (첫 클리어 덤 포함)' : ' 별빛 결정') : '';
     const dbl = $('btn-double');
     dbl.hidden = !r.canDoubleGold;
     dbl.disabled = false;
@@ -1523,7 +1548,7 @@
     refreshGold();
     pickedStage = r.stageId || pickedStage;
     pickedChampion = r.championId || pickedChampion;
-    $('btn-retry').focus({ preventScroll: true });
+    $('btn-title').focus({ preventScroll: true });
   }
 
   // ---------- 화면 전환 ----------
@@ -1558,7 +1583,10 @@
     if (!$('pull-fx').hidden) { if (pullPhase === 'done') closePull(); else finishPull(); return true; }
     switch (current) {
       case 'stage': showTitleScreen(); $('btn-new').focus({ preventScroll: true }); return true;
-      case 'champion': openStage(); return true;
+      case 'champion':
+        if (championFrom === 'title') { showTitleScreen(); $('btn-new').focus({ preventScroll: true }); }
+        else openStage();
+        return true;
       case 'shop':
         showTitleScreen();
         $('btn-shop').focus({ preventScroll: true });
@@ -1624,8 +1652,9 @@
       closeChest();
       return;
     }
+    if (current === 'title' && e.key === 'Enter' && tag !== 'BUTTON' && loaded) { $('btn-new').click(); e.preventDefault(); return; }
     if (current === 'champion' && e.key === 'Enter' && tag !== 'BUTTON') { startRun(); e.preventDefault(); return; }
-    if (current === 'end' && e.key === 'Enter' && tag !== 'BUTTON') { game.retry(); e.preventDefault(); return; }
+    if (current === 'end' && e.key === 'Enter' && tag !== 'BUTTON') { game.toTitle(); e.preventDefault(); return; }
     if (tag === 'INPUT' && e.target.type === 'range') return;
     const visible = current && current !== null && $('screen-' + current) && !$('screen-' + current).hidden;
     if (!visible && $('dialog').hidden && $('odds').hidden) return;
@@ -1646,7 +1675,9 @@
       markLogo();
 
       $('btn-continue').addEventListener('click', () => { sfx('select'); game.continueRun(); });
-      $('btn-new').addEventListener('click', () => { sfx('select'); openStage(); });
+      $('btn-new').addEventListener('click', () => { if (!loaded) return; renderTitle(); sfx('select'); openChampion('title'); });
+      $('btn-lobby-stage').addEventListener('click', () => { sfx('click'); openStage(); });
+      $('btn-crystal-add').addEventListener('click', () => { sfx('click'); openStore('title'); });
       $('btn-shop').addEventListener('click', () => { sfx('click'); openShop('title'); });
       $('btn-gacha').addEventListener('click', () => { sfx('click'); openGacha('title'); });
       $('btn-store').addEventListener('click', () => { sfx('click'); openStore('title'); });
@@ -1698,11 +1729,6 @@
       $('pause-btn').addEventListener('click', () => game.pause());
 
       $('btn-retry').addEventListener('click', () => { sfx('select'); game.retry(); });
-      $('btn-end-stage').addEventListener('click', () => {
-        sfx('click');
-        if (game.toTitle) game.toTitle();
-        openStage();
-      });
       $('btn-title').addEventListener('click', () => { sfx('click'); game.toTitle(); });
 
       $('dialog-yes').addEventListener('click', () => { if (dialogYes) dialogYes(); });
@@ -1718,7 +1744,7 @@
       loaded = !!done;
       const btn = $('btn-new');
       btn.disabled = !done;
-      $('new-label').textContent = done ? '새 게임' : '등불을 켜는 중 ' + Math.round((progress || 0) * 100) + '%';
+      $('new-label').textContent = done ? '전투 시작' : '등불을 켜는 중 ' + Math.round((progress || 0) * 100) + '%';
       $('btn-continue').disabled = !done;
       if (done) {
         renderTitle();

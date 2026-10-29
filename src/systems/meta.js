@@ -176,24 +176,25 @@
     return true;
   };
 
-  // 판이 끝났을 때: 금화 정산, 클리어·최고 기록, 첫 클리어 별빛 결정, 새로 열린 것 문구
+  // 판이 끝났을 때: 금화 정산, 클리어·최고 기록, 클리어 별빛 결정(매번 + 첫 클리어 덤), 새로 열린 것 문구
   G.settleRun = function (game, win) {
     const st = game.stage;
     const newlyUnlocked = [];
-    const minutes = Math.floor(game.time / 60);
+    const minutes = Math.floor(G.curveTime(game) / 60); // 짧은 난이도도 20분 기준으로 센다
     const diff = game.difficulty || G.DIFFICULTIES[0];
     const goldMul = (game.player && game.player.stats.goldMul) || 1;
-    const bonus = Math.round((minutes * 6 + (win ? 120 : 0)) * st.goldMul * diff.gold * goldMul);
+    const bonus = Math.round((minutes * 15 + (win ? 300 : 0)) * st.goldMul * diff.gold * goldMul);
     const gold = Math.round(game.runGold * diff.gold * goldMul) + bonus;
     G.addCurrency('gold', gold);
-    let crystals = 0;
+    let crystals = 0, firstClear = false;
     let unlockedDifficulty = null;
     if (win) {
       const dKey = st.id + ':' + diff.id;
+      crystals = diff.crystals || 0;
       if (!G.meta.cleared[dKey]) {
         G.meta.cleared[dKey] = true;
-        crystals = G.GACHA.firstClearCrystals[diff.id] || 0;
-        G.addCurrency('crystals', crystals);
+        firstClear = true;
+        crystals += G.GACHA.firstClearCrystals[diff.id] || 0;
         if (diff.id !== 'normal') newlyUnlocked.push(st.name + ' ' + diff.name + ' 클리어!');
         const next = G.DIFFICULTIES[G.DIFFICULTIES.indexOf(diff) + 1];
         if (next) {
@@ -212,12 +213,13 @@
         }
       }
     }
+    if (crystals) G.addCurrency('crystals', crystals);
     const rec = { time: Math.floor(game.time), kills: game.kills, level: game.player.level, champion: game.player.champion, difficulty: diff.id };
     const better = (b) => !b || rec.time > b.time || (rec.time === b.time && rec.kills > b.kills);
     const isBest = better(G.meta.best[st.id + ':' + diff.id]);
     if (isBest) G.meta.best[st.id + ':' + diff.id] = rec;
     if (better(G.meta.best[st.id])) G.meta.best[st.id] = rec;
     G.saveMeta();
-    return { gold, bonus, isBest, newlyUnlocked, crystals, unlockedDifficulty };
+    return { gold, bonus, isBest, newlyUnlocked, crystals, firstClear, unlockedDifficulty };
   };
 })(window.G);

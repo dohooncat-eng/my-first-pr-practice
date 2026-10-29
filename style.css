@@ -2933,3 +2933,112 @@ ul.odds-rules {
 @media (prefers-reduced-motion: reduce) {
   .screen-chest *, .screen-chest *::before, .pull-fx *, .pull-fx *::before, .pull-fx *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- 밤의 숲 로비 ---------- */
+#screen-title {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: 20px; justify-content: stretch;
+  padding: max(16px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  overflow: hidden; isolation: isolate; background: #091512;
+}
+.lobby-backdrop { position: absolute; inset: 0; overflow: hidden; z-index: -3; pointer-events: none; }
+#screen-title .title-art { height: 100%; object-position: left top; transform: scale(1.45); transform-origin: left top; animation: none; z-index: -3; }
+#screen-title .title-shade { z-index: -2; background: linear-gradient(180deg, #06110dbb, transparent 26%, transparent 40%, #06110dea 100%); }
+/* 배경의 오른쪽 끝 인물은 화면 밖으로 보내고 등불지기를 따로 세운다. */
+.lobby-hero { position: absolute; left: 12%; top: 18%; width: min(38vw, 410px); height: 58%; z-index: -1; pointer-events: none; display: grid; place-items: center; }
+.lobby-hero::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 68% 60%, #ffc76c38, #ffc76c0d 35%, transparent 67%); }
+.lobby-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 12px 12px #0008); animation: lobby-breathe 4s ease-in-out infinite; }
+@keyframes lobby-breathe { 50% { transform: translateY(-3px); } }
+.lobby-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; align-self: start; }
+#screen-title .logo { width: clamp(130px, 20vw, 240px); flex-shrink: 0; }
+#screen-title .logo img { width: 100%; }
+#screen-title .logo-text { font-size: clamp(18px, 3vw, 30px); }
+.lobby-wallet { display: flex; gap: 10px; align-items: center; }
+.lobby-currency { display: flex; align-items: center; gap: 8px; margin: 0; min-height: 44px; padding: 0 14px; background: #071511df; border: 1px solid #b5985055; border-radius: 24px; color: #ffe4a5; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.lobby-currency img { width: 24px; height: 24px; object-fit: contain; }
+.lobby-crystal { padding-right: 0; color: #c7e8ff; border-color: #84c7dd55; }
+#btn-crystal-add { width: 44px; height: 44px; border: 0; border-left: 1px solid #84c7dd44; border-radius: 0 24px 24px 0; background: #26483f; color: #e4f6cf; font-size: 26px; }
+.lobby-departure { width: min(100%, 420px); justify-self: end; align-self: end; display: grid; gap: 10px; margin-right: clamp(0px, 4vw, 64px); }
+.lobby-stage { background: linear-gradient(135deg, #20392ef5, #0b1c18f5); border: 1px solid #c7ab626b; border-radius: 15px; box-shadow: 0 12px 36px #0005, inset 0 1px #ffe3a512; overflow: hidden; }
+.lobby-stage-link { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px; text-align: left; background: transparent; border: 0; color: #f4ecd6; }
+.lobby-stage-link > img { width: 64px; height: 58px; object-fit: cover; border-radius: 8px; border: 1px solid #c7ab6255; background: #1b3529; }
+.lobby-stage-link > span:nth-child(2) { display: grid; gap: 4px; }
+.lobby-stage-link small { font-size: 11px; color: #c4cbb8; letter-spacing: .12em; }
+.lobby-stage-link strong { font: 23px/1.2 var(--font-display); }
+.lobby-change { margin-left: auto; white-space: nowrap; font-size: 12px; color: #e2cc99; }
+.lobby-change b { font-size: 24px; margin-left: 4px; }
+.lobby-difficulties { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 0 12px; }
+.lobby-diff { min-height: 48px; padding: 5px 2px; border: 1px solid #78917b55; border-radius: 7px; background: #081810; color: #cdd6c7; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; align-items: center; gap: 2px; font-size: 12px; }
+.lobby-diff small { width: 100%; font-size: 11px; color: #b8c6ad; }
+.lobby-diff svg { width: 12px; height: 12px; }
+.lobby-diff.is-bonus small { color: #ffce79; font-weight: 600; }
+.lobby-diff:disabled { opacity: .75; cursor: not-allowed; }
+.lobby-diff.is-picked { border-color: #e6bc66; background: #594a28; color: #fff0cd; box-shadow: inset 0 0 12px #eabc3820; }
+.lobby-rewards { text-align: center; margin: 9px 4px 11px; color: #f2ce88; font-size: 12px; }
+.lobby-battle { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; min-height: 76px; padding: 14px; color: #31210d; border: 1px solid #ffe9a9; border-bottom: 5px solid #8e5d25; border-radius: 13px; background: linear-gradient(175deg, #fff1bb 0%, #f5c467 45%, #e6a541 100%); font: 30px/1.2 var(--font-display); text-shadow: 0 1px #fff8; box-shadow: inset 0 2px #fff8, 0 0 28px #ffbd4930, 0 7px 0 #08110c; }
+.lobby-battle > span:last-child { position: absolute; right: 20px; font: 32px/1 sans-serif; }
+.lobby-battle { position: relative; }
+.lobby-battle:disabled { font-size: 20px; filter: saturate(.4); cursor: wait; }
+.lobby-battle:disabled > svg, .lobby-battle:disabled > span:last-child { display: none; }
+.lobby-battle:hover:not(:disabled) { filter: brightness(1.08); }
+.lobby-battle:active:not(:disabled) { transform: translateY(2px); }
+.lobby-continue { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; border: 1px solid #9dcc9d; border-radius: 12px; padding: 10px 14px; color: #f0f1cf; background: linear-gradient(110deg, #36543a, #152e23); text-align: left; box-shadow: 0 0 18px #8ab77720; }
+.lobby-continue strong { font: 20px/1.2 var(--font-display); }
+#continue-info { display: block; font-size: 11px; line-height: 1.5; margin-top: 4px; color: #c6d6b9; }
+.lobby-continue > span:last-child { margin-left: auto; font-size: 28px; }
+.lobby-resume-mark { color: #d9ed9b; }
+.lobby-tabs { justify-self: center; width: min(100%, 760px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 8px; padding: 10px 12px 0; border-top: 1px solid #b9a57066; background: linear-gradient(180deg, #172b2280, #081610e0); border-radius: 18px 18px 0 0; }
+.lobby-tab { min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: transparent; border: 1px solid transparent; border-radius: 12px; color: #d2d8c6; font-size: 13px; font-weight: 600; }
+.lobby-tab svg { width: 30px; height: 30px; color: #bec8a6; }
+.lobby-tab:hover { background: #36533b66; }
+.lobby-gacha { min-height: 90px; background: linear-gradient(180deg, #67502a, #302a1c); border-color: #d8b76b; color: #ffdf96; box-shadow: 0 -4px 24px #f7c36620; }
+.lobby-gacha svg { color: #ffe1a0; filter: drop-shadow(0 0 6px #ffbb57); width: 34px; height: 34px; }
+.lobby-gacha small { font-size: 10px; color: #cab584; }
+#screen-title button:focus-visible { outline: 3px solid #fff3ba; outline-offset: 3px; }
+.lobby-glow { position: absolute; inset: 15% 10% 15% 25%; z-index: -1; pointer-events: none; background: radial-gradient(ellipse, #ffd17a14, transparent 65%); animation: lobby-light 4s ease-in-out infinite alternate; }
+.lobby-fireflies { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.lobby-fireflies i { position: absolute; left: 28%; top: 38%; width: 3px; height: 3px; border-radius: 50%; background: #fff2aa; box-shadow: 0 0 9px 3px #e8d47855; animation: lobby-drift 6s ease-in-out infinite alternate; }
+.lobby-fireflies i:nth-child(2) { left: 60%; top: 28%; animation-delay: -2s; }
+.lobby-fireflies i:nth-child(3) { left: 45%; top: 52%; animation-delay: -4s; }
+.lobby-fireflies i:nth-child(4) { left: 78%; top: 40%; animation-delay: -1s; }
+.lobby-fireflies i:nth-child(5) { left: 18%; top: 62%; animation-delay: -3s; }
+.lobby-fireflies i:nth-child(6) { left: 55%; top: 16%; animation-delay: -5s; }
+@keyframes lobby-light { from { opacity: .4; } to { opacity: 1; } }
+@keyframes lobby-drift { from { opacity: .2; transform: translate(0, 7px); } to { opacity: .9; transform: translate(12px, -14px); } }
+#screen-title.reduce-motion *, #screen-title.reduce-motion *::before, #screen-title.reduce-motion *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #screen-title *, #screen-title *::before, #screen-title *::after { animation: none !important; transition: none !important; }
+}
+@media (max-width: 600px) and (min-height: 501px) {
+  #screen-title { gap: 16px; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+  .lobby-top { flex-wrap: wrap; gap: 8px; }
+  #screen-title .logo { width: 160px; }
+  .lobby-wallet { width: 100%; justify-content: flex-end; gap: 6px; }
+  .lobby-currency { font-size: 12px; padding-left: 10px; gap: 5px; }
+  .lobby-hero { left: 15%; top: 120px; width: 70%; height: clamp(100px, calc(100vh - 480px), 240px); }
+  #screen-title:has(#btn-continue:not([hidden])) .lobby-hero { height: clamp(80px, calc(100vh - 580px), 240px); }
+  .lobby-departure { margin: 0; justify-self: center; }
+  .lobby-tabs { gap: 3px; padding: 8px 3px 0; }
+  .lobby-tab { font-size: 12px; min-height: 67px; }
+  .lobby-gacha { min-height: 82px; }
+}
+@media (max-height: 500px) {
+  #screen-title { grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); grid-template-rows: auto 1fr; gap: 10px 20px; padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+  .lobby-hero { left: 16px; top: 58px; width: calc(100% - 412px); height: max(88px, calc(100% - 240px)); }
+  .lobby-top { grid-column: 1 / -1; }
+  #screen-title .logo { width: 150px; }
+  .lobby-departure { grid-column: 2; grid-row: 2; margin: 0; gap: 6px; }
+  .lobby-stage-link { padding: 7px 10px; }
+  .lobby-stage-link > img { width: 44px; height: 40px; }
+  .lobby-stage-link strong { font-size: 20px; }
+  .lobby-stage-link small { font-size: 10px; }
+  .lobby-diff { min-height: 44px; }
+  .lobby-rewards { margin: 5px; font-size: 11px; }
+  .lobby-battle { min-height: 56px; padding: 8px; font-size: 26px; }
+  .lobby-continue { min-height: 52px; padding: 6px 10px; }
+  .lobby-continue strong { font-size: 17px; }
+  #continue-info { margin-top: 0; font-size: 10px; }
+  .lobby-tabs { grid-column: 1; grid-row: 2; align-self: end; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 8px; }
+  .lobby-tab, .lobby-gacha { min-height: 74px; font-size: 12px; gap: 3px; }
+  .lobby-tab svg { width: 25px; height: 25px; }
+  .lobby-gacha small { display: none; }
+}

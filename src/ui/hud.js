@@ -102,7 +102,7 @@
     ctx.fillText(String(p.level), L, T + 60);
 
     // 버틴 시간 / 목표 시간, 처치 수, 금화
-    const win = G.WIN_TIME || 1200;
+    const win = G.runTime(game);
     ctx.textAlign = 'center';
     ctx.font = (narrow ? 30 : 34) + 'px ' + FONT_DISPLAY;
     ctx.fillStyle = game.time >= win - 60 ? '#ffd27a' : '#ece4d2';

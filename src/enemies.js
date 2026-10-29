@@ -10,7 +10,7 @@
   G.spawnEnemy = function (game, type, x, y, elite) {
     const t = G.ENEMY_TYPES[type];
     const st = stage(game);
-    const minutes = game.time / 60;
+    const minutes = G.curveTime(game) / 60;
     const scale = elite ? 1.8 : 1;
     // 체력 배율: 5분 4.9배 · 8분 11배 · 10분 18배 · 15분 44배 · 20분 87배 (중반부터 가파르게, 뒤 스테이지는 더)
     const growth = (0.1 * minutes + 0.11 * minutes * minutes + 0.005 * minutes * minutes * minutes) * st.growth;
@@ -81,7 +81,7 @@
     game.kills++;
     if (e.boss) { G.onBossKilled(game, e); return; }
     const t = G.ENEMY_TYPES[e.type];
-    const gemScale = 1 + Math.floor(game.time / 180) * 0.25;
+    const gemScale = 1 + Math.floor(G.curveTime(game) / 180) * 0.25;
     G.dropGem(game, e.x, e.y, e.xp * gemScale);
     G.burst(game, e.x, e.y, t.color, e.elite ? 26 : 7, e.elite ? 260 : 150);
     if (game.rings.length < 30) G.ring(game, e.x, e.y, e.r * 0.4, e.r * (e.elite ? 3.2 : 1.9), e.elite ? 0.45 : 0.28, 'rgba(255, 236, 200, 0.7)', e.elite ? 5 : 2.5);

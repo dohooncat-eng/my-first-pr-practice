@@ -1,7 +1,8 @@
-// 스테이지 4개. 앞 스테이지를 깨면 다음이 열린다. 모두 20분 생존이 목표.
+// 스테이지 4개. 앞 스테이지를 깨면 다음이 열린다. 버티는 시간은 난이도마다 다르다(보통 10분 · 어려움 15분 · MAX 20분).
 (function (G) {
   'use strict';
 
+  // 적·보스 곡선은 20분 기준. 짧은 난이도는 같은 곡선을 더 빨리 지나간다(G.curveTime)
   G.WIN_TIME = 1200;
 
   G.STAGES = [
@@ -53,21 +54,25 @@
 
   G.stageById = function (id) { return G.STAGES.find((s) => s.id === id) || G.STAGES[0]; };
 
-  // 난이도: 적 등장량·체력·피해·속도, 엘리트 간격, 보스 체력, 금화 배율
+  // 난이도: 버틸 시간(초), 적 등장량·체력·피해·속도, 엘리트 간격(곡선 초), 보스 체력, 금화 배율, 깰 때마다 받는 결정
   G.DIFFICULTIES = [
     {
-      id: 'normal', name: '보통', desc: '적이 쏟아지는 기본 밤',
-      spawn: 1, hp: 1, dmg: 1, speed: 1, eliteEvery: 60, bossHp: 1, gold: 1,
+      id: 'normal', name: '보통', desc: '10분 · 적이 쏟아지는 기본 밤 · 금화 2배',
+      time: 600, spawn: 1, hp: 1, dmg: 1, speed: 1, eliteEvery: 60, bossHp: 1, gold: 2, crystals: 10,
     },
     {
-      id: 'hard', name: '어려움', desc: '적 1.5배·체력 1.8배·피해 1.3배, 금화 1.8배',
-      spawn: 1.5, hp: 1.8, dmg: 1.3, speed: 1.06, eliteEvery: 45, bossHp: 1.8, gold: 1.8,
+      id: 'hard', name: '어려움', desc: '15분 · 적 1.5배·체력 1.8배·피해 1.3배 · 금화 5배, 결정 40',
+      time: 900, spawn: 1.5, hp: 1.8, dmg: 1.3, speed: 1.06, eliteEvery: 45, bossHp: 1.8, gold: 5, crystals: 40,
     },
     {
-      id: 'max', name: 'MAX', desc: '적 2배·체력 3배·피해 1.5배, 엘리트 30초마다, 금화 3배',
-      spawn: 2, hp: 3, dmg: 1.5, speed: 1.12, eliteEvery: 30, bossHp: 3, gold: 3,
+      id: 'max', name: 'MAX', desc: '20분 · 적 2배·체력 3배·피해 1.5배, 엘리트 30초마다 · 금화 10배, 결정 100',
+      time: 1200, spawn: 2, hp: 3, dmg: 1.5, speed: 1.12, eliteEvery: 30, bossHp: 3, gold: 10, crystals: 100,
     },
   ];
 
   G.difficultyById = function (id) { return G.DIFFICULTIES.find((d) => d.id === id) || G.DIFFICULTIES[0]; };
+
+  // 이번 판에서 버틸 시간(초), 그리고 20분 곡선 위의 지금 위치(초)
+  G.runTime = function (game) { return (game.difficulty || G.DIFFICULTIES[0]).time; };
+  G.curveTime = function (game) { return game.time * G.WIN_TIME / G.runTime(game); };
 })(window.G);

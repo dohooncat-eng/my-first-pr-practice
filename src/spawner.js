@@ -29,7 +29,7 @@
   G.updateSpawner = function (game, dt) {
     const d = game.director;
     const roster = game.stage.enemies;
-    const t = game.time, m = t / 60;
+    const t = G.curveTime(game), m = t / 60; // 20분 곡선 위의 위치
 
     // 1초에 나오는 적 수(보통): 처음엔 적게, 중반에 가파르게, 후반엔 완만하게(S자).
     // 0분 0.5 → 2분 1.9 → 4분 4.6 → 6분 8.3 → 8분 13 → 10분 18 → 15분 31 → 20분 43마리, 마지막 2분은 더 몰려온다
@@ -75,7 +75,7 @@
       d.bossIndex++;
     }
 
-    if (!d.finalWave && t >= G.WIN_TIME - 60) {
+    if (!d.finalWave && game.time >= G.runTime(game) - 60) {
       d.finalWave = true;
       G.announce(game, '새벽까지 1분! 버티세요');
     }

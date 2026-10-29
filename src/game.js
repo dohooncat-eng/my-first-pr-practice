@@ -93,7 +93,7 @@
     music('play', game.stage.id);
     music('setBoss', false);
     music('duck', false);
-    G.announce(game, game.stage.name + (game.difficulty.id === 'normal' ? '' : ' · ' + game.difficulty.name) + ' · 20분을 버티세요');
+    G.announce(game, game.stage.name + (game.difficulty.id === 'normal' ? '' : ' · ' + game.difficulty.name) + ' · ' + G.runTime(game) / 60 + '분을 버티세요');
     G.saveRun(game);
   };
 
@@ -229,7 +229,7 @@
     const p = game.player;
     G.ui.showEnd(game, {
       win, time: Math.floor(game.time), level: p.level, kills: game.kills,
-      gold: settle.gold, isBest: settle.isBest, crystals: settle.crystals,
+      gold: settle.gold, isBest: settle.isBest, crystals: settle.crystals, firstClear: settle.firstClear,
       canDoubleGold: settle.gold > 0 && G.ads.rewardedReady(), unlockedDifficulty: settle.unlockedDifficulty,
       stageId: game.stage.id, championId: p.champion, difficultyId: game.difficulty.id, newlyUnlocked: settle.newlyUnlocked,
     });
@@ -253,7 +253,7 @@
     G.updateEffects(game, dt);
     game.retaliateFx = Math.max(0, game.retaliateFx - dt);
 
-    music('setIntensity', game.time / G.WIN_TIME);
+    music('setIntensity', G.curveTime(game) / G.WIN_TIME);
     const bossNow = !!game.boss;
     if (bossNow !== game.bossMusic) { game.bossMusic = bossNow; music('setBoss', bossNow); }
     if (p.hp > 0 && p.hp / p.maxHp < 0.3) {
@@ -281,8 +281,8 @@
       G.addShake(game, 12);
       return;
     }
-    if (game.time >= G.WIN_TIME) {
-      game.time = G.WIN_TIME;
+    if (game.time >= G.runTime(game)) {
+      game.time = G.runTime(game);
       endRun(true);
       return;
     }
