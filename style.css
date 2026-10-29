@@ -2872,3 +2872,74 @@ ul.odds-rules {
   .settings .set-coupon .coupon-wrap { max-width: none; flex: 1 1 100%; }
   .coupon-msg { text-align: left; }
 }
+
+/* ---------- 상자·뽑기 입자 연출 (src/ui/celebrate.js) ---------- */
+.celebrate-fx {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.fx-quake { animation: fx-quake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.fx-quake-big { animation: fx-quake-big 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+@keyframes fx-quake {
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, 1px); }
+  80% { transform: translate(2px, -1px); }
+}
+
+@keyframes fx-quake-big {
+  10% { transform: translate(-8px, 5px) rotate(-0.4deg); }
+  25% { transform: translate(8px, -6px) rotate(0.4deg); }
+  40% { transform: translate(-6px, 4px); }
+  55% { transform: translate(5px, -3px); }
+  70% { transform: translate(-3px, 2px); }
+  85% { transform: translate(2px, -1px); }
+}
+
+/* 3성·조합 카드: 테두리를 도는 무지개빛 */
+@property --holo { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.pcard.star-3.is-flipped .pcard-front::before,
+.ccard.is-combo.is-in .ccard-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0; /* 앞면이 overflow: hidden이라 안쪽에 그린다 */
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--holo), #ffb547, #ffe2a0, #ff6b3d, #a684f0, #7fd4ff, #ffb547);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: holo-spin 2.4s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ccard.is-combo .ccard-inner { position: relative; }
+
+/* 2성: 은은한 보랏빛 흐름 */
+.pcard.star-2.is-flipped .pcard-front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(214, 190, 255, 0) 35%, rgba(214, 190, 255, 0.3) 48%, rgba(214, 190, 255, 0) 60%);
+  background-size: 260% 100%;
+  mix-blend-mode: screen;
+  animation: shimmer 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes holo-spin { to { --holo: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-quake, .fx-quake-big { animation: none; }
+  .pcard.star-3.is-flipped .pcard-front::before,
+  .ccard.is-combo.is-in .ccard-inner::before,
+  .pcard.star-2.is-flipped .pcard-front::after { animation: none; }
+}

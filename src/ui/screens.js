@@ -557,6 +557,20 @@
 
   function pullLater(ms, fn) { pullTimers.push(setTimeout(fn, ms)); }
 
+  // 등급별 빛 색 (CSS의 .best-N --pc와 맞춘다)
+  const STAR_RGB = { 1: '127,212,255', 2: '166,132,240', 3: '255,181,71' };
+  const STAR_BURST = {
+    1: ['127,212,255', '200,236,255'],
+    2: ['166,132,240', '214,190,255', '127,212,255'],
+    3: ['255,181,71', '255,226,160', '255,107,61', '255,255,235', '166,132,240'],
+  };
+  const TIER_RGB = { wood: '255,181,71', silver: '200,225,255', gold: '255,214,100' };
+  const TIER_BURST = {
+    wood: ['255,181,71', '255,214,150'],
+    silver: ['200,225,255', '255,255,255', '127,212,255'],
+    gold: ['255,214,100', '255,226,160', '255,107,61', '255,255,235'],
+  };
+
   function playPull(res) {
     const fx = $('pull-fx');
     pullReturnFocus = document.activeElement;
@@ -575,11 +589,25 @@
     pullPhase = 'charge';
     if (reducedMotion()) { finishPull(); return; }
     sfx('pickupChest');
+    const cel = G.celebrate;
+    const orb = cel.centerOf(fx.querySelector('.pull-orb'));
+    const col = STAR_RGB[res.best];
+    // 빛이 구슬로 빨려들다가, 높은 등급이면 도중에 색이 바뀐다
+    cel.charge(orb.x, orb.y, STAR_RGB[1], res.best >= 2 ? 0.55 : 0.9, 60);
+    if (res.best >= 2) pullLater(550, () => { cel.charge(orb.x, orb.y, col, 0.4, res.best === 3 ? 160 : 100); cel.ring(orb.x, orb.y, col, 90, 0.35, 4); });
     pullLater(950, () => {
       pullPhase = 'burst';
       fx.classList.add('ph-burst');
       sfx(res.best === 3 ? 'evolve' : res.best === 2 ? 'levelup' : 'chest');
-      if (res.best === 3) sfx('gong');
+      cel.ring(orb.x, orb.y, col, 260 + res.best * 120, 0.8, 14);
+      cel.burst(orb.x, orb.y, { count: 50 + res.best * 50, colors: STAR_BURST[res.best], speed: 420 + res.best * 160, stars: res.best >= 2 });
+      cel.shake(fx, res.best === 3);
+      if (res.best === 3) {
+        sfx('gong');
+        cel.pillar(orb.x, col, 140, 2.2);
+        pullLater(160, () => cel.ring(orb.x, orb.y, '255,255,255', 620, 1, 6));
+        pullLater(300, () => cel.confetti(STAR_BURST[3], 110));
+      }
     });
     pullLater(1350, () => { pullPhase = 'reveal'; fx.classList.add('ph-reveal'); });
     const step = ten ? 150 : 0;
@@ -589,6 +617,13 @@
         li.classList.add('is-flipped');
         const r = res.results[i];
         sfx(r.star === 3 ? 'gong' : r.star === 2 ? 'coin' : 'gem');
+        const c = cel.centerOf(li);
+        cel.burst(c.x, c.y, { count: 10 + r.star * 14, colors: STAR_BURST[r.star], speed: 160 + r.star * 90, size: 2.4, life: 0.7, stars: r.star === 3 });
+        if (r.star === 3) {
+          // 빛기둥은 첫 ★★★ 카드에만 (여러 장이면 카드가 가려진다)
+          if (res.results.findIndex((x) => x.star === 3) === i) cel.pillar(c.x, STAR_RGB[3], 46, 1.4);
+          cel.ring(c.x, c.y, STAR_RGB[3], 140, 0.6, 6);
+        }
       });
     });
     pullLater(1600 + cards.length * step + 450, finishPull);
@@ -598,7 +633,7 @@
     pullTimers.forEach(clearTimeout);
     pullTimers = [];
     const fx = $('pull-fx');
-    if (pullPhase !== 'done' && pullPhase !== 'reveal') fx.classList.add('skip');
+    if (pullPhase !== 'done' && pullPhase !== 'reveal') { fx.classList.add('skip'); G.celebrate.clear(); }
     fx.classList.add('ph-burst', 'ph-reveal', 'ph-done');
     [...$('pull-cards').children].forEach((li) => li.classList.add('is-flipped'));
     pullPhase = 'done';
@@ -1225,12 +1260,32 @@
 
     if (reducedMotion()) { finishChest(); return; }
 
+    const cel = G.celebrate;
+    const box = () => cel.centerOf($('chest-stage').querySelector('.chest-box'));
     screen.classList.add('ch-drop');
-    chestLater(430, () => { sfx('impact'); chestSparks(10, 'dust'); });
-    chestLater(620, () => { screen.classList.add('ch-shake'); sfx('pickupChest'); });
+    chestLater(430, () => {
+      sfx('impact');
+      chestSparks(10, 'dust');
+      const c = box();
+      cel.ring(c.x, c.y + 40, '255,214,150', 160, 0.45, 5);
+      cel.shake(screen, false);
+    });
+    chestLater(620, () => {
+      screen.classList.add('ch-shake');
+      sfx('pickupChest');
+      const c = box();
+      cel.charge(c.x, c.y, TIER_RGB[start], (upgrade ? 1.7 : 0.85), 50 + n * 16);
+    });
     let t = 1500;
     if (upgrade) {
-      chestLater(t, () => { screen.classList.add('ch-flash'); });
+      chestLater(t, () => {
+        screen.classList.add('ch-flash');
+        const c = box();
+        cel.ring(c.x, c.y, TIER_RGB[tier], 360, 0.7, 12);
+        cel.burst(c.x, c.y, { count: 60, colors: TIER_BURST[tier], speed: 480 });
+        cel.charge(c.x, c.y, TIER_RGB[tier], 0.85, 120);
+        cel.shake(screen, true);
+      });
       chestLater(t + 180, () => {
         setChestTier(tier);
         screen.classList.remove('tier-' + start);
@@ -1247,6 +1302,14 @@
       screen.classList.add('ch-open');
       sfx('chest');
       chestSparks(n >= 5 ? 26 : n >= 3 ? 18 : 12, '');
+      const c = box();
+      cel.ring(c.x, c.y, TIER_RGB[tier], 220 + n * 70, 0.8, 8 + n * 2);
+      cel.burst(c.x, c.y - 20, { count: 40 + n * 22, colors: TIER_BURST[tier], speed: 380 + n * 70, lift: 220, stars: n >= 3 });
+      cel.shake(screen, n >= 5);
+      if (n >= 5) {
+        cel.pillar(c.x, TIER_RGB.gold, 130, 2);
+        chestLater(250, () => cel.confetti(TIER_BURST.gold, 90));
+      }
       if (n >= 3) {
         const b = $('chest-banner');
         b.textContent = n >= 5 ? '강화 5개!!' : '강화 ' + n + '개!';
@@ -1259,11 +1322,19 @@
       const combo = li.classList.contains('is-combo');
       chestLater(t + 120 + i * 300 + (combo ? 200 : 0), () => {
         li.classList.add('is-in');
+        const c = cel.centerOf(li);
         if (combo) {
           screen.classList.add('ch-burst');
           chestSparks(30, 'gold');
           sfx('evolve');
-        } else sfx('gem');
+          cel.ring(c.x, c.y, '255,214,100', 300, 0.8, 10);
+          cel.burst(c.x, c.y, { count: 90, colors: TIER_BURST.gold.concat(STAR_BURST[2]), speed: 520, stars: true });
+          cel.pillar(c.x, '255,214,100', 80, 1.4);
+          cel.shake(screen, true);
+        } else {
+          sfx('gem');
+          cel.burst(c.x, c.y, { count: 16, colors: TIER_BURST[tier], speed: 200, size: 2.2, life: 0.6, grav: 120 });
+        }
       });
     });
     chestLater(t + 120 + cards.length * 300 + (result.combo ? 700 : 350), finishChest);
@@ -1277,6 +1348,7 @@
     const r = chestResult;
     const screen = $('screen-chest');
     const skipping = !screen.classList.contains('ch-cards') || [...$('chest-list').children].some((li) => !li.classList.contains('is-in'));
+    if (skipping) G.celebrate.clear();
     const n = (r && r.count) || 1;
     const tier = r && TIERS.indexOf(r.tier) >= 0 ? r.tier : 'wood';
     setChestTier(tier);
@@ -1405,6 +1477,7 @@
     const ch = G.CHAMPIONS[g.player.champion];
     $('pause-eyebrow').textContent = '일시정지 · ' + st.name + ' · ' + G.formatTime(g.time);
     $('pause-title').textContent = (ch ? ch.name : '지금') + '의 등불';
+    $('btn-save-quit').textContent = '저장하고 나가기';
     renderBuild(g);
     renderComboBook(g);
     setTab('build');
@@ -1602,7 +1675,10 @@
       $('tab-combo').addEventListener('click', () => { sfx('click'); setTab('combo'); });
       $('btn-resume').addEventListener('click', () => { sfx('click'); game.resume(); });
       $('btn-pause-settings').addEventListener('click', () => { sfx('click'); openSettings('pause'); });
-      $('btn-save-quit').addEventListener('click', () => { sfx('click'); game.saveAndQuit(); });
+      $('btn-save-quit').addEventListener('click', () => {
+        sfx('click');
+        if (!game.saveAndQuit()) $('btn-save-quit').textContent = '저장 실패 · 다시 시도';
+      });
       $('btn-giveup').addEventListener('click', () => {
         confirmDialog('이번 판을 포기할까요?', '지금까지 버틴 시간과 모은 금화로 결과가 정해지고, 이어하기 기록은 지워집니다.', '포기하기', () => {
           closeDialog();

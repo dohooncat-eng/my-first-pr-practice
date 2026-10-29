@@ -9,7 +9,7 @@ src/data/enemies.js  src/data/weapons.js  src/data/passives.js  src/data/combos.
 src/systems/meta.js  src/player.js  src/enemies.js
 src/systems/weapons/core.js  src/systems/weapons/base.js  src/systems/weapons/new.js  src/systems/weapons/combo.js
 src/upgrades.js  src/systems/combos.js  src/systems/chest.js  src/systems/boss.js  src/spawner.js  src/pickups.js  src/systems/save.js
-src/ui/hud.js  src/ui/screens.js  src/game.js  src/main.js
+src/ui/hud.js  src/ui/celebrate.js  src/ui/screens.js  src/game.js  src/main.js
 ```
 
 ## 파일 담당
@@ -17,7 +17,7 @@ src/ui/hud.js  src/ui/screens.js  src/game.js  src/main.js
 |---|---|
 | 메인 | `src/data/*`, `src/game.js` `player.js` `enemies.js` `spawner.js` `pickups.js` `effects.js` `sprites.js` `upgrades.js` `main.js`, `src/systems/{meta,combos,chest,boss,save}.js`, `src/systems/weapons/{core,base}.js` |
 | 무기 에이전트 | `src/systems/weapons/new.js`(새 무기 5), `src/systems/weapons/combo.js`(진화 9 + 무기 조합 3). `src/data/weapons.js`에서는 자기 무기의 수치만 고칠 수 있음 |
-| UI 에이전트 | `index.html`, `style.css`, `src/ui/hud.js`, `src/ui/screens.js`, `src/systems/audio.js` |
+| UI 에이전트 | `index.html`, `style.css`, `src/ui/hud.js`, `src/ui/celebrate.js`(상자·뽑기 입자 연출 `G.celebrate`), `src/ui/screens.js`, `src/systems/audio.js` |
 
 ## 핵심 객체
 - `G.game` — 게임 하나. 주요 필드: `state`, `stage`(G.STAGES 항목), `player`, `enemies`, `projectiles`, `gems`, `items`, `particles`, `numbers`, `boss`(지금 살아 있는 보스 적 또는 null), `time`(초), `kills`, `runGold`(이번 판 금화), `banner`, `settings`(= G.meta.settings), `cam`, `w` `h`(화면 CSS px), `safe`(안전 영역 여백), `fps`.

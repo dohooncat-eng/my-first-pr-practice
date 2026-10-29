@@ -100,8 +100,16 @@
   game.continueRun = function () {
     const d = G.loadRunData();
     if (!d || game.state === 'loading') return false;
-    resetWorld(d.stageId, d.player.champion, d.difficultyId);
-    G.restoreRun(game, d);
+    try {
+      resetWorld(d.stageId, d.player.champion, d.difficultyId);
+      G.restoreRun(game, d);
+    } catch (e) {
+      // 망가진 저장은 버리고 타이틀로 (계속 같은 곳에서 멈추지 않게)
+      console.warn('이어하기 실패', e);
+      G.clearRun();
+      game.toTitle();
+      return false;
+    }
     G.input.clear();
     game.state = 'paused';
     music('play', game.stage.id);
@@ -156,8 +164,10 @@
   };
 
   game.saveAndQuit = function () {
-    if (game.player && SAVE_STATES.indexOf(game.state) !== -1) G.saveRun(game);
+    // 저장에 실패하면 나가지 않는다(나가면 이 판을 잃는다)
+    if (game.player && SAVE_STATES.indexOf(game.state) !== -1 && !G.saveRun(game)) return false;
     game.toTitle();
+    return true;
   };
 
   game.giveUp = function () {
@@ -212,7 +222,8 @@
     game.state = 'end';
     music('setBoss', false);
     music('stinger', win ? 'victory' : 'defeat');
-    const settle = G.settleRun(game, win);
+    const settle = game.deathSettle || G.settleRun(game, win);
+    game.deathSettle = null;
     game.lastSettle = { gold: settle.gold, doubled: false };
     G.clearRun();
     const p = game.player;
@@ -260,6 +271,8 @@
 
     if (p.hp <= 0) {
       game.state = 'dying';
+      // 정산을 먼저 저장해 둔다: 쓰러지는 연출 중에 앱이 꺼져도 보상은 남는다
+      game.deathSettle = G.settleRun(game, false);
       G.clearRun(); // 쓰러진 판은 이어할 수 없다
       game.dieTimer = 1.3;
       G.burst(game, p.x, p.y, 'rgba(255, 181, 71, 0.9)', 40, 260, true);
@@ -462,7 +475,12 @@
     if (raw > 0) game.fps = game.fps * 0.93 + (1 / raw) * 0.07;
     game.clock += dt;
     autoQuality(dt);
-    if (game.state === 'playing') update(dt);
+    if (game.state === 'playing') {
+      // 느린 폰(20fps 미만)에서도 게임 시간이 실제 시간을 따라가게 나눠서 진행한다. 0.1초 넘게 멈춘 프레임은 버린다.
+      const total = Math.min(0.1, raw);
+      const n = Math.max(1, Math.ceil(total / 0.05));
+      for (let i = 0; i < n && game.state === 'playing'; i++) update(total / n);
+    }
     else if (game.state === 'dying') {
       game.dieTimer -= dt;
       G.updateEffects(game, dt * 0.5);

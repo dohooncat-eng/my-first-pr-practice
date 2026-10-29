@@ -5,6 +5,7 @@
 ## 게임
 - 뱀서류 생존 액션 웹 게임. 순수 HTML/JS/Canvas, 빌드 도구 없음. `index.html`을 브라우저로 열면 바로 실행된다(`file://`에서도 돌아가야 함).
 - 모든 코드는 전역 `window.G` 하나에 붙는다. **ES 모듈·import·npm 패키지 금지**, `<script>` 태그 순서로 불러온다.
+- **작업 시작 전 `docs/worklog.md`를 읽는다.** 로컬·클라우드·Codex 세션이 서로의 기억을 공유하는 유일한 곳이다. 끝나면 한 일·남은 일을 거기에 적는다.
 - 구조와 함수 계약: `docs/architecture.md`. 그림 규칙: `docs/art-style.md`. 기능 설명: `README.md`.
 
 ## 코드 규칙

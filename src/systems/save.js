@@ -6,6 +6,12 @@
   const MAX_SAVED_ENEMIES = 450;
 
   function r1(v) { return Math.round(v * 10) / 10; }
+  function rank(e) { return e.boss ? 2 : e.elite ? 1 : 0; }
+  function pickKnown(obj, table) {
+    const out = {};
+    Object.keys(obj || {}).forEach((k) => { if (table[k]) out[k] = obj[k]; });
+    return out;
+  }
 
   G.serializeRun = function (game) {
     const p = game.player;
@@ -26,7 +32,8 @@
         passives: Object.assign({}, p.passives), fusions: p.fusions.slice(),
         weapons: p.weapons.map((w) => ({ key: w.key, level: w.level, timer: w.timer })),
       },
-      enemies: game.enemies.filter((e) => !e.dead).slice(0, MAX_SAVED_ENEMIES).map((e) => ({
+      // 잘라낼 때 보스·엘리트가 빠지지 않게 앞으로 (sort는 같은 순위의 순서를 지킨다)
+      enemies: game.enemies.filter((e) => !e.dead).sort((a, b) => rank(b) - rank(a)).slice(0, MAX_SAVED_ENEMIES).map((e) => ({
         type: e.type, x: r1(e.x), y: r1(e.y), hp: Math.round(e.hp), maxHp: Math.round(e.maxHp),
         speed: r1(e.speed), damage: r1(e.damage), xp: e.xp, r: e.r, scale: e.scale,
         elite: e.elite || undefined, boss: e.boss || undefined, index: e.index, name: e.name,
@@ -37,15 +44,18 @@
   };
 
   G.saveRun = function (game) {
-    if (!game.player || !game.stage) return;
-    G.storage.set(G.RUN_KEY, G.serializeRun(game));
+    if (!game.player || !game.stage) return false;
+    return G.storage.set(G.RUN_KEY, G.serializeRun(game));
   };
 
   G.clearRun = function () { G.storage.remove(G.RUN_KEY); };
 
   G.loadRunData = function () {
     const d = G.storage.get(G.RUN_KEY);
-    if (!d || d.v !== 1 || !d.player || !G.CHAMPIONS[d.player.champion]) return null;
+    if (!d || d.v !== 1 || !d.player || !G.CHAMPIONS[d.player.champion] || !Array.isArray(d.player.weapons)) return null;
+    // 숫자가 깨진 저장은 화면 그리기에서 멈추므로 버린다
+    if (![d.time, d.player.x, d.player.y, d.player.hp, d.player.level].every(Number.isFinite)) return null;
+    ['enemies', 'gems', 'items'].forEach((k) => { if (!Array.isArray(d[k])) d[k] = []; });
     return d;
   };
 
@@ -66,7 +76,8 @@
     Object.assign(p, {
       x: d.player.x, y: d.player.y, level: d.player.level, xp: d.player.xp,
       xpNext: d.player.xpNext, revivesUsed: d.player.revivesUsed || 0,
-      passives: Object.assign({}, d.player.passives), fusions: (d.player.fusions || []).slice(),
+      // 이름이 바뀌거나 빠진 패시브·조합은 건너뛴다(예전 저장도 읽히게)
+      passives: pickKnown(d.player.passives, G.PASSIVES), fusions: (d.player.fusions || []).filter((k) => G.FUSIONS[k]),
     });
     p.weapons = [];
     d.player.weapons.forEach((w) => {

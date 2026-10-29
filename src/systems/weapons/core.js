@@ -39,6 +39,7 @@
 
   // ---------- 적 찾기 ----------
   const near = [];
+  const projNear = [];
 
   // (x, y) 반경 r 안(적의 몸 반지름 포함)에 있는 살아 있는 적을 out에 담는다
   G.enemiesInCircle = function (game, x, y, r, out) {
@@ -134,8 +135,9 @@
       }
       if (b.spin) b.angle += b.spin * dt;
       if (b.dead) continue;
-      game.grid.query(b.x, b.y, b.r + 50, near);
-      for (const e of near) {
+      // near는 onHit 안의 범위 공격(enemiesInCircle)이 덮어쓰므로 따로 쓴다
+      game.grid.query(b.x, b.y, b.r + 50, projNear);
+      for (const e of projNear) {
         if (e.dead || b.hits.indexOf(e.id) !== -1) continue;
         const dx = e.x - b.x, dy = e.y - b.y;
         if (dx * dx + dy * dy > (e.r + b.r) * (e.r + b.r)) continue;
