@@ -1,8 +1,11 @@
-// 레벨업 선택지: 칸 제한(무기 6·패시브 6)을 지키며 가중치로 고른다
+// 레벨업 선택지: 칸 제한(무기 6·패시브 6, 조합 결과는 칸 밖)을 지키며 가중치로 고른다
 (function (G) {
   'use strict';
 
   G.passiveSlotsUsed = function (p) { return Object.keys(p.passives).length + p.fusions.length; };
+  // 무기+무기·패시브+패시브 조합 결과는 칸을 따로 받는다(조합할 때마다 새로 하나 더 고를 수 있게)
+  G.weaponSlots = function (p) { return G.WEAPON_SLOTS + p.weapons.filter((w) => G.WEAPONS[w.key].kind === 'union').length; };
+  G.passiveSlots = function (p) { return G.PASSIVE_SLOTS + p.fusions.length; };
 
   // 이 기본 무기가 이미 진화·조합 재료로 쓰였는지
   function consumed(p, key) {
@@ -19,8 +22,8 @@
   G.buildChoices = function (game, n) {
     const p = game.player;
     const pool = [];
-    const weaponSlotFree = p.weapons.length < G.WEAPON_SLOTS;
-    const passiveSlotFree = G.passiveSlotsUsed(p) < G.PASSIVE_SLOTS;
+    const weaponSlotFree = p.weapons.length < G.weaponSlots(p);
+    const passiveSlotFree = G.passiveSlotsUsed(p) < G.passiveSlots(p);
 
     Object.keys(G.WEAPONS).forEach((key) => {
       if (!G.isBaseWeapon(key) || !G.WEAPON_BEHAVIORS[key]) return; // 동작이 없는 무기는 내보내지 않는다

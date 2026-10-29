@@ -172,7 +172,7 @@
     // 무기 6칸 + 패시브 6칸
     const big = narrow ? 36 : 40, gap = narrow ? 5 : 6;
     const slotsY = T + 78;
-    const wslots = G.WEAPON_SLOTS || 6;
+    const wslots = G.weaponSlots(p);
     for (let i = 0; i < wslots; i++) {
       const wpn = p.weapons[i];
       const def = wpn && G.WEAPONS[wpn.key];
@@ -181,7 +181,7 @@
     }
     const small = narrow ? 26 : 28;
     const py = slotsY + big + 6;
-    const pslots = G.PASSIVE_SLOTS || 6;
+    const pslots = G.passiveSlots(p);
     const pk = Object.keys(p.passives || {});
     const fusions = p.fusions || [];
     for (let i = 0; i < pslots; i++) {

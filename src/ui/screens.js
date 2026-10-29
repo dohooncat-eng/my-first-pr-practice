@@ -3,7 +3,7 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const SCREENS = ['title', 'stage', 'champion', 'shop', 'gacha', 'store', 'settings', 'levelup', 'chest', 'pause', 'end'];
+  const SCREENS = ['title', 'stage', 'champion', 'shop', 'codex', 'gacha', 'store', 'settings', 'levelup', 'chest', 'pause', 'end'];
 
   let game = null;
   let current = null;        // 지금 보이는 화면 이름
@@ -388,8 +388,9 @@
 
   // ---------- 업그레이드 상점 ----------
 
-  function renderShop() {
-    const list = $('shop-list');
+  // readOnly: 도감에서 쓰는 보기 전용(단추 없이 상태만)
+  function renderShop(target, readOnly) {
+    const list = target || $('shop-list');
     list.textContent = '';
     refreshGold();
     const m = meta();
@@ -419,7 +420,9 @@
       row.appendChild(body);
 
       const act = el('div', 'shop-act');
-      if (!unlocked) {
+      if (readOnly) {
+        act.appendChild(el('span', 'shop-max', !unlocked ? '잠김' : lv >= max ? '각성 완료' : 'Lv ' + lv));
+      } else if (!unlocked) {
         const price = G.championPrice ? G.championPrice(key) : ch.price;
         const buy = el('button', 'btn btn-ghost btn-small');
         buy.type = 'button';
@@ -712,8 +715,8 @@
     doPull(lastPull.n, lastPull.cur);
   }
 
-  function renderCollection() {
-    const box = $('gacha-coll');
+  function renderCollection(target) {
+    const box = target || $('gacha-coll');
     box.textContent = '';
     const items = G.gachaCollection();
     [3, 2, 1].forEach((star) => {
@@ -1393,6 +1396,87 @@
 
   // ---------- 일시정지 ----------
 
+  // ---------- 도감: 뽑기·업그레이드·무기·패시브·조합을 한곳에서 ----------
+
+  const CODEX_TABS = ['gacha', 'upgrade', 'weapon', 'passive', 'combo'];
+  let codexTab = 'gacha';
+
+  // 무기·패시브 한 장. 아직 열리지 않은 것은 이름·설명을 숨긴다
+  function codexCard(key, name, desc, extra, locked) {
+    const li = el('li', 'coll-card codex-card' + (locked ? ' is-locked' : ' is-owned'));
+    const tile = el('span', 'coll-tile');
+    tile.appendChild(hideOnError(img(iconUrl(key), 'coll-icon', 0, '')));
+    li.appendChild(tile);
+    const body = el('span', 'coll-body');
+    const top = el('span', 'coll-top');
+    top.appendChild(el('span', 'coll-name', locked ? '???' : name));
+    body.appendChild(top);
+    body.appendChild(el('span', 'coll-desc', locked ? '다음 스테이지에서 열립니다' : desc));
+    if (!locked) extra.forEach((t) => body.appendChild(el('span', 'coll-next', t)));
+    li.appendChild(body);
+    return li;
+  }
+
+  function codexGrid(box, title, cards) {
+    const sec = el('section', 'coll-group');
+    const head = el('div', 'coll-head');
+    head.appendChild(el('h3', 'coll-title', title));
+    head.appendChild(el('span', 'coll-owned', cards.filter((c) => !c.classList.contains('is-locked')).length + ' / ' + cards.length));
+    sec.appendChild(head);
+    const ul = el('ul', 'coll-grid');
+    cards.forEach((c) => ul.appendChild(c));
+    sec.appendChild(ul);
+    box.appendChild(sec);
+  }
+
+  function renderCodexWeapons(box) {
+    const cards = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k)).map((k) => {
+      const w = G.WEAPONS[k];
+      const extra = ['최대 Lv ' + G.WEAPON_MAX];
+      G.COMBOS.forEach((c) => {
+        if (c.type === 'evolve' && c.weapon === k) extra.push('진화: ' + G.WEAPONS[c.result].name + ' (+ ' + G.PASSIVES[c.passive].name + ')');
+        if (c.type === 'union' && c.weapons.indexOf(k) !== -1) {
+          const other = c.weapons.find((o) => o !== k);
+          extra.push('조합: ' + G.WEAPONS[c.result].name + ' (+ ' + G.WEAPONS[other].name + ')');
+        }
+      });
+      return codexCard(k, w.name, w.desc, extra, !G.isItemUnlocked('weapon', k));
+    });
+    codexGrid(box, '무기', cards);
+  }
+
+  function renderCodexPassives(box) {
+    const cards = Object.keys(G.PASSIVES).map((k) => {
+      const ps = G.PASSIVES[k];
+      const extra = ['최대 Lv ' + G.PASSIVE_MAX];
+      G.COMBOS.forEach((c) => {
+        if (c.type === 'evolve' && c.passive === k) extra.push('진화 재료: ' + G.WEAPONS[c.weapon].name + ' → ' + G.WEAPONS[c.result].name);
+        if (c.type === 'fusion' && c.passives.indexOf(k) !== -1) extra.push('조합: ' + G.FUSIONS[c.result].name);
+      });
+      return codexCard(k, ps.name, ps.desc, extra, !G.isItemUnlocked('passive', k));
+    });
+    codexGrid(box, '패시브', cards);
+  }
+
+  function setCodexTab(tab) {
+    codexTab = tab;
+    CODEX_TABS.forEach((t) => $('codex-tab-' + t).setAttribute('aria-selected', String(t === tab)));
+    const box = $('codex-body');
+    box.textContent = '';
+    box.scrollTop = 0;
+    if (tab === 'gacha') { const c = el('div', 'coll'); box.appendChild(c); renderCollection(c); }
+    else if (tab === 'upgrade') { const c = el('div', 'shop-list'); box.appendChild(c); renderShop(c, true); }
+    else if (tab === 'weapon') { const c = el('div', 'coll'); box.appendChild(c); renderCodexWeapons(c); }
+    else if (tab === 'passive') { const c = el('div', 'coll'); box.appendChild(c); renderCodexPassives(c); }
+    else { const c = el('div', 'combo-book'); box.appendChild(c); renderComboBook(game, c, true); }
+  }
+
+  function openCodex() {
+    setCodexTab(codexTab);
+    show('codex');
+    $('codex-tab-' + codexTab).focus({ preventScroll: true });
+  }
+
   function buildItem(key, name, levelText, cls) {
     const li = el('li', 'build-item' + (cls ? ' ' + cls : ''));
     li.appendChild(img(iconUrl(key), '', 36, ''));
@@ -1414,29 +1498,30 @@
       const combo = def.kind !== 'base';
       wl.appendChild(buildItem(w.key, def.name, combo ? (def.kind === 'evolved' ? '진화' : '무기 조합') : 'Lv ' + w.level + (w.level >= G.WEAPON_MAX ? ' MAX' : ''), combo ? 'is-combo' : ''));
     });
-    for (let i = p.weapons.length; i < G.WEAPON_SLOTS; i++) wl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
+    for (let i = p.weapons.length; i < G.weaponSlots(p); i++) wl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
     (p.fusions || []).forEach((f) => pl.appendChild(buildItem(f, G.FUSIONS[f].name, '패시브 조합', 'is-combo')));
     Object.keys(p.passives).forEach((k) => {
       const lv = p.passives[k];
       pl.appendChild(buildItem(k, G.PASSIVES[k].name, 'Lv ' + lv + (lv >= G.PASSIVE_MAX ? ' MAX' : ''), ''));
     });
     const used = Object.keys(p.passives).length + (p.fusions || []).length;
-    for (let i = used; i < G.PASSIVE_SLOTS; i++) pl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
-    $('build-wcount').textContent = p.weapons.length + ' / ' + G.WEAPON_SLOTS;
-    $('build-pcount').textContent = used + ' / ' + G.PASSIVE_SLOTS;
+    for (let i = used; i < G.passiveSlots(p); i++) pl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
+    $('build-wcount').textContent = p.weapons.length + ' / ' + G.weaponSlots(p);
+    $('build-pcount').textContent = used + ' / ' + G.passiveSlots(p);
   }
 
-  function renderComboBook(g) {
-    const book = $('combo-book');
+  // catalog: 도감에서 쓰는 목록(진행도 없이 조합법만)
+  function renderComboBook(g, target, catalog) {
+    const book = target || $('combo-book');
     book.textContent = '';
-    const status = G.comboStatus ? G.comboStatus(g.player) : [];
+    const status = G.comboStatus ? G.comboStatus(catalog ? { weapons: [], passives: {}, fusions: [] } : g.player) : [];
     const groups = { evolve: [], union: [], fusion: [] };
     status.forEach((s) => { (groups[s.combo.type] || (groups[s.combo.type] = [])).push(s); });
     const labels = G.COMBO_TYPE_LABEL || { evolve: '진화', union: '무기 조합', fusion: '패시브 조합' };
     const rules = {
       evolve: '무기 Lv 5 + 패시브 보유 → 상자에서 진화',
-      union: '두 무기 모두 Lv 5 → 상자에서 하나로',
-      fusion: '두 패시브 모두 Lv 5 → 상자에서 하나로',
+      union: '두 무기 모두 Lv 5 → 상자에서 하나로, 칸 하나 더',
+      fusion: '두 패시브 모두 Lv 5 → 상자에서 하나로, 칸 하나 더',
     };
     Object.keys(groups).forEach((type) => {
       if (!groups[type].length) return;
@@ -1454,10 +1539,10 @@
         const parts = el('span', 'combo-parts');
         s.parts.forEach((pt, i) => {
           if (i > 0) parts.appendChild(el('span', 'combo-plus', '+'));
-          const part = el('span', 'combo-part' + (pt.ok ? ' is-ok' : pt.level > 0 ? ' is-partial' : ''));
+          const part = el('span', 'combo-part' + (catalog || pt.ok ? ' is-ok' : pt.level > 0 ? ' is-partial' : ''));
           part.title = pt.name;
           part.appendChild(img(iconUrl(pt.key), '', 30, pt.name));
-          const need = pt.kind === 'weapon' || pt.need > 1 ? (pt.level || 0) + '/' + pt.need : pt.level > 0 ? '보유' : '없음';
+          const need = catalog ? (pt.need > 1 ? 'Lv ' + pt.need : '보유') : pt.kind === 'weapon' || pt.need > 1 ? (pt.level || 0) + '/' + pt.need : pt.level > 0 ? '보유' : '없음';
           part.appendChild(el('span', 'combo-part-lv', need));
           parts.appendChild(part);
         });
@@ -1597,6 +1682,10 @@
         showTitleScreen();
         $('btn-gacha').focus({ preventScroll: true });
         return true;
+      case 'codex':
+        showTitleScreen();
+        $('btn-codex').focus({ preventScroll: true });
+        return true;
       case 'store':
         if (storeFrom === 'gacha') { openGacha(gachaFrom); return true; }
         if (storeFrom === 'pause') { showPause(game); return true; }
@@ -1685,6 +1774,8 @@
       $('btn-crystal-add').addEventListener('click', () => { sfx('click'); openStore('title'); });
       $('btn-shop').addEventListener('click', () => { sfx('click'); openShop('title'); });
       $('btn-gacha').addEventListener('click', () => { sfx('click'); openGacha('title'); });
+      $('btn-codex').addEventListener('click', () => { sfx('click'); openCodex(); });
+      CODEX_TABS.forEach((t) => $('codex-tab-' + t).addEventListener('click', () => { sfx('click'); setCodexTab(t); }));
       $('btn-store').addEventListener('click', () => { sfx('click'); openStore('title'); });
       $('tab-altar').addEventListener('click', () => { sfx('click'); setGachaTab('altar'); });
       $('tab-coll').addEventListener('click', () => { sfx('click'); setGachaTab('coll'); });

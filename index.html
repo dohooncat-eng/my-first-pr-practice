@@ -62,6 +62,7 @@
   <nav class="lobby-tabs" aria-label="로비 메뉴">
     <button id="btn-shop" class="lobby-tab" type="button"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 5 8v9c0 6 11 12 11 12s11-6 11-12V8ZM16 23V10m-5 5 5-5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>업그레이드</span></button>
     <button id="btn-gacha" class="lobby-tab lobby-gacha" type="button"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 6V3h8v3M8 10l8-4 8 4-2 15-6 4-6-4ZM8 10h16M10 25h12" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 11 2 5 4 2-4 2-2 5-2-5-4-2 4-2Z" fill="currentColor"/></svg><span>뽑기</span><small>등불 제단</small></button>
+    <button id="btn-codex" class="lobby-tab" type="button"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 8C12 5 7 5 4 6v19c3-1 8-1 12 2 4-3 9-3 12-2V6c-3-1-8-1-12 2Zm0 0v19" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 11h4M8 15h4M20 11h4M20 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>도감</span></button>
     <button id="btn-store" class="lobby-tab" type="button"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13v15h22V13M3 13l4-9h18l4 9M3 13q4 6 9 0 4 6 8 0 5 6 9 0M12 28V19h8v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>상점</span></button>
     <button id="btn-settings" class="lobby-tab" type="button"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="m12 3-1 4-4 2-4-1-2 7 4 2 1 4-2 4 6 4 3-3h5l3 3 6-4-2-4 1-4 4-2-2-7-4 1-4-2-1-4Z" transform="translate(2 1) scale(.88)" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="16" r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>설정</span></button>
   </nav>
@@ -212,6 +213,28 @@
 </section>
 
 <!-- 설정 -->
+<section id="screen-codex" class="screen screen-menu" hidden>
+  <div class="menu-wrap">
+    <header class="menu-head">
+      <button class="back-btn" type="button" data-back aria-label="뒤로">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="menu-title">
+        <p class="eyebrow">모든 것을 한눈에</p>
+        <h2>도감</h2>
+      </div>
+    </header>
+    <div class="tabs codex-tabs" role="tablist" aria-label="도감 종류">
+      <button id="codex-tab-gacha" class="tab" type="button" role="tab" aria-selected="true">뽑기</button>
+      <button id="codex-tab-upgrade" class="tab" type="button" role="tab" aria-selected="false">업그레이드</button>
+      <button id="codex-tab-weapon" class="tab" type="button" role="tab" aria-selected="false">무기</button>
+      <button id="codex-tab-passive" class="tab" type="button" role="tab" aria-selected="false">패시브</button>
+      <button id="codex-tab-combo" class="tab" type="button" role="tab" aria-selected="false">조합</button>
+    </div>
+    <div id="codex-body" class="codex-body" role="tabpanel"></div>
+  </div>
+</section>
+
 <section id="screen-settings" class="screen screen-menu" hidden>
   <div class="menu-wrap menu-narrow">
     <header class="menu-head">

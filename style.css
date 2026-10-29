@@ -2986,7 +2986,7 @@ ul.odds-rules {
 #continue-info { display: block; font-size: 11px; line-height: 1.5; margin-top: 4px; color: #c6d6b9; }
 .lobby-continue > span:last-child { margin-left: auto; font-size: 28px; }
 .lobby-resume-mark { color: #d9ed9b; }
-.lobby-tabs { justify-self: center; width: min(100%, 760px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 8px; padding: 10px 12px 0; border-top: 1px solid #b9a57066; background: linear-gradient(180deg, #172b2280, #081610e0); border-radius: 18px 18px 0 0; }
+.lobby-tabs { justify-self: center; width: min(100%, 760px); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; gap: 8px; padding: 10px 12px 0; border-top: 1px solid #b9a57066; background: linear-gradient(180deg, #172b2280, #081610e0); border-radius: 18px 18px 0 0; }
 .lobby-tab { min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: transparent; border: 1px solid transparent; border-radius: 12px; color: #d2d8c6; font-size: 13px; font-weight: 600; }
 .lobby-tab svg { width: 30px; height: 30px; color: #bec8a6; }
 .lobby-tab:hover { background: #36533b66; }
@@ -3037,7 +3037,7 @@ ul.odds-rules {
   .lobby-continue { min-height: 52px; padding: 6px 10px; }
   .lobby-continue strong { font-size: 17px; }
   #continue-info { margin-top: 0; font-size: 10px; }
-  .lobby-tabs { grid-column: 1; grid-row: 2; align-self: end; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 8px; }
+  .lobby-tabs { grid-column: 1; grid-row: 2; align-self: end; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 8px; }
   .lobby-tab, .lobby-gacha { min-height: 74px; font-size: 12px; gap: 3px; }
   .lobby-tab svg { width: 25px; height: 25px; }
   .lobby-gacha small { display: none; }
@@ -3179,6 +3179,16 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
 }
 .pause-btn:active { transform: translateY(2px); box-shadow: none; }
+
+/* 도감 */
+.codex-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.codex-tabs .tab { padding: 0 4px; font-size: 14px; white-space: nowrap; }
+.codex-body { min-height: 50vh; }
+.codex-card .coll-tile { display: grid; place-items: center; }
+.codex-card .coll-icon { width: 44px; height: 44px; }
+.codex-card.is-locked { opacity: 0.6; }
+.codex-card.is-locked .coll-icon { filter: brightness(0) opacity(0.5); }
+@media (max-width: 400px) { .codex-tabs .tab { font-size: 12px; } }
 
 /* 판 끝·일시정지 단추는 폭을 나눠 꽉 채운다 */
 .end-panel .row .btn, .pause-actions .btn { flex: 1 1 auto; justify-content: center; }

@@ -12,6 +12,10 @@
 - [ ] 안드로이드 포장(TWA 또는 Capacitor), 아이콘, 오프라인 실행, 뒤로가기 버튼, 개인정보처리방침.
 - [ ] 실기기 확인: 터치가 눌린 채로 남는지, 화면 회전 뒤 조이스틱, 적이 많을 때 저사양 폰 프레임.
 
+## 2026-10-30 (3) · 로컬 Claude Code · `claude/play-fixes-fx`
+- 도감 화면(`#screen-codex`, 로비 아래 탭 "도감"): 뽑기·업그레이드·무기·패시브·조합 5탭. 기존 그리기 함수(`renderCollection`·`renderShop(target, readOnly)`·`renderComboBook(g, target, catalog)`)를 재사용. 아직 안 열린 무기·패시브는 "???"로 숨긴다.
+- 무기+무기·패시브+패시브 조합 결과는 칸 밖: `G.weaponSlots(p)` = 6 + 무기 조합 수, `G.passiveSlots(p)` = 6 + 패시브 조합 수. 조합할 때마다 새로 하나 더 고를 수 있다(HUD·일시정지 칸 수도 따라 늘어남). 진화는 그대로 1칸.
+
 ## 2026-10-30 (2) · 로컬 Claude Code · `claude/play-fixes-fx`
 - 새 무기 2개 + 진화 2개(`src/systems/weapons/new3.js`, 그림 `frost`·`shield`·`icon_frost/winter/shield/bulwark`): 서리 방울 → 겨울밤(+ 오래 타는 심지), 빛의 방패 → 성벽(+ 바위 갑옷). 늪 해금. 기본 무기 16개.
 - 확인: 얼리기(튼튼한 적 6마리 동시에 1.2초), 방패가 사방 탄환 24발 모두 막음, 상자에서 두 진화 모두 실제로 일어남, 콘솔 오류 0.
