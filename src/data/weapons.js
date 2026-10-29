@@ -1,5 +1,5 @@
-// 무기 데이터: 기본 무기 14개(레벨 1~5) + 진화 무기 14개 + 무기 조합 3개(레벨 1개)
-// 새 무기 5개(덫·빛의 창·달나방·회오리·불꽃 채찍)의 동작은 src/systems/weapons/new2.js
+// 무기 데이터: 기본 무기 16개(레벨 1~5) + 진화 무기 16개 + 무기 조합 3개(레벨 1개)
+// 새 무기 5개(덫·빛의 창·달나방·회오리·불꽃 채찍)의 동작은 src/systems/weapons/new2.js, 서리 방울·빛의 방패는 new3.js
 // 동작은 src/systems/weapons/에 있다. 수치 이름은 무기마다 그 동작이 읽는 필드다.
 (function (G) {
   'use strict';
@@ -178,6 +178,31 @@
       notes: ['', '피해 +30%, 길어집니다', '양쪽을 함께 후려칩니다', '피해 +31%, 길어집니다', '피해 +59%, 더 길고 빨라집니다'],
     },
 
+    frost: {
+      kind: 'base', name: '서리 방울',
+      desc: '가까운 적에게 얼음 방울을 쏩니다. 맞은 적은 느려지고, 서리가 쌓이면 얼어붙습니다.',
+      levels: [
+        { dmg: 9, cd: 1.1, count: 1, pierce: 1, speed: 380, slow: 2, slowMul: 0.6, freezeAt: 3, freeze: 1.0 },
+        { dmg: 9, cd: 1.1, count: 2, pierce: 1, speed: 380, slow: 2, slowMul: 0.6, freezeAt: 3, freeze: 1.0 },
+        { dmg: 13, cd: 1.0, count: 2, pierce: 2, speed: 400, slow: 2.2, slowMul: 0.55, freezeAt: 3, freeze: 1.0 },
+        { dmg: 13, cd: 0.9, count: 3, pierce: 2, speed: 400, slow: 2.2, slowMul: 0.55, freezeAt: 3, freeze: 1.1 },
+        { dmg: 19, cd: 0.8, count: 4, pierce: 2, speed: 420, slow: 2.5, slowMul: 0.5, freezeAt: 2, freeze: 1.2 },
+      ],
+      notes: ['', '얼음 방울 +1', '피해 +44%, 관통 +1, 더 느리게', '얼음 방울 +1, 더 자주 쏩니다', '피해 +46%, 얼음 방울 +1, 서리 2번에 얼어붙습니다'],
+    },
+    shield: {
+      kind: 'base', name: '빛의 방패',
+      desc: '방패가 주위를 돌며 적을 밀쳐내고, 날아오는 탄환을 막습니다.',
+      levels: [
+        { dmg: 8, count: 2, radius: 58, spin: 2.2, knock: 320, size: 1 },
+        { dmg: 8, count: 3, radius: 58, spin: 2.2, knock: 320, size: 1 },
+        { dmg: 12, count: 3, radius: 64, spin: 2.4, knock: 360, size: 1.1 },
+        { dmg: 12, count: 4, radius: 64, spin: 2.6, knock: 360, size: 1.1 },
+        { dmg: 18, count: 5, radius: 70, spin: 2.8, knock: 420, size: 1.2 },
+      ],
+      notes: ['', '방패 +1', '피해 +50%, 더 크고 넓게', '방패 +1, 더 빠르게 돕니다', '피해 +50%, 방패 +1, 더 세게 밀쳐냅니다'],
+    },
+
     // ---------- 진화 무기 (무기 Lv 5 + 패시브) ----------
     inferno: {
       kind: 'evolved', from: 'bolt', name: '화염 폭풍',
@@ -249,6 +274,17 @@
       kind: 'evolved', from: 'whip', name: '용의 채찍',
       desc: '양쪽을 한꺼번에 후려치고, 지나간 자리에 불길이 남습니다.',
       levels: [{ dmg: 70, cd: 0.8, length: 230, width: 54, both: true, flame: true }],
+    },
+
+    winter: {
+      kind: 'evolved', from: 'frost', name: '겨울밤',
+      desc: '얼음 방울이 쏟아지고, 주위가 서리 장판이 되어 다가온 적을 얼려 버립니다.',
+      levels: [{ dmg: 28, cd: 0.6, count: 5, pierce: 3, speed: 440, slow: 2.5, slowMul: 0.45, freezeAt: 2, freeze: 1.4, field: 130, fieldDmg: 7, tick: 0.5 }],
+    },
+    bulwark: {
+      kind: 'evolved', from: 'shield', name: '성벽',
+      desc: '큰 방패 여섯 개가 주위를 지키고, 탄환을 막을 때마다 체력을 회복합니다.',
+      levels: [{ dmg: 32, count: 6, radius: 80, spin: 3.0, knock: 500, size: 1.45, heal: 1 }],
     },
 
     // ---------- 무기 조합 (무기 Lv 5 + 무기 Lv 5) ----------

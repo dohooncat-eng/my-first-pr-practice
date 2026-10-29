@@ -27,6 +27,8 @@
     sun: { w: 40, h: 40 },
     trap: { w: 30, h: 30 },
     moth: { w: 24, h: 24 },
+    frost: { w: 22, h: 22 },
+    shield: { w: 30, h: 30 },
     tornado: { w: 64, h: 80, ay: 0.85 },
     gem_0: { w: 13, h: 16 },
     gem_1: { w: 15, h: 19 },

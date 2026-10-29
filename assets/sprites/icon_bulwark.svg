@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ibw-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fff0b0" stop-opacity="0.45"/>
+    <stop offset="0.6" stop-color="#ffb547" stop-opacity="0.18"/>
+    <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ibw-face" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="0.45" stop-color="#ffe08a"/>
+    <stop offset="1" stop-color="#c98a30"/>
+  </linearGradient>
+</defs>
+  <circle cx="32" cy="32" r="30" fill="url(#ibw-back)"/>
+  <g fill="url(#ibw-face)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round">
+    <path d="M12 22 L20 19 L28 22 Q28 34 20 40 Q12 34 12 22 Z"/>
+    <path d="M36 22 L44 19 L52 22 Q52 34 44 40 Q36 34 36 22 Z"/>
+  </g>
+  <path d="M32 8 L47 14 Q47 38 32 54 Q17 38 17 14 Z" fill="url(#ibw-face)" stroke="#0a1110" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M28 25 H36 V30 H41 V38 H36 V43 H28 V38 H23 V30 H28 Z" fill="#ff7a6a" stroke="#6b1424" stroke-width="1.2"/>
+  <path d="M32 13 L42 17" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+</svg>

@@ -17,6 +17,8 @@
     { type: 'evolve', result: 'mothswarm', weapon: 'moth', passive: 'lore' },
     { type: 'evolve', result: 'tempest', weapon: 'tornado', passive: 'cloak' },
     { type: 'evolve', result: 'dragonwhip', weapon: 'whip', passive: 'rage' },
+    { type: 'evolve', result: 'winter', weapon: 'frost', passive: 'wick' },
+    { type: 'evolve', result: 'bulwark', weapon: 'shield', passive: 'armor' },
 
     { type: 'union', result: 'thunderbolt', weapons: ['bolt', 'chain'] },
     { type: 'union', result: 'twinmoon', weapons: ['sword', 'scythe'] },

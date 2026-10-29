@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ish-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffd27a" stop-opacity="0.28"/>
+    <stop offset="1" stop-color="#ffd27a" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ish-face" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fff3c4"/>
+    <stop offset="0.5" stop-color="#f2c160"/>
+    <stop offset="1" stop-color="#b9772c"/>
+  </linearGradient>
+</defs>
+  <circle cx="32" cy="32" r="30" fill="url(#ish-back)"/>
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#ffe3a0" stroke-width="1.6" stroke-dasharray="3 6" opacity="0.6"/>
+  <path d="M32 10 L49 16.5 Q49 40 32 54 Q15 40 15 16.5 Z" fill="url(#ish-face)" stroke="#0a1110" stroke-width="2.6" stroke-linejoin="round"/>
+  <path d="M32 15 L44 19.5 Q44 37.5 32 48.5 Q20 37.5 20 19.5 Z" fill="none" stroke="#fffbe8" stroke-width="1.4" opacity="0.7"/>
+  <path d="M32 21 L34.6 28.6 L42.4 28.6 L36 33.2 L38.6 40.6 L32 36 L25.4 40.6 L28 33.2 L21.6 28.6 L29.4 28.6 Z" fill="#fffdf0" stroke="#8a5420" stroke-width="1"/>
+</svg>

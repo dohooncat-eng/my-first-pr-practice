@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<defs>
+  <radialGradient id="frost-halo" cx="26" cy="24" r="22" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#e8fbff" stop-opacity="0.9"/>
+    <stop offset="0.4" stop-color="#8fe0ff" stop-opacity="0.35"/>
+    <stop offset="1" stop-color="#5cc8ff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="frost-ice" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="0.45" stop-color="#bff0ff"/>
+    <stop offset="1" stop-color="#4fa9e0"/>
+  </linearGradient>
+</defs>
+  <circle cx="26" cy="24" r="22" fill="url(#frost-halo)"/>
+  <path d="M6 24 L18 19 L28 13 L42 24 L28 35 L18 29 Z" fill="url(#frost-ice)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M18 19 L24 24 L18 29 M28 13 L24 24 L28 35 M24 24 L42 24" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.7"/>
+  <circle cx="33" cy="21" r="1.6" fill="#ffffff"/>
+</svg>

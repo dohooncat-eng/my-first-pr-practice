@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<defs>
+  <radialGradient id="shield-halo" cx="24" cy="24" r="23" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fff6d6" stop-opacity="0.75"/>
+    <stop offset="0.5" stop-color="#ffd27a" stop-opacity="0.25"/>
+    <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="shield-face" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fff3c4"/>
+    <stop offset="0.5" stop-color="#f2c160"/>
+    <stop offset="1" stop-color="#b9772c"/>
+  </linearGradient>
+</defs>
+  <circle cx="24" cy="24" r="23" fill="url(#shield-halo)"/>
+  <path d="M24 7 L37 12 Q37 30 24 41 Q11 30 11 12 Z" fill="url(#shield-face)" stroke="#0a1110" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M24 11 L33 14.5 Q33 28 24 36.5 Q15 28 15 14.5 Z" fill="none" stroke="#fffbe8" stroke-width="1.2" opacity="0.7"/>
+  <path d="M24 16 L26 22 L32 22 L27 25.5 L29 31 L24 27.5 L19 31 L21 25.5 L16 22 L22 22 Z" fill="#fffdf0" stroke="#8a5420" stroke-width="0.8"/>
+</svg>

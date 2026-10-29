@@ -21,7 +21,7 @@
       enemies: { basic: 'toad', fast: 'wisp', tank: 'wraith' },
       boss: 'marshqueen',
       // 이 스테이지가 열리면 레벨업에 나오기 시작하는 무기·패시브
-      unlocks: ['weapon:poison', 'passive:regen', 'passive:amount', 'passive:armor', 'weapon:trap', 'passive:wick'],
+      unlocks: ['weapon:poison', 'passive:regen', 'passive:amount', 'passive:armor', 'weapon:trap', 'passive:wick', 'weapon:frost', 'weapon:shield'],
       ground: 'ground_marsh', decals: ['decal_marsh_0', 'decal_marsh_1', 'decal_marsh_2', 'decal_marsh_3'],
       hpMul: 1.08, growth: 1.08, dmgMul: 1.08, speedMul: 1.03, goldMul: 1.5,
       dark: [4, 10, 9], groundColor: '#12201a', dust: 'rgba(90, 110, 80, 0.5)',
