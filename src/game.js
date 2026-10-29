@@ -236,12 +236,14 @@
   }
 
   function update(dt) {
-    game.time += dt;
+    // 2배속: 판 시간과 적 등장만 빨라지고, 움직임·공격은 그대로
+    const tdt = G.speedOn() ? dt * 2 : dt;
+    game.time += tdt;
     const p = game.player;
     G.updatePlayer(game, dt);
     game.grid.clear();
     for (const e of game.enemies) game.grid.insert(e);
-    G.updateSpawner(game, dt);
+    G.updateSpawner(game, tdt);
     G.updateEnemies(game, dt);
     G.updateWeapons(game, dt);
     G.updateProjectiles(game, dt);

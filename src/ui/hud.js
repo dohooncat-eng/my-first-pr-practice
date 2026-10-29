@@ -106,7 +106,7 @@
     ctx.textAlign = 'center';
     ctx.font = (narrow ? 30 : 34) + 'px ' + FONT_DISPLAY;
     ctx.fillStyle = game.time >= win - 60 ? '#ffd27a' : '#ece4d2';
-    ctx.fillText(G.formatTime(game.time), w / 2, T + 50);
+    ctx.fillText(G.formatTime(game.time) + (G.speedOn() ? '  ×2' : ''), w / 2, T + 50);
     ctx.font = '600 12px ' + FONT_BODY;
     ctx.fillStyle = '#a3aea7';
     const line = '/ ' + G.formatTime(win) + '  ·  처치 ' + game.kills.toLocaleString('ko-KR');

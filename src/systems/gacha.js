@@ -34,29 +34,38 @@
     return Math.max(1, minStar);
   }
 
-  function giveStar(star) {
+  // 아직 최대 레벨이 아닌 것만 (3성은 최대 1이라 이미 가진 것은 빠진다)
+  function openKeys(star) {
+    const items = st().items;
+    return G.gachaKeysByStar(star).filter((k) => (items[k] || 0) < G.GACHA_ITEMS[k].max);
+  }
+
+  // 나온 등급에 남은 것이 없으면 아래 등급, 그다음 위 등급에서 고른다. 중복·최대 레벨은 나오지 않는다.
+  function starWithItems(star) {
+    const order = [star, star - 1, star - 2, star + 1, star + 2].filter((s) => s >= 1 && s <= 3);
+    return order.find((s) => openKeys(s).length) || 0;
+  }
+
+  function giveStar(rolled) {
     const g = st();
     g.pulls++;
-    g.pity = star === 3 ? 0 : g.pity + 1;
-    let keys = G.gachaKeysByStar(star);
-    if (star === 3) keys = keys.filter((k) => !g.items[k]);
-    if (!keys.length) {
-      // 3성을 모두 모았다: 별빛 결정으로
-      const c = G.GACHA.refund[3].crystals;
+    g.pity = rolled === 3 ? 0 : g.pity + 1;
+    const star = starWithItems(rolled);
+    if (!star) {
+      // 전부 최대 레벨: 별빛 결정으로 돌려준다
+      const c = G.GACHA.refund[rolled].crystals;
       G.addCurrency('crystals', c);
-      return { key: null, star: 3, name: '별빛 결정 ' + c, icon: 'crystal', from: 0, to: 0, isNew: false, refund: { crystals: c } };
+      return { key: null, star: rolled, name: '별빛 결정 ' + c, icon: 'crystal', from: 0, to: 0, isNew: false, refund: { crystals: c } };
     }
-    const key = G.pick(keys);
+    const key = G.pick(openKeys(star));
     const it = G.GACHA_ITEMS[key];
     const from = g.items[key] || 0;
-    if (from >= it.max) {
-      const gold = G.GACHA.refund[star].gold;
-      G.addCurrency('gold', gold);
-      return { key, star, name: it.name, icon: it.icon, from, to: from, isNew: false, refund: { gold } };
-    }
     g.items[key] = from + 1;
     return { key, star, name: it.name, icon: it.icon, from, to: from + 1, isNew: from === 0, refund: null };
   }
+
+  // 전부 최대 레벨인지 (뽑기 화면 안내용)
+  G.gachaComplete = function () { return !starWithItems(3); };
 
   G.gachaPull = function (n, currency) {
     n = n >= 10 ? 10 : 1;
@@ -110,8 +119,9 @@
         '10회 뽑기는 ★★ 이상을 1개 보장합니다(마지막 장).',
         '★★★ 없이 ' + G.GACHA.pity + '번째 뽑기는 ★★★가 확정됩니다(천장). ★★★가 나오면 횟수는 0으로 돌아갑니다.',
         '천장을 포함한 ★★★의 실제 확률은 약 ' + pct(effectiveThreeRate(), 2) + '입니다.',
-        '★★★는 아직 없는 것만 나옵니다(이미 가진 ★★★의 확률은 남은 ★★★가 나눠 가집니다). 모두 모으면 ★★★ 자리에서 별빛 결정 ' + r[3].crystals + '개를 받습니다.',
-        '이미 최대 레벨인 ★★가 나오면 금화 ' + r[2].gold + ', ★가 나오면 금화 ' + r[1].gold + '으로 돌려받습니다.',
+        '이미 가진 ★★★와 최대 레벨인 것은 나오지 않습니다. 같은 등급의 남은 것이 그 확률을 나눠 가집니다.',
+        '한 등급을 모두 최대로 만들면 그 자리에서 아래 등급(없으면 위 등급)의 남은 것이 나옵니다.',
+        '모든 것을 최대로 만든 뒤에는 별빛 결정으로 돌려받습니다(★★★ ' + r[3].crystals + ' · ★★ ' + r[2].crystals + ' · ★ ' + r[1].crystals + ').',
         '★★ 확정 뽑기권은 ★★ 이상이 나오며, ★★★ 확률은 같습니다. 모든 뽑기는 천장 횟수에 들어갑니다.',
       ],
     };

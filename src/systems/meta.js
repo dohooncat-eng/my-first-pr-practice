@@ -13,17 +13,21 @@
       champLv: { keeper: 0, knight: 0, witch: 0, hunter: 0 },
       cleared: {},
       best: {},
-      settings: { sfx: 0.7, music: 0.5, shake: true, numbers: true, fps: false, quality: 'auto' },
+      settings: { sfx: 0.7, music: 0.5, shake: true, numbers: true, fps: false, quality: 'auto', speed2x: false },
       lastDifficulty: 'normal',
       crystals: 0,
       gacha: { pulls: 0, pity: 0, items: {}, tickets2: 0, freeDay: -1 },
       purchases: {},
       noAds: false,
+      speedMode: false, // 2배속 구매 여부
       pass: { until: -1, lastClaim: -1 },
       runsSinceAd: 0,
       coupons: {},
     };
   }
+
+  // 2배속: 샀고 켜 두었을 때만
+  G.speedOn = function () { return !!(G.meta.speedMode && G.meta.settings.speed2x); };
 
   // 재화 한도
   G.CURRENCY_MAX = { gold: 9999999, crystals: 99999 };
@@ -83,6 +87,7 @@
       loadGacha(m, saved.gacha);
       Object.assign(m.purchases, saved.purchases);
       m.noAds = !!saved.noAds;
+      m.speedMode = !!saved.speedMode;
       if (saved.pass) m.pass = { until: num(saved.pass.until, -1), lastClaim: num(saved.pass.lastClaim, -1) };
       m.runsSinceAd = Math.max(0, num(saved.runsSinceAd, 0));
     } else {

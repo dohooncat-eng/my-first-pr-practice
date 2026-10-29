@@ -972,6 +972,10 @@ input[type="range"]:focus-visible {
   gap: 10px;
 }
 
+.chest-wrap { transition: transform .65s cubic-bezier(.2,.8,.3,1); }
+.screen-chest:not(.ch-cards) { overflow-y: hidden; }
+.screen-chest:not(.ch-cards) .chest-wrap { transform: translateY(max(0px, calc(35vh - 140px))); }
+
 .chest-banner {
   min-height: 36px;
   font: 30px/1.2 var(--font-display);
@@ -983,16 +987,7 @@ input[type="range"]:focus-visible {
 
 .chest-banner.is-on { opacity: 1; animation: banner-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.5) both; }
 .cnt-3 .chest-banner.is-count, .cnt-4 .chest-banner.is-count { color: #e2d4ff; }
-.cnt-5 .chest-banner.is-count {
-  background: linear-gradient(90deg, #ff8a8a, #ffd36b, #8affb0, #7fd4ff, #c78bff, #ff8a8a);
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: none;
-  filter: drop-shadow(0 0 14px rgba(255, 210, 120, 0.7));
-  animation: banner-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.5) both, rainbow-slide 2.4s linear infinite;
-}
+.cnt-5 .chest-banner.is-count { color: #ffe2a0; text-shadow: 0 0 24px #ffb54788; }
 
 .chest-stage {
   position: relative;
@@ -1005,7 +1000,7 @@ input[type="range"]:focus-visible {
   cursor: pointer;
 }
 
-.chest-stage:focus-visible { outline: none; }
+.chest-stage:focus-visible { outline: 1px solid #ffe2a066; outline-offset: 3px; }
 
 .chest-aura {
   position: absolute;
@@ -1021,29 +1016,13 @@ input[type="range"]:focus-visible {
 }
 
 .chest-rays {
-  position: absolute;
-  left: 50%;
-  top: 44%;
-  width: 560px;
-  height: 560px;
-  margin: -280px 0 0 -280px;
-  border-radius: 50%;
-  opacity: 0;
-  background: repeating-conic-gradient(from 0deg, rgba(var(--cg), 0.3) 0deg 7deg, rgba(var(--cg), 0) 7deg 20deg);
-  -webkit-mask: radial-gradient(circle, #000 16%, transparent 64%);
-  mask: radial-gradient(circle, #000 16%, transparent 64%);
-  transition: opacity 0.5s ease;
+  position: absolute; left: -50%; right: -50%; top: -90%; bottom: 20%;
+  background: repeating-linear-gradient(100deg, transparent 0 12%, rgba(var(--cg),.16) 14%, transparent 18% 26%);
+  clip-path: polygon(5% 0,95% 0,58% 100%,42% 100%);
+  opacity: 0; transform: scaleY(.2); transform-origin: bottom;
+  transition: opacity .6s, transform .8s;
 }
-
-.cnt-5 .chest-rays {
-  background: repeating-conic-gradient(from 0deg,
-    rgba(255, 120, 120, 0.42) 0deg 6deg, transparent 6deg 12deg,
-    rgba(255, 214, 110, 0.42) 12deg 18deg, transparent 18deg 24deg,
-    rgba(130, 255, 170, 0.38) 24deg 30deg, transparent 30deg 36deg,
-    rgba(127, 212, 255, 0.42) 36deg 42deg, transparent 42deg 48deg,
-    rgba(199, 139, 255, 0.42) 48deg 54deg, transparent 54deg 60deg);
-}
-
+.ch-open .chest-rays { opacity: .8; transform: scaleY(1); }
 .chest-box {
   position: absolute;
   left: 50%;
@@ -1148,9 +1127,9 @@ input[type="range"]:focus-visible {
 .chest-sparks i.gold { background: var(--lamp-hot); box-shadow: 0 0 12px rgba(255, 200, 100, 1); }
 
 /* 단계 */
-.ch-drop .chest-drop { animation: chest-fall 0.6s cubic-bezier(0.35, 0, 0.5, 1) both; }
-.ch-shake .chest-shaker { animation: chest-rattle 0.3s ease-in-out infinite; }
-.ch-shake .cp-seam { animation: seam-pulse 0.28s ease-in-out infinite alternate; }
+.ch-drop .chest-drop { animation: chest-fall 0.9s cubic-bezier(0.35, 0, 0.5, 1) both; }
+.ch-shake .chest-shaker { animation: chest-rattle 0.65s ease-in-out infinite; }
+.ch-shake .cp-seam { animation: seam-pulse 0.75s ease-in-out infinite alternate; }
 .ch-shake .chest-aura { opacity: 0.6; }
 .ch-shake.ch-upgraded .chest-shaker { animation: tier-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.5) both, chest-rattle 0.3s 0.45s ease-in-out infinite; }
 .ch-flash .chest-flash { animation: flash-pop 0.75s ease-out both; }
@@ -1160,7 +1139,7 @@ input[type="range"]:focus-visible {
 .ch-open .cp-lidopen { animation: lid-swing 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.35) both; }
 .ch-open .cp-lock { animation: lock-fly 0.75s cubic-bezier(0.25, 0.6, 0.45, 1) both; }
 .ch-open .cp-beam { animation: beam-rise 0.65s 0.08s cubic-bezier(0.2, 0.8, 0.3, 1) both, beam-breathe 2.2s 0.75s ease-in-out infinite alternate; }
-.ch-open .chest-rays { opacity: 1; animation: rays-spin 18s linear infinite; }
+
 .ch-open .chest-aura { opacity: 0.85; transform: scale(1.15); }
 .ch-burst .chest-flash { animation: flash-pop 0.8s ease-out both; }
 
@@ -1171,7 +1150,20 @@ input[type="range"]:focus-visible {
 .ch-final .cp-beam { opacity: 1; transform: none; animation: beam-breathe 2.2s ease-in-out infinite alternate; }
 .ch-final .chest-flash { animation: none; }
 .ch-skip .ccard.is-in { animation: none; opacity: 1; }
+.ch-skip .chest-wrap, .skip .pull-results { transition: none; }
 
+.chest-skip { color: var(--dim); font-size: 12px; text-align: center; }
+.ch-final .chest-skip { visibility: hidden; }
+.ch-awaken.ch-shake .cp-seam { height: 10%; box-shadow: 0 -18px 35px rgba(var(--sg),.4); }
+.ch-awaken.ch-shake .chest-shaker { animation-duration: .35s; }
+.chest-fallback { display: none; }
+.no-art .chest-fallback {
+  display: block; position: absolute; left: 17%; top: 31%; width: 66%; height: 54%;
+  border: 3px solid #d6b87c; border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(90deg,#403421 0 12%,#c09b57 12% 16%,#30281f 16% 84%,#c09b57 84% 88%,#403421 88%);
+}
+.no-art .chest-fallback::before { content: ""; position: absolute; left: 0; right: 0; top: 36%; height: 4px; background: #ffe2a0; }
+.ch-open .no-art .chest-fallback::before { top: -12%; height: 22%; border: 2px solid #d6b87c; background: #55442a; transform: skewX(-12deg); }
 .chest-result {
   width: 100%;
   display: flex;
@@ -1259,6 +1251,7 @@ input[type="range"]:focus-visible {
 .ccard.is-empty { width: 230px; }
 .ccard.is-empty .ccard-detail { color: var(--dim); }
 
+.chest-result[aria-hidden="true"] { visibility: hidden; }
 .chest-gold {
   font: 18px/1 var(--font-display);
   color: var(--lamp-hot);
@@ -1278,9 +1271,10 @@ input[type="range"]:focus-visible {
 
 @keyframes chest-rattle {
   0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-3.5deg) translateY(-1.5%); }
+  20%, 40% { transform: rotate(-1.8deg) translateY(-1%); }
   50% { transform: rotate(0deg) translateY(0); }
-  75% { transform: rotate(3.5deg) translateY(-1.5%); }
+  30% { transform: rotate(1.8deg) translateY(-1%); }
+  55%, 90% { transform: none; }
 }
 
 @keyframes seam-pulse {
@@ -1341,8 +1335,6 @@ input[type="range"]:focus-visible {
   100% { opacity: 1; transform: none; }
 }
 
-@keyframes rainbow-slide { to { background-position: 200% 0; } }
-@keyframes rays-spin { to { transform: rotate(360deg); } }
 
 /* ---------- 일시정지 ---------- */
 
@@ -2211,7 +2203,7 @@ input[type="range"]:focus-visible {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   box-sizing: border-box;
   overflow-y: auto;
-  background: radial-gradient(ellipse at 50% 45%, rgba(30, 24, 48, 0.95), rgba(3, 4, 8, 0.98) 70%);
+  background: linear-gradient(115deg, #071413, #121b21 48%, #060d10);
   cursor: pointer;
 }
 
@@ -2229,61 +2221,63 @@ input[type="range"]:focus-visible {
   pointer-events: none;
 }
 
-.pull-orb {
-  position: absolute;
-  left: -60px;
-  top: -60px;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 45% 40%, #fff 0%, rgba(var(--pc), 1) 30%, rgba(var(--pc), 0.35) 60%, rgba(var(--pc), 0) 72%);
-  box-shadow: 0 0 60px 20px rgba(var(--pc), 0.45);
-  animation: orb-charge 0.95s cubic-bezier(0.5, 0, 0.6, 1) both, orb-wobble 0.22s ease-in-out infinite alternate;
+/* 매달린 육각 등불과 찢어지는 수직 장막. 원형 광원은 쓰지 않는다. */
+.pull-lantern {
+  position: absolute; width: 112px; height: 170px; left: -56px; top: -85px;
+  transform-origin: 50% -140px;
+  animation: lantern-arrive 0.9s cubic-bezier(.16,.8,.25,1) both;
+  transition: opacity .3s, filter .5s;
+  filter: drop-shadow(0 0 18px rgba(var(--pc), .35));
 }
-
-.pull-orb-core {
-  position: absolute;
-  inset: 34%;
-  border-radius: 50%;
-  background: #fff;
-  filter: blur(4px);
+.lantern-chain { position: absolute; width: 1px; height: 60vh; bottom: 100%; left: 50%; background: linear-gradient(transparent, #c1a56c); }
+.lantern-roof, .lantern-foot { position: absolute; left: 0; width: 100%; height: 28px; background: linear-gradient(100deg,#77664a,#ffe2a0 48%,#6a5740); }
+.lantern-roof { top: 0; clip-path: polygon(50% 0,100% 100%,0 100%); }
+.lantern-foot { bottom: 0; clip-path: polygon(0 0,100% 0,75% 65%,50% 100%,25% 65%); }
+.lantern-glass {
+  position: absolute; inset: 27px 10px; border: 2px solid #d8bc7a;
+  background: linear-gradient(90deg, #182a2a, rgba(var(--pc),.45), #182a2a);
+  clip-path: polygon(0 0,100% 0,90% 100%,10% 100%);
 }
-
-.pull-rays {
-  position: absolute;
-  left: -380px;
-  top: -380px;
-  width: 760px;
-  height: 760px;
-  border-radius: 50%;
-  background: repeating-conic-gradient(from 0deg, rgba(var(--pc), 0.32) 0deg 5deg, rgba(var(--pc), 0) 5deg 15deg);
-  -webkit-mask: radial-gradient(circle, #000 10%, transparent 62%);
-  mask: radial-gradient(circle, #000 10%, transparent 62%);
-  opacity: 0.35;
-  animation: rays-spin 14s linear infinite;
+.lantern-glass::before, .lantern-glass::after { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: #cbb984; }
+.lantern-glass::before { left: 20%; } .lantern-glass::after { right: 20%; }
+.lantern-flame {
+  position: absolute; left: 39%; top: 40%; width: 22%; height: 34%;
+  background: linear-gradient(#fff9dc, rgb(var(--pc)));
+  clip-path: polygon(55% 0,100% 70%,60% 100%,0 80%,20% 45%);
+  animation: wick-breathe 1.1s ease-in-out infinite alternate;
 }
-
-.best-3.ph-burst .pull-rays {
-  background:
-    repeating-conic-gradient(from 3deg, rgba(255, 240, 200, 0.4) 0deg 2deg, rgba(255, 240, 200, 0) 2deg 15deg),
-    repeating-conic-gradient(from 0deg, rgba(var(--pc), 0.45) 0deg 6deg, rgba(var(--pc), 0) 6deg 15deg);
+.pull-veil {
+  position: absolute; left: -45vw; top: -60vh; width: 90vw; height: 120vh;
+  background: repeating-linear-gradient(102deg, transparent 0 9%, rgba(var(--pc),.12) 10%, transparent 12% 20%);
+  clip-path: polygon(20% 0,80% 0,62% 100%,38% 100%);
+  opacity: 0; transform: scaleX(.08); transition: opacity .5s, transform 1s;
 }
-
+.pull-whisper {
+  position: fixed; top: calc(50% + 125px); left: 16px; right: 16px;
+  text-align: center; color: #e8d5ac; font: 18px/1.5 var(--font-display);
+  letter-spacing: .12em; transition: opacity .3s; pointer-events: none;
+}
+.ph-awaken.best-1 { --pc: 127,212,255; }
+.ph-awaken.best-2 { --pc: 166,132,240; }
+.ph-awaken.best-3 { --pc: 255,214,140; }
+.ph-awaken .pull-veil { opacity: 1; transform: scaleX(.5); }
+.ph-awaken .pull-lantern { filter: drop-shadow(0 0 28px rgba(var(--pc),.7)); }
+.ph-hush .pull-lantern, .ph-hush .pull-veil { opacity: .08; }
+.ph-burst .pull-lantern { animation: lantern-split .65s ease-in both; }
+.ph-burst .pull-veil { opacity: .65; transform: scaleX(1.4); }
+.best-3.ph-burst .pull-veil { background: repeating-linear-gradient(95deg, transparent 0 12%,rgba(255,226,160,.35) 13%,transparent 16% 25%); }
 .pull-flash {
-  position: absolute;
-  left: -50vmax;
-  top: -50vmax;
-  width: 100vmax;
-  height: 100vmax;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(var(--pc), 0.7) 25%, rgba(var(--pc), 0) 60%);
+  position: absolute; left: -50vw; top: -2px; width: 100vw; height: 4px;
+  background: linear-gradient(90deg,transparent,rgba(var(--pc),.7),#fff5dc,rgba(var(--pc),.7),transparent);
   opacity: 0;
 }
-
-.ph-burst .pull-orb { animation: orb-burst 0.45s ease-out both; }
-.ph-burst .pull-flash { animation: pull-flash 0.8s ease-out both; }
-.ph-burst .pull-rays { opacity: 0.9; transition: opacity 0.3s ease; }
-.ph-reveal .pull-rays { opacity: 0.45; }
+.ph-burst .pull-flash { animation: light-cut .7s ease-out both; }
+.ph-reveal .pull-stage { opacity: .18; transition: opacity .6s; }
+.ph-reveal .pull-whisper, .ph-done .pull-stage, .skip .pull-stage { display: none; }
+@keyframes lantern-arrive { from { opacity: 0; transform: translateY(-160px) rotate(-12deg); } to { opacity: 1; transform: none; } }
+@keyframes wick-breathe { from { transform: scaleY(.8); opacity: .65; } to { transform: scaleY(1.2); opacity: 1; } }
+@keyframes lantern-split { 40% { transform: translateY(-10px) scaleX(1.08); opacity: 1; } to { transform: translateY(-75px) scaleX(1.8); opacity: 0; } }
+@keyframes light-cut { 0% { opacity: 0; transform: scaleX(.05); } 25% { opacity: .85; transform: scaleX(1); } 100% { opacity: 0; transform: scaleY(35); } }
 
 .pull-results {
   position: relative;
@@ -2353,23 +2347,19 @@ input[type="range"]:focus-visible {
 }
 
 .pcard-back {
-  transform: rotateY(180deg);
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(255, 214, 150, 0.35);
-  background:
-    radial-gradient(circle at 50% 45%, rgba(255, 181, 71, 0.35), rgba(255, 181, 71, 0) 55%),
-    repeating-linear-gradient(45deg, rgba(255, 214, 150, 0.06) 0 6px, rgba(255, 214, 150, 0) 6px 12px),
-    #15121f;
+  transform: rotateY(180deg); display: grid; place-items: center;
+  border: 1px solid #847754;
+  background: repeating-linear-gradient(125deg, transparent 0 18px, #bca97012 19px 20px), linear-gradient(145deg,#243634,#0a1518);
 }
 
+
 .pcard-back-mark {
-  width: 34%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 214, 150, 0.6);
-  box-shadow: 0 0 18px rgba(255, 181, 71, 0.5), inset 0 0 12px rgba(255, 181, 71, 0.5);
+  width: 22%; height: 44%; border: 1px solid #e6ca83;
+  background: linear-gradient(90deg,transparent,#ffdc8b66,transparent);
+  clip-path: polygon(50% 0,100% 25%,85% 85%,50% 100%,15% 85%,0 25%);
 }
+.pcard.is-foretold:not(.is-flipped) .pcard-back { border-color: #ffe2a0; box-shadow: inset 0 0 24px #ffb54788; }
+
 
 .pcard-front {
   display: block;
@@ -2395,8 +2385,8 @@ input[type="range"]:focus-visible {
   transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--sc), 0.4), rgba(var(--sc), 0) 70%);
+  border-radius: 0;
+  background: linear-gradient(135deg, transparent, rgba(var(--sc), 0.18), transparent);
 }
 
 .pcard-icon img { width: 100%; height: 100%; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6)); }
@@ -2480,26 +2470,6 @@ input[type="range"]:focus-visible {
 }
 
 .ph-done .pull-skip { display: none; }
-
-@keyframes orb-charge {
-  0% { transform: scale(0.15); opacity: 0; }
-  20% { opacity: 1; }
-  85% { transform: scale(1.15); }
-  100% { transform: scale(0.95); }
-}
-
-@keyframes orb-wobble { from { filter: brightness(1); } to { filter: brightness(1.35); } }
-
-@keyframes orb-burst {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(4.5); opacity: 0; }
-}
-
-@keyframes pull-flash {
-  0% { opacity: 0; transform: scale(0.3); }
-  25% { opacity: 1; }
-  100% { opacity: 0; transform: scale(1.2); }
-}
 
 @keyframes pcard-in {
   from { opacity: 0; transform: translateY(24px) scale(0.85); }
@@ -2902,8 +2872,7 @@ ul.odds-rules {
   85% { transform: translate(2px, -1px); }
 }
 
-/* 3성·조합 카드: 테두리를 도는 무지개빛 */
-@property --holo { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+/* 3성·조합 카드: 달빛에서 금빛으로 이어지는 금속 테두리 */
 
 .pcard.star-3.is-flipped .pcard-front::before,
 .ccard.is-combo.is-in .ccard-inner::before {
@@ -2912,11 +2881,11 @@ ul.odds-rules {
   inset: 0; /* 앞면이 overflow: hidden이라 안쪽에 그린다 */
   border-radius: inherit;
   padding: 2px;
-  background: conic-gradient(from var(--holo), #ffb547, #ffe2a0, #ff6b3d, #a684f0, #7fd4ff, #ffb547);
+  background: linear-gradient(120deg, #7fd4ff, #ffe2a0 35%, #ffb547 65%, #fff3cc);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: holo-spin 2.4s linear infinite;
+  animation: none;
   pointer-events: none;
   z-index: 2;
 }
@@ -2935,11 +2904,32 @@ ul.odds-rules {
   pointer-events: none;
 }
 
-@keyframes holo-spin { to { --holo: 360deg; } }
 
 @media (prefers-reduced-motion: reduce) {
   .fx-quake, .fx-quake-big { animation: none; }
   .pcard.star-3.is-flipped .pcard-front::before,
   .ccard.is-combo.is-in .ccard-inner::before,
   .pcard.star-2.is-flipped .pcard-front::after { animation: none; }
+}
+
+/* 좁은 화면에서도 공개 중인 카드와 확인 버튼을 함께 볼 수 있게 한다. */
+@media (max-width: 600px) {
+  .pull-lantern { scale: .85; }
+  .pull-whisper { font-size: 15px; letter-spacing: .06em; }
+  .is-ten .pcard-inner { height: 78px; }
+  .is-ten .pcard-new { top: 2px; right: 3px; font-size: 8px; padding: 1px 3px; }
+  .is-ten .pcard-name { font-size: 12px; }
+  .is-ten .pcard-lv { font-size: 9px; }
+  .is-ten .pcard-body { top: 15px; left: 44px; right: 4px; }
+  .is-ten .pcard-icon { left: 22px; width: 27px; }
+  .pull-results { gap: 10px; }
+  .pull-title { font-size: 23px; }
+  .chest-wrap { gap: 5px; }
+  .chest-banner { font-size: 21px; }
+  .chest-stage { height: 170px; }
+  .chest-result { gap: 8px; }
+  .chest-title { font-size: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-chest *, .screen-chest *::before, .pull-fx *, .pull-fx *::before, .pull-fx *::after { animation: none !important; transition: none !important; }
 }

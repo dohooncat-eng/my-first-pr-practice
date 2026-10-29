@@ -20,7 +20,7 @@
     const m = G.meta;
     const g = product.grant;
     const bought = m.purchases[product.id] || 0;
-    const out = { crystals: 0, gold: 0, tickets2: 0, noAds: false, passDays: 0 };
+    const out = { crystals: 0, gold: 0, tickets2: 0, noAds: false, speedMode: false, passDays: 0 };
     if (g.crystals) {
       out.crystals = g.crystals * (product.firstBonus && bought === 0 ? 2 : 1);
       G.addCurrency('crystals', out.crystals);
@@ -28,6 +28,7 @@
     if (g.gold) { out.gold = g.gold; G.addCurrency('gold', g.gold); }
     if (g.tickets2) { out.tickets2 = g.tickets2; m.gacha.tickets2 += g.tickets2; }
     if (g.noAds) { out.noAds = true; m.noAds = true; }
+    if (g.speedMode) { out.speedMode = true; m.speedMode = true; m.settings.speed2x = true; }
     if (g.passDays) {
       // 오늘부터 30일(이미 쓰는 중이면 이어서 30일). 오늘 몫은 바로 받을 수 있다.
       const today = G.dayNumber();
@@ -70,7 +71,7 @@
       const firstBonus = !!(product && product.firstBonus && bought === 0);
       let note = '';
       if (firstBonus) note = '첫 구매 2배';
-      else if (limitLeft === 0) note = product.kind === 'noads' ? '구매함' : '구매 완료';
+      else if (limitLeft === 0) note = product.kind === 'noads' || product.kind === 'speed' ? '구매함' : '구매 완료';
       else if (limitLeft !== null) note = limitLeft + '회 남음';
       if (product && product.kind === 'pass') {
         const ps = G.store.passStatus();

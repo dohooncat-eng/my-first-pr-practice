@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HOLLOWLIGHT</string>
+    <string name="title_activity_main">HOLLOWLIGHT</string>
+    <string name="package_name">com.dohooncat.hollowlight</string>
+    <string name="custom_url_scheme">com.dohooncat.hollowlight</string>
+    <!-- AdMob 앱 id. 지금은 구글 시험용 id. AdMob에서 앱을 만들면 그 id(~ 들어간 것)로 바꾼다 -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
+</resources>

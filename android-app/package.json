@@ -1,0 +1,20 @@
+{
+  "name": "hollowlight-android",
+  "private": true,
+  "description": "HOLLOWLIGHT 구글 플레이 앱 포장 (Capacitor). 게임 코드는 저장소 루트에 있고, 여기서는 복사해서 감싸기만 한다.",
+  "scripts": {
+    "copy": "node scripts/copy-web.js",
+    "sync": "node scripts/copy-web.js && cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capgo/native-purchases": "8.9.6"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  }
+}
