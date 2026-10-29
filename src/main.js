@@ -33,6 +33,7 @@
   window.addEventListener('pagehide', () => { if (game.canSave()) G.saveRun(game); });
 
   G.loadSprites((p) => G.ui.setLoading(p, false)).then(() => {
+    game.resize();
     game.state = 'menu';
     G.ui.setLoading(1, true);
     G.ui.showTitle();

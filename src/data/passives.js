@@ -14,7 +14,7 @@
     might: { name: '불꽃 심지', desc: '모든 피해 +10%', apply(s, lv) { s.damage += 0.1 * lv; } },
     haste: { name: '숙련', desc: '공격 대기 시간 -8%', apply(s, lv) { s.cooldown *= Math.pow(0.92, lv); } },
     magnet: { name: '끌림', desc: '경험치 흡수 범위 +30%', apply(s, lv) { s.magnet *= 1 + 0.3 * lv; } },
-    regen: { name: '재생의 이끼', desc: '1초마다 체력 0.4 회복', apply(s, lv) { s.regen += 0.4 * lv; } },
+    regen: { name: '재생의 이끼', desc: '1초마다 체력 0.15 회복', apply(s, lv) { s.regen += 0.15 * lv; } },
     armor: { name: '바위 갑옷', desc: '받는 피해 -6%', apply(s, lv) { s.armor += 0.06 * lv; } },
     area: { name: '넓은 빛', desc: '공격 범위 +10%', apply(s, lv) { s.area += 0.1 * lv; } },
     amount: { name: '쌍둥이 심지', desc: 'Lv 1·3·5에 투사체 +1', apply(s, lv) { s.amount += AMOUNT_BY_LEVEL[lv]; } },
@@ -25,8 +25,8 @@
   G.FUSIONS = {
     heart: {
       name: '불멸의 심장', contains: ['vitality', 'regen'],
-      desc: '최대 체력 +150, 1초마다 3.5 회복, 쓰러지면 한 번 되살아납니다.',
-      apply(s) { s.maxHp += 150; s.regen += 3.5; s.revive += 1; },
+      desc: '최대 체력 +150, 1초마다 1.2 회복, 쓰러지면 한 번 되살아납니다.',
+      apply(s) { s.maxHp += 150; s.regen += 1.2; s.revive += 1; },
     },
     hellfire: {
       name: '겁화', contains: ['might', 'amount'],

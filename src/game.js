@@ -49,7 +49,9 @@
     game.kills = 0;
     game.runGold = 0;
     game.pendingLevelUps = 0;
-    game.pendingChests = 0;
+    game.chestQueue = []; // 주운 상자의 출처 'elite' | 'boss'
+    game.currentChoices = null;
+    game.lastSettle = null;
     game.shake = 0;
     game.banner = null;
     game.boss = null;
@@ -61,11 +63,14 @@
     game.lastRun = { stageId: game.stage.id, championId: game.player.champion, difficultyId: game.difficulty.id };
     G.recalcStats(game);
     game.player.hp = game.player.maxHp;
+    game.rerollsLeft = game.player.stats.rerolls;
   }
 
   game.newRun = function (stageId, championId, difficultyId) {
     if (game.state === 'loading') return;
-    resetWorld(stageId, championId, difficultyId || game.pickedDifficulty || 'normal');
+    let diffId = difficultyId || game.pickedDifficulty || 'normal';
+    if (!G.isDifficultyUnlocked(G.stageById(stageId).id, diffId)) diffId = 'normal';
+    resetWorld(stageId, championId, diffId);
     const p = game.player;
     const champ = G.CHAMPIONS[p.champion];
     G.addWeapon(p, champ.weapon, champ.weaponLevel || 1);
@@ -73,6 +78,13 @@
     if (p.stats.extraWeapon) {
       const options = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k) && !p.weapons.some((w) => w.key === k));
       G.addWeapon(p, G.pick(options), 1);
+    }
+    // 가챠 첫걸음: 높은 레벨로 시작하고, 그만큼 카드를 먼저 고른다
+    const startLevels = Math.floor(p.stats.startLevel || 0);
+    if (startLevels > 0) {
+      p.level += startLevels;
+      p.xpNext = G.xpToNext(p.level);
+      game.pendingLevelUps += startLevels;
     }
     G.clearRun();
     G.input.clear();
@@ -98,7 +110,36 @@
     return true;
   };
 
-  game.retry = function () { game.newRun(game.lastRun.stageId, game.lastRun.championId, game.lastRun.difficultyId); };
+  game.retry = function () {
+    leaveEnd();
+    game.newRun(game.lastRun.stageId, game.lastRun.championId, game.lastRun.difficultyId);
+  };
+
+  // 결과 화면을 떠날 때: 3판에 1번 전면 광고 (구글 플레이 앱에서만, 광고 제거 시 없음)
+  function leaveEnd() {
+    if (game.state === 'end' && G.ads) G.ads.maybeInterstitial();
+  }
+
+  // 결과 화면 "광고 보고 금화 2배"
+  game.claimDoubleGold = function () {
+    const s = game.lastSettle;
+    if (!s || s.doubled || game.state !== 'end' || !G.ads.rewardedReady()) return Promise.resolve(0);
+    s.doubled = true;
+    return G.ads.rewarded('double_gold').then((ok) => {
+      if (!ok) { s.doubled = false; return 0; }
+      G.meta.gold += s.gold;
+      G.saveMeta();
+      return s.gold;
+    });
+  };
+
+  // 레벨업 카드 다시 뽑기 (가챠 운명 바꾸기)
+  game.rerollChoices = function () {
+    if (game.state !== 'levelup' || !(game.rerollsLeft > 0)) return null;
+    game.rerollsLeft--;
+    game.currentChoices = G.buildChoices(game, game.player.stats.choices);
+    return game.currentChoices;
+  };
 
   game.pause = function () {
     if (game.state !== 'playing') return;
@@ -124,6 +165,7 @@
   };
 
   game.toTitle = function () {
+    leaveEnd();
     game.state = 'menu';
     G.input.clear();
     music('setBoss', false);
@@ -134,7 +176,7 @@
 
   // 레벨업·상자 창이 닫힌 뒤: 남은 상자 → 남은 레벨업 → 플레이 순서
   function continueAfterModal() {
-    if (game.pendingChests > 0) openChest();
+    if (game.chestQueue.length) openChest();
     else if (game.pendingLevelUps > 0) openLevelUp();
     else {
       game.state = 'playing';
@@ -147,8 +189,9 @@
     game.state = 'levelup';
     G.input.clear();
     music('duck', true);
-    const choices = G.buildChoices(game, game.player.stats.choices);
+    const choices = game.currentChoices = G.buildChoices(game, game.player.stats.choices);
     G.ui.showLevelUp(game, choices, (c) => {
+      game.currentChoices = null;
       G.applyChoice(game, c);
       game.pendingLevelUps--;
       // 선택하고 돌아오면 금빛 충격파가 주변 적을 밀어낸다
@@ -161,8 +204,7 @@
     game.state = 'chest';
     G.input.clear();
     music('duck', true);
-    game.pendingChests--;
-    const result = G.openChest(game);
+    const result = G.openChest(game, game.chestQueue.shift());
     G.ui.showChest(game, result, continueAfterModal);
   }
 
@@ -171,11 +213,13 @@
     music('setBoss', false);
     music('stinger', win ? 'victory' : 'defeat');
     const settle = G.settleRun(game, win);
+    game.lastSettle = { gold: settle.gold, doubled: false };
     G.clearRun();
     const p = game.player;
     G.ui.showEnd(game, {
       win, time: Math.floor(game.time), level: p.level, kills: game.kills,
-      gold: settle.gold, isBest: settle.isBest,
+      gold: settle.gold, isBest: settle.isBest, crystals: settle.crystals,
+      canDoubleGold: settle.gold > 0 && G.ads.rewardedReady(), unlockedDifficulty: settle.unlockedDifficulty,
       stageId: game.stage.id, championId: p.champion, difficultyId: game.difficulty.id, newlyUnlocked: settle.newlyUnlocked,
     });
   }
@@ -227,7 +271,7 @@
       endRun(true);
       return;
     }
-    if (game.pendingChests > 0) openChest();
+    if (game.chestQueue.length) openChest();
     else if (game.pendingLevelUps > 0) openLevelUp();
   }
 
@@ -364,9 +408,30 @@
 
   // ---------- 화면 크기와 루프 ----------
 
+  // 그래픽 품질 = 그리기 해상도(기기 픽셀 비율) 상한. 자동은 플레이 중 FPS를 보고 단계를 내리거나 올린다.
+  const QUALITY_DPR = { high: 2, medium: 1.5, low: 1 };
+  const AUTO_DPR = [2, 1.5, 1];
+  let autoStep = 0, slowFor = 0, fastFor = 0;
+
+  function quality() { return (game.settings && game.settings.quality) || 'auto'; }
+  function dprCap() { return quality() === 'auto' ? AUTO_DPR[autoStep] : QUALITY_DPR[quality()] || 2; }
+
+  G.applyQuality = function () {
+    autoStep = 0;
+    slowFor = fastFor = 0;
+    if (game.canvas) game.resize();
+  };
+
+  function autoQuality(dt) {
+    if (quality() !== 'auto' || game.state !== 'playing') { slowFor = fastFor = 0; return; }
+    if (game.fps < 48) { slowFor += dt; fastFor = 0; } else if (game.fps > 58) { fastFor += dt; slowFor = 0; } else { slowFor = fastFor = 0; }
+    if (slowFor > 2.5 && autoStep < AUTO_DPR.length - 1) { autoStep++; slowFor = 0; game.resize(); }
+    else if (fastFor > 20 && autoStep > 0) { autoStep--; fastFor = 0; game.resize(); }
+  }
+
   game.resize = function () {
     const w = window.innerWidth, h = window.innerHeight;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(dprCap(), window.devicePixelRatio || 1);
     game.w = w;
     game.h = h;
     game.dpr = dpr;
@@ -385,7 +450,8 @@
       b: parseFloat(probe.paddingBottom) || 0,
       l: parseFloat(probe.paddingLeft) || 0,
     };
-    game.ctx.imageSmoothingQuality = 'high';
+    // 그림은 화면 배율에 맞춰 구워 두므로 보통은 빠른 보간으로 충분하다. 많이 줄여 그릴 때만 한 단계 높인다.
+    game.ctx.imageSmoothingQuality = (dpr * game.zoom) / G.spriteRes < 0.6 ? 'medium' : 'low';
   };
 
   let last = 0;
@@ -395,6 +461,7 @@
     last = ts;
     if (raw > 0) game.fps = game.fps * 0.93 + (1 / raw) * 0.07;
     game.clock += dt;
+    autoQuality(dt);
     if (game.state === 'playing') update(dt);
     else if (game.state === 'dying') {
       game.dieTimer -= dt;
@@ -411,7 +478,7 @@
     if (game.state === 'playing' && (e.key === 'Escape' || e.code === 'KeyP')) game.pause();
   };
 
-  // ?debug: L 레벨업 · K 60초 넘기기 · H 회복 · B 보스 · C 상자 · M 가진 것 모두 만렙 · G 금화 1000
+  // ?debug: L 레벨업 · K 60초 넘기기 · H 회복 · B 보스 · C 상자 · V 보스 상자 · M 가진 것 모두 만렙 · G 금화 1000
   function debugKey(e) {
     const p = game.player;
     switch (e.code) {
@@ -419,7 +486,8 @@
       case 'KeyK': game.time += 60; break;
       case 'KeyH': p.hp = p.maxHp; break;
       case 'KeyB': G.spawnBoss(game, Math.min(2, game.director.bossIndex)); break;
-      case 'KeyC': G.dropItem(game, p.x + 40, p.y, 'chest'); break;
+      case 'KeyC': G.dropItem(game, p.x + 40, p.y, 'chest', 'elite'); break;
+      case 'KeyV': G.dropItem(game, p.x + 40, p.y, 'chest', 'boss'); break;
       case 'KeyM':
         p.weapons.forEach((w) => { if (G.isBaseWeapon(w.key)) w.level = G.WEAPON_MAX; });
         Object.keys(p.passives).forEach((k) => { p.passives[k] = G.PASSIVE_MAX; });
@@ -436,6 +504,8 @@
   game.step = function (dt, n) {
     for (let i = 0; i < (n || 1); i++) if (game.state === 'playing') update(dt);
   };
+
+  game.render = render; // 테스트·성능 측정용
 
   game.canSave = function () { return !!game.player && SAVE_STATES.indexOf(game.state) !== -1; };
 })(window.G);

@@ -227,7 +227,7 @@
   G.onBossKilled = function (game, e) {
     if (game.boss === e) game.boss = null;
     const st = game.stage;
-    G.dropItem(game, e.x, e.y + 10, 'chest');
+    G.dropItem(game, e.x, e.y + 10, 'chest', 'boss');
     G.dropItem(game, e.x + 30, e.y, 'coin', Math.round(30 * st.goldMul));
     G.dropItem(game, e.x - 30, e.y, 'heal');
     G.dropGem(game, e.x, e.y - 20, 40);

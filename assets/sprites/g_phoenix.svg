@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs><radialGradient id="gph-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ff6b3d" stop-opacity="0.36"/><stop offset="0.55" stop-color="#ff6b3d" stop-opacity="0.16"/><stop offset="1" stop-color="#ff6b3d" stop-opacity="0"/></radialGradient><linearGradient id="gph-vane" x1="0" y1="50" x2="0" y2="3" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#b02a1c"/><stop offset="0.35" stop-color="#f0552f"/><stop offset="0.65" stop-color="#ff9a3d"/><stop offset="0.85" stop-color="#ffc75a"/><stop offset="1" stop-color="#fff3c4"/></linearGradient><linearGradient id="gph-core" x1="0" y1="48" x2="0" y2="8" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb547" stop-opacity="0"/><stop offset="0.45" stop-color="#ffd27a" stop-opacity="0.75"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.95"/></linearGradient><linearGradient id="gph-wisp" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb547"/><stop offset="1" stop-color="#fff3c4"/></linearGradient><filter id="gph-b" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
+<circle cx="32" cy="32" r="30" fill="url(#gph-back)"/>
+<g transform="rotate(32 32 34) translate(32 34) scale(1.18 1.08) translate(-32 -34)">
+<path d="M31.4 50 C28 46 25 41 24.4 35 L27.2 34.2 L24 32.2 C23.6 27 24.6 22 26.6 17.6 C25 15.6 23.4 14.6 21.6 14.2 C24.6 12.6 26.8 12.6 28.2 13.2 C27.6 9.6 28.2 6.4 30.2 3 C31.4 6 32.6 7.6 34 8.6 C34.6 6.4 36.4 4.8 38.6 4 C37.8 7 38.4 10 40 12.4 C41.4 11.6 42.8 11.6 44.2 12 C42 15 41.6 19 41.4 24 C41.2 30 40.2 33 39.2 35.6 L36.6 35 L38.6 38.4 C37.2 43 35.2 47 32.6 50 Z" fill="#ff6b3d" opacity="0.85" filter="url(#gph-b)"/>
+<path d="M32 49 L32 61" stroke="#0a1110" stroke-width="5.4" stroke-linecap="round"/>
+<path d="M31.4 50 C28 46 25 41 24.4 35 L27.2 34.2 L24 32.2 C23.6 27 24.6 22 26.6 17.6 C25 15.6 23.4 14.6 21.6 14.2 C24.6 12.6 26.8 12.6 28.2 13.2 C27.6 9.6 28.2 6.4 30.2 3 C31.4 6 32.6 7.6 34 8.6 C34.6 6.4 36.4 4.8 38.6 4 C37.8 7 38.4 10 40 12.4 C41.4 11.6 42.8 11.6 44.2 12 C42 15 41.6 19 41.4 24 C41.2 30 40.2 33 39.2 35.6 L36.6 35 L38.6 38.4 C37.2 43 35.2 47 32.6 50 Z" fill="url(#gph-vane)" stroke="#0a1110" stroke-width="2.6" stroke-linejoin="round"/>
+<path d="M32 12 C35.6 16 37.4 22 37 29 C36.6 35 34.6 41 32 46 C29.4 41 27.4 35 27 29 C26.6 22 28.4 16 32 12 Z" fill="url(#gph-core)"/>
+<path d="M32 20 Q35 19 38 16.2 M32 20 Q29 19 26 16.2" fill="none" stroke="#a8261a" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+<path d="M32 26 Q35.7 25 39.4 22.2 M32 26 Q28.3 25 24.6 22.2" fill="none" stroke="#a8261a" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+<path d="M32 32 Q35.7 31 39.4 28.2 M32 32 Q28.3 31 24.6 28.2" fill="none" stroke="#a8261a" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+<path d="M32 40 Q34.7 39 37.4 36.2 M32 40 Q29.3 39 26.6 36.2" fill="none" stroke="#a8261a" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+<path d="M32 10 L32 60" stroke="#fff6dc" stroke-width="1.5" stroke-linecap="round"/>
+<path d="M32 49.5 L32 60.5" stroke="#ece4d2" stroke-width="2.4" stroke-linecap="round"/>
+</g>
+<path d="M56 4 C59 8 58.6 12 56 12.4 C53.4 12 53 8 56 4 Z" fill="url(#gph-wisp)" stroke="#0a1110" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="M50 0.5 C51.8 2.9 51.56 5.3 50 5.54 C48.44 5.3 48.2 2.9 50 0.5 Z" fill="url(#gph-wisp)" stroke="#0a1110" stroke-width="1.24" stroke-linejoin="round"/>
+<path d="M59 17.25 C60.65 19.45 60.43 21.65 59 21.87 C57.57 21.65 57.35 19.45 59 17.25 Z" fill="url(#gph-wisp)" stroke="#0a1110" stroke-width="1.17" stroke-linejoin="round"/>
+<circle cx="8" cy="24" r="1.4" fill="#ff6b3d"/>
+<circle cx="14" cy="12" r="1.1" fill="#ffb547"/>
+<circle cx="44" cy="56" r="1.2" fill="#ffb547"/>
+<path d="M9 42.6 L9.88 45.12 L12.4 46 L9.88 46.88 L9 49.4 L8.12 46.88 L5.6 46 L8.12 45.12 Z" fill="#ffffff"/>
+</svg>

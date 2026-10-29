@@ -24,7 +24,10 @@
 
   // ---------- 스탯 도우미 ----------
   G.cd = function (game, base) { return base * game.player.stats.cooldown; };
-  G.area = function (game, r) { return r * game.player.stats.area; };
+  // 무기 크기: 모든 범위·반지름에 G.WEAPON_SIZE를 곱한다 (화면에서 무기가 너무 크지 않게)
+  G.WEAPON_SIZE = 0.8;
+  G.areaMul = function (game) { return game.player.stats.area * G.WEAPON_SIZE; };
+  G.area = function (game, r) { return r * G.areaMul(game); };
   G.amount = function (game, n) { return n + game.player.stats.amount; };
 
   G.inView = function (game, x, y, margin) {

@@ -2,8 +2,8 @@
 (function (G) {
   'use strict';
 
-  const MAX_NUMBERS = 90;
-  const MAX_PARTICLES = 500;
+  const MAX_NUMBERS = 60;
+  const MAX_PARTICLES = 300;
 
   // style: '' 보통, 'big' 큰 피해, 'soft' 지속 피해, 'crit' 치명타, 'heal' 회복
   G.addDamageNumber = function (game, x, y, n, style) {
@@ -28,10 +28,11 @@
     }
   };
 
+  // 흔들림은 약하게: 들어온 세기의 0.4배, 최대 6px, 빨리 가라앉는다
   G.addShake = function (game, amount) {
     if (game.settings && !game.settings.shake) return;
-    if (game.reducedMotion) amount *= 0.3;
-    game.shake = Math.min(14, game.shake + amount);
+    amount *= game.reducedMotion ? 0.15 : 0.4;
+    game.shake = Math.min(6, game.shake + amount);
   };
 
   // 퍼져 나가는 빛 고리 (가산 합성으로 그린다)
@@ -48,13 +49,14 @@
   };
 
   // 레벨업 선택 직후: 금빛 충격파가 주변 적을 밀어낸다
+  const blastList = [];
   G.levelUpBlast = function (game) {
     const p = game.player;
     G.ring(game, p.x, p.y, 10, 240, 0.55, 'rgba(255, 214, 130, 0.95)', 7);
     G.ring(game, p.x, p.y, 10, 150, 0.4, 'rgba(255, 245, 210, 0.9)', 3);
     G.burst(game, p.x, p.y - 10, 'rgba(255, 210, 120, 0.95)', 24, 260, true);
     G.screenFlash(game, '255, 214, 140', 0.18, 0.35);
-    for (const e of G.enemiesInCircle(game, p.x, p.y, 200, [])) {
+    for (const e of G.enemiesInCircle(game, p.x, p.y, 200, blastList)) {
       const dx = e.x - p.x, dy = e.y - p.y;
       const k = (e.boss ? 60 : 520) / (Math.hypot(dx, dy) || 1);
       e.kx += dx * k;
@@ -110,7 +112,7 @@
       }
     }
 
-    game.shake = Math.max(0, game.shake - dt * 30);
+    game.shake = Math.max(0, game.shake - dt * 40);
     if (game.banner) {
       game.banner.life -= dt;
       if (game.banner.life <= 0) game.banner = null;
@@ -155,23 +157,70 @@
     ctx.globalAlpha = 1;
   };
 
+  // 데미지 숫자: 글자를 스타일마다 한 번 그려 둔 판에서 잘라 찍는다 (매 프레임 글자를 그리면 느리다)
+  const GLYPHS = '0123456789+G';
+  const NUM_STYLES = ['', 'big', 'soft', 'crit', 'heal'];
+  const NUM_COLORS = ['#fff6e4', '#ffd27a', '#ffcf8a', '#ff8a5c', '#8affb0'];
+  const BAKE = 40, PAD = 6;
+  const FONT_CHECK = BAKE + 'px "Black Han Sans"';
+  let atlas = null, atlasFont = false, fontPoll = 0;
+
+  function buildAtlas() {
+    atlasFont = !document.fonts || document.fonts.check(FONT_CHECK);
+    const font = BAKE + 'px "Black Han Sans", "IBM Plex Sans KR", sans-serif';
+    const c = document.createElement('canvas');
+    const cx = c.getContext('2d');
+    cx.font = font;
+    const cellH = Math.ceil(BAKE * 1.3) + PAD * 2;
+    const widths = GLYPHS.split('').map((ch) => Math.ceil(cx.measureText(ch).width) + PAD * 2);
+    c.width = widths.reduce((a, b) => a + b, 0);
+    c.height = cellH * NUM_STYLES.length;
+    cx.font = font;
+    cx.textBaseline = 'middle';
+    cx.lineJoin = 'round';
+    cx.lineWidth = 3.5 * BAKE / 15;
+    cx.strokeStyle = 'rgba(8, 12, 11, 0.9)';
+    const map = {};
+    NUM_STYLES.forEach((st, row) => {
+      map[st] = {};
+      let x = 0;
+      GLYPHS.split('').forEach((ch, i) => {
+        const y = row * cellH;
+        cx.fillStyle = NUM_COLORS[row];
+        cx.strokeText(ch, x + PAD, y + cellH / 2);
+        cx.fillText(ch, x + PAD, y + cellH / 2);
+        map[st][ch] = { x, y, w: widths[i], h: cellH };
+        x += widths[i];
+      });
+    });
+    atlas = { canvas: c, map };
+  }
+
   G.drawNumbers = function (ctx, game) {
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.lineJoin = 'round';
+    if (!atlas || (!atlasFont && ++fontPoll % 60 === 0 && document.fonts.check(FONT_CHECK))) buildAtlas();
+    const img = atlas.canvas;
     for (const d of game.numbers) {
       const t = d.life / d.max;
       // 처음에 살짝 커졌다 작아지는 팝
       const pop = t > 0.8 ? 1 + (t - 0.8) * 2.5 : 1;
-      const st = d.style;
+      const st = d.style || '';
       const size = (st === 'crit' ? 20 : st === 'big' || st === 'heal' ? 17 : st === 'soft' ? 10 : 13) * pop;
-      ctx.font = size + 'px "Black Han Sans", "IBM Plex Sans KR", sans-serif';
+      const k = size / BAKE;
+      const glyphs = atlas.map[st] || atlas.map[''];
+      const str = String(d.n);
+      let total = 0;
+      for (let i = 0; i < str.length; i++) {
+        const g = glyphs[str[i]];
+        if (g) total += (g.w - PAD * 2) * k;
+      }
       ctx.globalAlpha = Math.min(1, t * 2.2) * (st === 'soft' ? 0.6 : 1);
-      ctx.lineWidth = 3.5;
-      ctx.strokeStyle = 'rgba(8, 12, 11, 0.9)';
-      ctx.strokeText(d.n, d.x, d.y);
-      ctx.fillStyle = st === 'heal' ? '#8affb0' : st === 'crit' ? '#ff8a5c' : st === 'big' ? '#ffd27a' : st === 'soft' ? '#ffcf8a' : '#fff6e4';
-      ctx.fillText(d.n, d.x, d.y);
+      let x = d.x - total / 2;
+      for (let i = 0; i < str.length; i++) {
+        const g = glyphs[str[i]];
+        if (!g) continue;
+        ctx.drawImage(img, g.x, g.y, g.w, g.h, x - PAD * k, d.y - (g.h * k) / 2, g.w * k, g.h * k);
+        x += (g.w - PAD * 2) * k;
+      }
     }
     ctx.globalAlpha = 1;
   };

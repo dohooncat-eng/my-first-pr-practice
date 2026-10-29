@@ -1,9 +1,9 @@
-// HTML 화면: 타이틀, 스테이지 선택, 챔피언 선택, 업그레이드, 설정, 레벨업, 상자, 일시정지, 결과, 확인 창
+// HTML 화면: 타이틀, 스테이지 선택, 챔피언 선택, 업그레이드, 뽑기, 상점, 설정, 레벨업, 상자, 일시정지, 결과, 확인 창
 (function (G) {
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const SCREENS = ['title', 'stage', 'champion', 'shop', 'settings', 'levelup', 'chest', 'pause', 'end'];
+  const SCREENS = ['title', 'stage', 'champion', 'shop', 'gacha', 'store', 'settings', 'levelup', 'chest', 'pause', 'end'];
 
   let game = null;
   let current = null;        // 지금 보이는 화면 이름
@@ -58,8 +58,21 @@
 
   function refreshGold() {
     const g = fmtNum(meta().gold);
+    const c = fmtNum(meta().crystals);
     document.querySelectorAll('.js-gold').forEach((n) => { n.textContent = g; });
+    document.querySelectorAll('.js-crystal').forEach((n) => { n.textContent = c; });
     $('title-gold').textContent = g;
+    $('title-crystal').textContent = c;
+  }
+
+  function reducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  // 그림이 아직 없을 때 깨진 그림 대신 빈 자리를 보이게
+  function hideOnError(i) {
+    i.addEventListener('error', () => { i.style.visibility = 'hidden'; });
+    return i;
   }
 
   function focusFirst(container) {
@@ -84,9 +97,26 @@
     $('dialog-title').textContent = title;
     $('dialog-text').textContent = text;
     $('dialog-yes').textContent = yesLabel;
+    $('dialog-yes').className = 'btn btn-danger';
+    $('dialog-no').hidden = false;
     dialogYes = onYes;
     $('dialog').hidden = false;
+    $('dialog').setAttribute('role', 'alertdialog');
     $('dialog-no').focus({ preventScroll: true });
+  }
+
+  // 버튼 하나짜리 안내 창
+  function infoDialog(title, text) {
+    dialogReturnFocus = document.activeElement;
+    $('dialog-title').textContent = title;
+    $('dialog-text').textContent = text;
+    $('dialog-yes').textContent = '확인';
+    $('dialog-yes').className = 'btn btn-primary';
+    $('dialog-no').hidden = true;
+    dialogYes = closeDialog;
+    $('dialog').hidden = false;
+    $('dialog').setAttribute('role', 'dialog');
+    $('dialog-yes').focus({ preventScroll: true });
   }
 
   function closeDialog() {
@@ -119,10 +149,25 @@
 
   const LOCK_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2" fill="currentColor"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
-  // 난이도: 보통 / 어려움 / MAX
+  // 난이도: 보통 / 어려움 / MAX. 스테이지마다 앞 난이도를 깨야 열린다.
+  function diffOpen(stageId, diffId) {
+    return G.isDifficultyUnlocked ? G.isDifficultyUnlocked(stageId, diffId) : true;
+  }
+
+  // 어느 스테이지에서든 열린 난이도인지 (위쪽 난이도 버튼)
+  function diffOpenAnywhere(diffId) {
+    return G.STAGES.some((st) => diffOpen(st.id, diffId));
+  }
+
   function pickedDiff() {
-    const id = game.pickedDifficulty || (G.meta && G.meta.lastDifficulty) || 'normal';
+    let id = game.pickedDifficulty || (G.meta && G.meta.lastDifficulty) || 'normal';
+    if (!diffOpenAnywhere(id)) id = 'normal';
     return G.difficultyById ? G.difficultyById(id) : { id: 'normal', name: '보통', desc: '' };
+  }
+
+  function diffLockLine(d) {
+    const t = G.difficultyLockText ? G.difficultyLockText(G.STAGES[0].id, d.id) : null;
+    return d.name + ' 잠김 · 스테이지마다 ' + (t || '앞 난이도를 깨면 열립니다');
   }
 
   function renderDifficulty() {
@@ -131,12 +176,21 @@
     box.textContent = '';
     const cur = pickedDiff();
     G.DIFFICULTIES.forEach((d) => {
-      const b = el('button', 'diff-btn diff-' + d.id + (d.id === cur.id ? ' is-on' : ''), d.name);
+      const open = diffOpenAnywhere(d.id);
+      const b = el('button', 'diff-btn diff-' + d.id + (d.id === cur.id ? ' is-on' : '') + (open ? '' : ' is-locked'));
       b.type = 'button';
       b.setAttribute('role', 'radio');
       b.setAttribute('aria-checked', d.id === cur.id ? 'true' : 'false');
+      if (!open) {
+        b.setAttribute('aria-disabled', 'true');
+        const lock = el('span', 'diff-lock');
+        lock.innerHTML = LOCK_SVG;
+        b.appendChild(lock);
+      }
+      b.appendChild(el('span', '', d.name));
       b.addEventListener('click', () => {
         sfx('click');
+        if (!open) { $('diff-desc').textContent = diffLockLine(d); return; }
         game.pickedDifficulty = d.id;
         if (G.meta) { G.meta.lastDifficulty = d.id; if (G.saveMeta) G.saveMeta(); }
         renderDifficulty();
@@ -153,8 +207,10 @@
     const m = meta();
     const diff = pickedDiff();
     G.STAGES.forEach((st, i) => {
-      const unlocked = G.isStageUnlocked ? G.isStageUnlocked(st.id) : i === 0;
-      const btn = el('button', 'stage-card' + (unlocked ? '' : ' is-locked'));
+      const stageOpen = G.isStageUnlocked ? G.isStageUnlocked(st.id) : i === 0;
+      const diffLocked = stageOpen && !diffOpen(st.id, diff.id);
+      const unlocked = stageOpen && !diffLocked;
+      const btn = el('button', 'stage-card' + (unlocked ? '' : ' is-locked') + (diffLocked ? ' is-difflocked' : ''));
       btn.type = 'button';
       btn.id = 'stage-' + st.id;
       btn.disabled = !unlocked;
@@ -172,10 +228,15 @@
       body.appendChild(el('span', 'stage-name', st.name));
       body.appendChild(el('span', 'stage-desc', st.desc));
       const best = m.best && (m.best[st.id + ':' + diff.id] || (diff.id === 'normal' && m.best[st.id] && !m.best[st.id].difficulty ? m.best[st.id] : null));
-      if (!unlocked) {
+      if (!stageOpen) {
         const lock = el('span', 'stage-lock');
         lock.innerHTML = LOCK_SVG;
         lock.appendChild(el('span', '', eulReul(G.STAGES[i - 1].name) + ' 깨면 열립니다'));
+        body.appendChild(lock);
+      } else if (diffLocked) {
+        const lock = el('span', 'stage-lock stage-lock-diff');
+        lock.innerHTML = LOCK_SVG;
+        lock.appendChild(el('span', '', diff.name + ' 잠김 · ' + (G.difficultyLockText(st.id, diff.id) || '')));
         body.appendChild(lock);
       } else if (best) {
         const champ = G.CHAMPIONS[best.champion];
@@ -288,7 +349,8 @@
   function startRun() {
     if (!pickedStage || !pickedChampion) return;
     sfx('select');
-    game.newRun(pickedStage, pickedChampion, pickedDiff().id);
+    const d = pickedDiff().id;
+    game.newRun(pickedStage, pickedChampion, diffOpen(pickedStage, d) ? d : 'normal');
   }
 
   // ---------- 업그레이드 상점 ----------
@@ -373,6 +435,455 @@
     focusFirst($('shop-list'));
   }
 
+  // ---------- 뽑기 (등불 제단) ----------
+
+  const STAR_TITLE = { 3: '★★★ · 한 번만 얻으면 끝', 2: '★★ · 최대 Lv 5', 1: '★ · 최대 Lv 100' };
+  let gachaTab = 'altar';
+  let gachaFrom = null;
+  let lastPull = null;     // { n, cur } 한 번 더 뽑기용
+  let pullBusy = false;    // 광고를 기다리는 중
+  let pullPhase = null;    // charge | burst | reveal | done
+  let pullTimers = [];
+  let pullReturnFocus = null;
+
+  function stars(n) { return '★'.repeat(n); }
+
+  function costLabel(n, cur) {
+    return fmtNum(G.gachaCost(n, cur)) + (cur === 'gold' ? ' 금화' : ' 결정');
+  }
+
+  function gachaMsg(text, storeLink) {
+    const box = $('gacha-msg');
+    box.textContent = text || '';
+    if (storeLink) {
+      const b = el('button', 'link-btn', '상점 가기');
+      b.type = 'button';
+      b.addEventListener('click', () => { sfx('click'); openStore('gacha'); });
+      box.appendChild(b);
+    }
+  }
+
+  function renderAltar() {
+    refreshGold();
+    $('gacha-pity').textContent = G.gachaPityLeft();
+    document.querySelectorAll('#pane-altar .pull-btn').forEach((b) => {
+      const n = Number(b.dataset.n), cur = b.dataset.cur;
+      const cost = b.querySelector('.js-cost');
+      if (cost) {
+        cost.textContent = '';
+        cost.appendChild(el('span', cur === 'gold' ? 'coin' : 'crystal', ''));
+        cost.appendChild(el('span', '', costLabel(n, cur)));
+      }
+      const ok = G.gachaCanAfford(n, cur);
+      b.classList.toggle('is-short', !ok);
+      b.setAttribute('aria-disabled', String(!ok));
+    });
+    const t = (G.meta.gacha && G.meta.gacha.tickets2) || 0;
+    $('pull-ticket').hidden = t <= 0;
+    $('ticket-label').textContent = '★★ 확정권 사용 (' + t + '장)';
+    $('pull-free').hidden = !G.gachaFreeAvailable();
+    const col = G.gachaCollection();
+    $('coll-count').textContent = col.filter((c) => c.level > 0).length + '/' + col.length;
+  }
+
+  function shortMsg(n, cur) {
+    if (cur === 'gold') return '금화가 ' + fmtNum(G.gachaCost(n, 'gold') - meta().gold) + ' 모자랍니다. 판을 돌아 금화를 모으거나, 상점에서 별빛 결정을 금화로 바꿀 수 있습니다.';
+    if (cur === 'crystal') return '별빛 결정이 ' + fmtNum(G.gachaCost(n, 'crystal') - meta().crystals) + ' 모자랍니다. 스테이지·난이도를 처음 깨면 결정을 받습니다.';
+    if (cur === 'ticket2') return '★★ 확정권이 없습니다.';
+    return '오늘 무료 뽑기는 이미 썼습니다.';
+  }
+
+  function doPull(n, cur) {
+    if (pullBusy || pullPhase) return;
+    if (!G.gachaCanAfford(n, cur)) {
+      sfx('click');
+      gachaMsg(shortMsg(n, cur), cur === 'gold' || cur === 'crystal');
+      return;
+    }
+    const go = () => {
+      const res = G.gachaPull(n, cur);
+      if (!res.ok) { gachaMsg(shortMsg(n, cur)); return; }
+      lastPull = { n, cur };
+      gachaMsg('');
+      renderAltar();
+      playPull(res);
+    };
+    if (cur === 'free') {
+      pullBusy = true;
+      G.ads.rewarded('free_pull').then((ok) => {
+        pullBusy = false;
+        if (ok) go();
+        else gachaMsg('광고를 끝까지 보면 무료로 1회 뽑을 수 있습니다.');
+      }, () => { pullBusy = false; });
+      return;
+    }
+    go();
+  }
+
+  function pullCard(r, i) {
+    const li = el('li', 'pcard star-' + r.star + (r.isNew ? ' is-new' : '') + (r.refund ? ' is-refund' : ''));
+    li.style.setProperty('--i', i);
+    let detail;
+    if (!r.key) detail = '★★★를 모두 모았습니다';
+    else if (r.refund) detail = '최대 레벨 · ' + (r.refund.gold ? '금화 ' + fmtNum(r.refund.gold) : '결정 ' + fmtNum(r.refund.crystals)) + ' 돌려받음';
+    else if (r.isNew) detail = '새로 얻음 · Lv ' + r.to;
+    else detail = 'Lv ' + r.from + ' → ' + r.to;
+    li.setAttribute('aria-label', stars(r.star) + ' ' + r.name + ', ' + detail);
+    const inner = el('span', 'pcard-inner');
+    const back = el('span', 'pcard-back');
+    back.appendChild(el('span', 'pcard-back-mark'));
+    inner.appendChild(back);
+    const front = el('span', 'pcard-front');
+    front.appendChild(hideOnError(img(G.spriteUrl('card_frame_' + r.star), 'pcard-frame', 0, '')));
+    const ic = el('span', 'pcard-icon');
+    ic.appendChild(hideOnError(img(G.spriteUrl(r.icon || 'crystal'), '', 0, '')));
+    front.appendChild(ic);
+    const body = el('span', 'pcard-body');
+    body.appendChild(el('span', 'pcard-stars', stars(r.star)));
+    body.appendChild(el('span', 'pcard-name', r.name));
+    body.appendChild(el('span', 'pcard-lv', detail));
+    front.appendChild(body);
+    if (r.isNew) front.appendChild(el('span', 'pcard-new', 'NEW'));
+    inner.appendChild(front);
+    li.appendChild(inner);
+    return li;
+  }
+
+  function pullLater(ms, fn) { pullTimers.push(setTimeout(fn, ms)); }
+
+  function playPull(res) {
+    const fx = $('pull-fx');
+    pullReturnFocus = document.activeElement;
+    pullTimers.forEach(clearTimeout);
+    pullTimers = [];
+    const ten = res.results.length > 1;
+    fx.className = 'pull-fx ph-charge best-' + res.best + (ten ? ' is-ten' : ' is-one');
+    fx.hidden = false;
+    const ul = $('pull-cards');
+    ul.textContent = '';
+    res.results.forEach((r, i) => ul.appendChild(pullCard(r, i)));
+    const best = res.results.filter((r) => r.star === res.best).length;
+    $('pull-eyebrow').textContent = (ten ? '10회 뽑기' : '1회 뽑기') + ' 결과';
+    $('pull-title').textContent = res.best === 3 ? '★★★ 전설이 깨어났습니다!' : res.best === 2 ? '★★ ' + best + '개!' : '등불이 조용히 타오릅니다';
+    $('pull-note').textContent = '★★★까지 ' + res.pityLeft + '회';
+    pullPhase = 'charge';
+    if (reducedMotion()) { finishPull(); return; }
+    sfx('pickupChest');
+    pullLater(950, () => {
+      pullPhase = 'burst';
+      fx.classList.add('ph-burst');
+      sfx(res.best === 3 ? 'evolve' : res.best === 2 ? 'levelup' : 'chest');
+      if (res.best === 3) sfx('gong');
+    });
+    pullLater(1350, () => { pullPhase = 'reveal'; fx.classList.add('ph-reveal'); });
+    const step = ten ? 150 : 0;
+    const cards = [...ul.children];
+    cards.forEach((li, i) => {
+      pullLater(1600 + i * step, () => {
+        li.classList.add('is-flipped');
+        const r = res.results[i];
+        sfx(r.star === 3 ? 'gong' : r.star === 2 ? 'coin' : 'gem');
+      });
+    });
+    pullLater(1600 + cards.length * step + 450, finishPull);
+  }
+
+  function finishPull() {
+    pullTimers.forEach(clearTimeout);
+    pullTimers = [];
+    const fx = $('pull-fx');
+    if (pullPhase !== 'done' && pullPhase !== 'reveal') fx.classList.add('skip');
+    fx.classList.add('ph-burst', 'ph-reveal', 'ph-done');
+    [...$('pull-cards').children].forEach((li) => li.classList.add('is-flipped'));
+    pullPhase = 'done';
+    const again = $('pull-again');
+    const canAgain = lastPull && lastPull.cur !== 'free' && G.gachaCanAfford(lastPull.n, lastPull.cur);
+    again.hidden = !canAgain;
+    if (canAgain) {
+      again.textContent = '';
+      again.appendChild(el('span', '', (lastPull.n === 10 ? '10회 더' : '한 번 더')));
+      if (lastPull.cur === 'gold' || lastPull.cur === 'crystal') {
+        again.appendChild(el('span', lastPull.cur === 'gold' ? 'coin' : 'crystal', ''));
+        again.appendChild(el('span', 'again-cost', fmtNum(G.gachaCost(lastPull.n, lastPull.cur))));
+      }
+    }
+    setTimeout(() => { if (pullPhase === 'done') $('pull-ok').focus({ preventScroll: true }); }, 60);
+  }
+
+  function closePull() {
+    pullTimers.forEach(clearTimeout);
+    pullTimers = [];
+    $('pull-fx').hidden = true;
+    pullPhase = null;
+    renderAltar();
+    if (gachaTab === 'coll') renderCollection();
+    const back = pullReturnFocus && pullReturnFocus.isConnected ? pullReturnFocus : $('pull-gold-1');
+    back.focus({ preventScroll: true });
+  }
+
+  function pullAgain() {
+    if (!lastPull || pullPhase !== 'done') return;
+    sfx('select');
+    $('pull-fx').hidden = true;
+    pullPhase = null;
+    doPull(lastPull.n, lastPull.cur);
+  }
+
+  function renderCollection() {
+    const box = $('gacha-coll');
+    box.textContent = '';
+    const items = G.gachaCollection();
+    [3, 2, 1].forEach((star) => {
+      const list = items.filter((it) => it.star === star);
+      const sec = el('section', 'coll-group star-' + star);
+      const head = el('div', 'coll-head');
+      head.appendChild(el('h3', 'coll-title', STAR_TITLE[star]));
+      head.appendChild(el('span', 'coll-owned', list.filter((it) => it.level > 0).length + ' / ' + list.length));
+      sec.appendChild(head);
+      const ul = el('ul', 'coll-grid');
+      list.forEach((it) => {
+        const owned = it.level > 0;
+        const li = el('li', 'coll-card star-' + star + (owned ? ' is-owned' : '') + (it.level >= it.max ? ' is-max' : ''));
+        const tile = el('span', 'coll-tile');
+        tile.appendChild(hideOnError(img(G.spriteUrl('card_frame_' + star), 'coll-frame', 0, '')));
+        tile.appendChild(hideOnError(img(G.spriteUrl(it.icon), 'coll-icon', 0, '')));
+        li.appendChild(tile);
+        const body = el('span', 'coll-body');
+        const top = el('span', 'coll-top');
+        top.appendChild(el('span', 'coll-name', it.name));
+        top.appendChild(el('span', 'coll-lv', !owned ? '없음' : it.max === 1 ? '보유' : 'Lv ' + it.level + ' / ' + it.max));
+        body.appendChild(top);
+        if (it.max > 1) {
+          const bar = el('span', 'coll-bar');
+          bar.setAttribute('role', 'img');
+          bar.setAttribute('aria-label', '레벨 ' + it.level + ' / ' + it.max);
+          const fill = el('i');
+          fill.style.width = Math.round((it.level / it.max) * 100) + '%';
+          bar.appendChild(fill);
+          body.appendChild(bar);
+        }
+        body.appendChild(el('span', 'coll-desc', (owned || it.max === 1 ? '' : 'Lv 1: ') + it.desc));
+        if (owned && it.next) body.appendChild(el('span', 'coll-next', '다음: ' + it.next));
+        li.appendChild(body);
+        ul.appendChild(li);
+      });
+      sec.appendChild(ul);
+      box.appendChild(sec);
+    });
+  }
+
+  function setGachaTab(tab) {
+    gachaTab = tab;
+    const altar = tab === 'altar';
+    $('tab-altar').setAttribute('aria-selected', String(altar));
+    $('tab-coll').setAttribute('aria-selected', String(!altar));
+    $('pane-altar').hidden = !altar;
+    $('pane-coll').hidden = altar;
+    if (!altar) renderCollection();
+  }
+
+  function openGacha(from) {
+    gachaFrom = from || 'title';
+    gachaMsg('');
+    renderAltar();
+    setGachaTab('altar');
+    show('gacha');
+    $('pull-gold-1').focus({ preventScroll: true });
+  }
+
+  function openOdds() {
+    const o = G.gachaOdds();
+    const body = $('odds-body');
+    body.textContent = '';
+    const c = G.GACHA.costs;
+    body.appendChild(el('p', 'odds-cost', '가격: 금화 1회 ' + fmtNum(c.gold.one) + ' · 10회 ' + fmtNum(c.gold.ten) +
+      ' / 별빛 결정 1회 ' + fmtNum(c.crystal.one) + ' · 10회 ' + fmtNum(c.crystal.ten)));
+    o.groups.forEach((g) => {
+      const sec = el('section', 'odds-group star-' + g.star);
+      const h = el('h3', 'odds-group-title');
+      h.appendChild(el('span', 'odds-stars', stars(g.star)));
+      h.appendChild(el('span', 'odds-rate', g.rateLabel));
+      sec.appendChild(h);
+      const table = el('table', 'odds-table');
+      const thead = el('thead');
+      const hr = el('tr');
+      hr.appendChild(el('th', '', '업그레이드'));
+      hr.appendChild(el('th', '', '1회 확률'));
+      thead.appendChild(hr);
+      table.appendChild(thead);
+      const tb = el('tbody');
+      g.items.forEach((it) => {
+        const tr = el('tr');
+        tr.appendChild(el('td', '', it.name));
+        tr.appendChild(el('td', 'odds-num', it.rateLabel));
+        tb.appendChild(tr);
+      });
+      table.appendChild(tb);
+      sec.appendChild(table);
+      body.appendChild(sec);
+    });
+    body.appendChild(el('h3', 'odds-rules-title', '뽑기 규칙'));
+    const ul = el('ul', 'odds-rules');
+    o.rules.forEach((r) => ul.appendChild(el('li', '', r)));
+    body.appendChild(ul);
+    $('odds').hidden = false;
+    body.scrollTop = 0;
+    $('odds-close').focus({ preventScroll: true });
+  }
+
+  function closeOdds() {
+    $('odds').hidden = true;
+    $('btn-odds').focus({ preventScroll: true });
+  }
+
+  // ---------- 상점 ----------
+
+  let storeFrom = null;
+
+  function grantText(g) {
+    const parts = [];
+    if (g.crystals) parts.push('별빛 결정 ' + fmtNum(g.crystals));
+    if (g.gold) parts.push('금화 ' + fmtNum(g.gold));
+    if (g.tickets2) parts.push('★★ 확정 뽑기권 ' + g.tickets2 + '장');
+    if (g.noAds) parts.push('광고 제거');
+    if (g.passDays) parts.push('등불 축복 ' + g.passDays + '일');
+    return '받은 것: ' + parts.join(' · ');
+  }
+
+  function buy(id) {
+    sfx('click');
+    G.billing.purchase(id).then((r) => {
+      if (r.ok) {
+        sfx('coin');
+        renderStore();
+        infoDialog('구매 완료' + (r.debug ? ' (시험 지급)' : ''), grantText(r.granted || {}));
+      } else if (r.reason === 'unavailable') {
+        infoDialog('구글 플레이 앱에서 구매할 수 있습니다', '웹 버전에서는 결제를 할 수 없습니다. 구글 플레이에서 HOLLOWLIGHT 앱을 받으면 같은 상품을 살 수 있습니다.');
+      } else if (r.reason === 'limit') {
+        infoDialog('이미 구매했습니다', '이 상품은 더 살 수 없습니다.');
+      } else if (r.reason !== 'cancelled') {
+        infoDialog('구매하지 못했습니다', '잠시 뒤에 다시 시도해 주세요.');
+      }
+    });
+  }
+
+  function productCard(p) {
+    const st = G.store.status(p.id);
+    const card = el('article', 'prod prod-' + p.kind + (st.canBuy ? '' : ' is-soldout'));
+    const art = el('span', 'prod-art');
+    art.appendChild(hideOnError(img(G.spriteUrl(p.art), '', 0, '')));
+    card.appendChild(art);
+    const body = el('div', 'prod-body');
+    const head = el('div', 'prod-head');
+    head.appendChild(el('h3', 'prod-name', p.name));
+    if (st.note) head.appendChild(el('span', 'badge prod-note' + (st.firstBonus ? ' is-bonus' : ''), st.note));
+    body.appendChild(head);
+    let desc = p.desc;
+    if (p.kind === 'crystals') {
+      const n = p.grant.crystals;
+      desc = st.firstBonus ? '첫 구매는 2배: 별빛 결정 ' + fmtNum(n * 2) + '개' : '별빛 결정 ' + fmtNum(n) + '개';
+    }
+    if (desc) body.appendChild(el('p', 'prod-desc', desc));
+    if (p.kind === 'pass') {
+      const ps = G.store.passStatus();
+      if (ps.active) body.appendChild(el('p', 'prod-status is-on', '사용 중 · ' + ps.daysLeft + '일 남음 · 오늘 ' + (ps.claimedToday ? '받음' : '받을 수 있음')));
+    }
+    card.appendChild(body);
+    const act = el('div', 'prod-act');
+    if (p.kind === 'pass') {
+      const ps = G.store.passStatus();
+      if (ps.active && !ps.claimedToday) {
+        const claim = el('button', 'btn btn-crystal btn-small');
+        claim.type = 'button';
+        claim.id = 'pass-claim';
+        claim.appendChild(el('span', 'crystal', ''));
+        claim.appendChild(el('span', '', '오늘 받기 +' + G.STORE.passDaily));
+        claim.addEventListener('click', () => {
+          const got = G.store.claimPassDaily();
+          if (got) { sfx('coin'); renderStore(); focusStore('buy-' + p.id); }
+        });
+        act.appendChild(claim);
+      }
+    }
+    const btn = el('button', 'btn btn-primary btn-small prod-buy');
+    btn.type = 'button';
+    btn.id = 'buy-' + p.id;
+    btn.disabled = !st.canBuy;
+    btn.textContent = st.canBuy ? G.store.priceLabel(p) : '구매함';
+    btn.setAttribute('aria-label', p.name + ' ' + (st.canBuy ? G.store.priceLabel(p) + '에 사기' : '구매함'));
+    btn.addEventListener('click', () => buy(p.id));
+    act.appendChild(btn);
+    card.appendChild(act);
+    return card;
+  }
+
+  function storeSection(title, note, cls) {
+    const sec = el('section', 'store-sec' + (cls ? ' ' + cls : ''));
+    const head = el('div', 'store-sec-head');
+    head.appendChild(el('h3', 'store-sec-title', title));
+    if (note) head.appendChild(el('span', 'store-sec-note', note));
+    sec.appendChild(head);
+    const grid = el('div', 'store-grid');
+    sec.appendChild(grid);
+    return { sec, grid };
+  }
+
+  function renderStore() {
+    refreshGold();
+    const body = $('store-body');
+    body.textContent = '';
+    if (!G.billing.available()) {
+      body.appendChild(el('p', 'store-web', '웹에서는 결제할 수 없습니다. 상품은 구글 플레이 앱에서 구매할 수 있습니다.'));
+    }
+    const prods = G.STORE.products;
+    const crystals = storeSection('별빛 결정', '각 묶음 첫 구매 2배', 'store-crystals');
+    prods.filter((p) => p.kind === 'crystals').forEach((p) => crystals.grid.appendChild(productCard(p)));
+    body.appendChild(crystals.sec);
+    const packs = storeSection('패키지 · 혜택', '', 'store-packs');
+    prods.filter((p) => p.kind !== 'crystals').forEach((p) => packs.grid.appendChild(productCard(p)));
+    body.appendChild(packs.sec);
+
+    const ex = G.STORE.exchange;
+    const exSec = storeSection('교환', '별빛 결정을 금화로', 'store-exchange');
+    const row = el('article', 'prod prod-exchange');
+    const art = el('span', 'prod-art prod-art-ex');
+    art.appendChild(el('span', 'crystal crystal-big', ''));
+    art.appendChild(el('span', 'ex-arrow', '→'));
+    art.appendChild(el('span', 'coin coin-big', ''));
+    row.appendChild(art);
+    const rb = el('div', 'prod-body');
+    rb.appendChild(el('h3', 'prod-name', '결정 ' + fmtNum(ex.crystals) + ' → 금화 ' + fmtNum(ex.gold)));
+    rb.appendChild(el('p', 'prod-desc', '뽑기나 챔피언 업그레이드에 쓸 금화가 모자랄 때'));
+    row.appendChild(rb);
+    const act = el('div', 'prod-act');
+    const b = el('button', 'btn btn-ghost btn-small');
+    b.type = 'button';
+    b.id = 'store-exchange';
+    b.disabled = meta().crystals < ex.crystals;
+    b.appendChild(el('span', 'crystal', ''));
+    b.appendChild(el('span', '', fmtNum(ex.crystals) + ' 바꾸기'));
+    b.addEventListener('click', () => {
+      if (G.store.exchange()) { sfx('coin'); renderStore(); focusStore('store-exchange'); }
+    });
+    act.appendChild(b);
+    row.appendChild(act);
+    exSec.grid.appendChild(row);
+    body.appendChild(exSec.sec);
+  }
+
+  function focusStore(id) {
+    const b = $(id);
+    if (b && !b.disabled) b.focus({ preventScroll: true });
+    else focusFirst($('store-body'));
+  }
+
+  function openStore(from) {
+    storeFrom = from || 'title';
+    renderStore();
+    show('store');
+    focusFirst($('store-body'));
+  }
+
   // ---------- 설정 ----------
 
   function settingsObj() {
@@ -384,7 +895,17 @@
     if (typeof s.shake !== 'boolean') s.shake = true;
     if (typeof s.numbers !== 'boolean') s.numbers = true;
     if (typeof s.fps !== 'boolean') s.fps = false;
+    if (['auto', 'high', 'medium', 'low'].indexOf(s.quality) === -1) s.quality = 'auto';
     return s;
+  }
+
+  function renderQuality() {
+    const q = settingsObj().quality;
+    document.querySelectorAll('#set-quality .seg-btn').forEach((b) => {
+      const on = b.dataset.q === q;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-checked', String(on));
+    });
   }
 
   function saveSettings() { if (G.saveMeta) G.saveMeta(); }
@@ -400,6 +921,7 @@
     $('set-shake').checked = s.shake;
     $('set-numbers').checked = s.numbers;
     $('set-fps').checked = s.fps;
+    renderQuality();
     $('set-fullscreen').textContent = document.fullscreenElement ? '창 모드로' : '전체 화면으로';
     // 판 진행 중에는 데이터를 지울 수 없게
     $('set-reset').disabled = settingsFrom === 'pause';
@@ -439,6 +961,13 @@
     $('set-shake').addEventListener('change', (e) => { s().shake = e.target.checked; saveSettings(); sfx('click'); });
     $('set-numbers').addEventListener('change', (e) => { s().numbers = e.target.checked; saveSettings(); sfx('click'); });
     $('set-fps').addEventListener('change', (e) => { s().fps = e.target.checked; saveSettings(); sfx('click'); });
+    document.querySelectorAll('#set-quality .seg-btn').forEach((b) => b.addEventListener('click', () => {
+      s().quality = b.dataset.q;
+      saveSettings();
+      if (G.applyQuality) G.applyQuality();
+      sfx('click');
+      renderQuality();
+    }));
     $('set-fullscreen').addEventListener('click', () => {
       sfx('click');
       const done = () => setTimeout(renderSettings, 150);
@@ -448,7 +977,7 @@
       } catch (e) { /* 전체 화면을 쓸 수 없는 환경 */ }
     });
     $('set-reset').addEventListener('click', () => {
-      confirmDialog('저장 데이터를 모두 지울까요?', '금화, 해금한 챔피언, 업그레이드, 기록, 이어하기가 모두 사라지고 되돌릴 수 없습니다.', '모두 지우기', () => {
+      confirmDialog('저장 데이터를 모두 지울까요?', '금화, 별빛 결정, 해금한 챔피언, 업그레이드, 뽑기로 얻은 강화, 기록, 이어하기가 모두 사라지고 되돌릴 수 없습니다. 구매 기록은 구글 플레이 앱에서 복원할 수 있습니다.', '모두 지우기', () => {
         if (G.resetAllData) G.resetAllData();
         closeDialog();
         renderSettings();
@@ -463,6 +992,8 @@
   let cardHandler = null;
   let cardsReady = false;
   let cardCount = 0;
+  let lvOnPick = null;
+  let armTimer = null;
 
   function choiceIcon(c, d) {
     if (c.kind === 'gold') return G.spriteUrl('coin');
@@ -472,9 +1003,15 @@
   function showLevelUp(g, choices, onPick) {
     show('levelup');
     $('lv-number').textContent = g.player.level;
+    lvOnPick = onPick;
+    renderCards(choices, 350);
+    sfx('levelup');
+  }
+
+  function renderCards(choices, armMs) {
     const box = $('cards');
     box.textContent = '';
-    box.classList.toggle('is-four', choices.length >= 4);
+    box.className = 'cards n-' + choices.length + (choices.length >= 4 ? ' is-four' : '');
     cardsReady = false;
     cardCount = choices.length;
     box.classList.add('arming');
@@ -503,15 +1040,31 @@
       btn.addEventListener('click', () => G.ui.pickCard(i));
       box.appendChild(btn);
     });
-    cardHandler = (i) => onPick(choices[i]);
-    sfx('levelup');
+    cardHandler = (i) => lvOnPick(choices[i]);
+    renderReroll();
     // 레벨업 순간의 실수 클릭을 막으려고 잠깐 기다린다
-    setTimeout(() => {
+    clearTimeout(armTimer);
+    armTimer = setTimeout(() => {
       cardsReady = true;
       box.classList.remove('arming');
       const first = $('card-0');
       if (first && current === 'levelup') first.focus({ preventScroll: true });
-    }, 350);
+    }, armMs);
+  }
+
+  function renderReroll() {
+    const left = (game && game.rerollsLeft) || 0;
+    $('btn-reroll').hidden = !(left > 0);
+    $('reroll-label').textContent = '다시 뽑기 (남은 ' + left + ')';
+  }
+
+  // 가챠 운명 바꾸기: 카드를 새로 받는다
+  function reroll() {
+    if (current !== 'levelup' || !cardsReady || !game.rerollChoices) return;
+    const c = game.rerollChoices();
+    if (!c) return;
+    sfx('whoosh');
+    renderCards(c, 200);
   }
 
   function pickCard(i) {
@@ -524,69 +1077,192 @@
   }
 
   // ---------- 상자 ----------
+  // 연출: 떨어짐 → 흔들리며 틈새로 빛 → (등급 상승) → 자물쇠가 튕겨 나가고 뚜껑이 열리며 빛기둥 → 카드가 하나씩 솟아올라 뒤집힘
+  // 화면을 누르면 바로 마지막 상태로 건너뛴다.
 
+  const TIERS = ['wood', 'silver', 'gold'];
+  const TIER_NAME = { wood: '나무 상자', silver: '은 상자', gold: '황금 상자' };
+  const CHEST_PARTS = ['body', 'lid', 'lid_open', 'lock'];
   let chestClose = null;
-  let chestTimer = null;
-  let chestRevealed = false;
+  let chestTimers = [];
+  let chestDone = true;
+  let chestResult = null;
 
-  function chestItem(iconKey, name, detail, cls) {
-    const li = el('li', 'chest-item' + (cls ? ' ' + cls : ''));
-    const ic = el('span', 'chest-item-icon');
-    ic.appendChild(img(iconUrl(iconKey), '', 44, ''));
-    li.appendChild(ic);
-    const body = el('span', 'chest-item-body');
-    body.appendChild(el('span', 'chest-item-name', name));
-    body.appendChild(el('span', 'chest-item-detail', detail));
-    li.appendChild(body);
+  function preloadChestArt() {
+    TIERS.forEach((t) => CHEST_PARTS.forEach((part) => { const i = new Image(); i.src = G.spriteUrl('chest_' + t + '_' + part); }));
+    const stage = $('chest-stage');
+    // 부품 그림이 없으면 예전 상자 그림으로 (no-art), 빠진 부품 하나는 숨긴다
+    stage.querySelectorAll('.cp:not(.cp-old)').forEach((i) => {
+      i.addEventListener('error', () => {
+        i.style.visibility = 'hidden';
+        if (i.classList.contains('cp-body')) stage.classList.add('no-art');
+      });
+      i.addEventListener('load', () => {
+        i.style.visibility = '';
+        if (i.classList.contains('cp-body')) stage.classList.remove('no-art');
+      });
+    });
+    stage.querySelector('.cp-beam').src = G.spriteUrl('chest_beam');
+  }
+
+  function setChestTier(tier) {
+    const stage = $('chest-stage');
+    stage.dataset.tier = tier;
+    const q = (c) => stage.querySelector(c);
+    q('.cp-body').src = G.spriteUrl('chest_' + tier + '_body');
+    q('.cp-lid').src = G.spriteUrl('chest_' + tier + '_lid');
+    q('.cp-lidopen').src = G.spriteUrl('chest_' + tier + '_lid_open');
+    q('.cp-lock').src = G.spriteUrl('chest_' + tier + '_lock');
+  }
+
+  function chestCard(iconSrc, name, detail, cls) {
+    const li = el('li', 'ccard' + (cls ? ' ' + cls : ''));
+    li.setAttribute('aria-label', name + ', ' + detail);
+    const inner = el('span', 'ccard-inner');
+    const ic = el('span', 'ccard-icon');
+    ic.appendChild(hideOnError(img(iconSrc, '', 48, '')));
+    inner.appendChild(ic);
+    const body = el('span', 'ccard-body');
+    body.appendChild(el('span', 'ccard-name', name));
+    body.appendChild(el('span', 'ccard-detail', detail));
+    inner.appendChild(body);
+    li.appendChild(inner);
     return li;
   }
 
-  function revealChest(result) {
-    if (chestRevealed) return;
-    chestRevealed = true;
-    clearTimeout(chestTimer);
-    const stage = $('chest-stage');
-    stage.classList.remove('is-shaking');
-    stage.classList.add('is-open');
+  function chestSparks(n, cls) {
+    const box = $('chest-stage').querySelector('.chest-sparks');
+    box.textContent = '';
+    for (let i = 0; i < n; i++) {
+      const sp = el('i', cls || '');
+      const a = (i / n) * Math.PI * 2 + Math.random() * 0.4;
+      const d = 90 + Math.random() * 90;
+      sp.style.setProperty('--dx', Math.round(Math.cos(a) * d) + 'px');
+      sp.style.setProperty('--dy', Math.round(Math.sin(a) * d * 0.8 - 40) + 'px');
+      sp.style.setProperty('--d', (Math.random() * 0.15).toFixed(2) + 's');
+      box.appendChild(sp);
+    }
+  }
+
+  function chestLater(ms, fn) { chestTimers.push(setTimeout(fn, ms)); }
+
+  function buildChestCards(result) {
     const list = $('chest-list');
     list.textContent = '';
-    if (result.combo) {
-      const c = result.combo;
-      const label = (G.COMBO_TYPE_LABEL && G.COMBO_TYPE_LABEL[c.type]) || '조합';
-      list.appendChild(chestItem(c.result, c.name, label + '!', 'is-combo'));
-    }
     (result.upgrades || []).forEach((u) => {
       const detail = u.from > 0 ? 'Lv ' + u.from + ' → ' + u.to : '새로 얻음 · Lv ' + u.to;
-      list.appendChild(chestItem(u.key, u.name, detail, ''));
+      list.appendChild(chestCard(iconUrl(u.key), u.name, detail, ''));
     });
-    if (!list.children.length) list.appendChild(chestItem('heal', '빈 상자', '더 올릴 무기나 패시브가 없습니다', ''));
-    [...list.children].forEach((li, i) => { li.style.animationDelay = (0.12 + i * 0.12) + 's'; });
-    const count = result.count || list.children.length;
-    $('chest-eyebrow').textContent = result.combo ? '조합 성공' : '상자';
-    $('chest-title').textContent = result.combo ? '강해졌습니다 · ' + count + '개' : '강화 ' + count + '개';
-    $('chest-result').hidden = false;
-    sfx(result.combo ? 'evolve' : 'chest');
-    setTimeout(() => { if (current === 'chest') $('btn-chest-ok').focus({ preventScroll: true }); }, 250);
+    if (result.combo) {
+      const c = result.combo;
+      const label = c.typeLabel || (G.COMBO_TYPE_LABEL && G.COMBO_TYPE_LABEL[c.type]) || '조합';
+      list.appendChild(chestCard(iconUrl(c.result || c.key), c.name, label + '!', 'is-combo'));
+    }
+    if (!list.children.length) list.appendChild(chestCard(G.spriteUrl('coin'), '더 올릴 것이 없습니다', '대신 금화를 받습니다', 'is-empty'));
+    const goldLine = $('chest-gold');
+    goldLine.hidden = !result.gold;
+    goldLine.textContent = result.gold ? '금화 +' + fmtNum(result.gold) : '';
+    return [...list.children];
+  }
+
+  function chestTexts(result) {
+    const n = result.count || 1;
+    const up = TIERS.indexOf(result.tier) > TIERS.indexOf(result.startTier);
+    $('chest-eyebrow').textContent = (result.source === 'boss' ? '보스 상자' : '엘리트 상자') + (up ? ' · 등급 상승' : '');
+    $('chest-title').textContent = (result.combo ? '조합 성공 · ' : '') + (n >= 3 ? TIER_NAME[result.tier] : '강화 ' + n + '개');
   }
 
   function showChest(g, result, onClose) {
     show('chest');
     chestClose = onClose;
-    chestRevealed = false;
-    const stage = $('chest-stage');
-    stage.classList.remove('is-open');
-    stage.classList.add('is-shaking');
-    stage.classList.toggle('is-combo', !!result.combo);
-    $('chest-result').hidden = true;
-    stage.onclick = () => revealChest(result);
-    stage.focus({ preventScroll: true });
-    sfx('chest');
-    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    chestTimer = setTimeout(() => revealChest(result), reduced ? 150 : 1100);
+    chestResult = result;
+    chestDone = false;
+    chestTimers.forEach(clearTimeout);
+    chestTimers = [];
+    const tier = TIERS.indexOf(result.tier) >= 0 ? result.tier : 'wood';
+    const start = TIERS.indexOf(result.startTier) >= 0 ? result.startTier : tier;
+    const upgrade = TIERS.indexOf(tier) > TIERS.indexOf(start);
+    const n = result.count || 1;
+    const screen = $('screen-chest');
+    screen.className = 'screen screen-chest cnt-' + Math.min(5, n) + ' tier-' + start + (result.combo ? ' has-combo' : '');
+    setChestTier(start);
+    $('chest-banner').textContent = '';
+    $('chest-banner').className = 'chest-banner';
+    chestTexts(result);
+    const cards = buildChestCards(result);
+    $('btn-chest-ok').classList.add('is-waiting');
+    $('chest-stage').focus({ preventScroll: true });
+
+    if (reducedMotion()) { finishChest(); return; }
+
+    screen.classList.add('ch-drop');
+    chestLater(430, () => { sfx('impact'); chestSparks(10, 'dust'); });
+    chestLater(620, () => { screen.classList.add('ch-shake'); sfx('pickupChest'); });
+    let t = 1500;
+    if (upgrade) {
+      chestLater(t, () => { screen.classList.add('ch-flash'); });
+      chestLater(t + 180, () => {
+        setChestTier(tier);
+        screen.classList.remove('tier-' + start);
+        screen.classList.add('tier-' + tier, 'ch-upgraded');
+        const b = $('chest-banner');
+        b.textContent = '등급 상승! ' + TIER_NAME[tier];
+        b.className = 'chest-banner is-on is-upgrade';
+        sfx('gong');
+      });
+      t += 900;
+    }
+    chestLater(t, () => {
+      screen.classList.remove('ch-shake');
+      screen.classList.add('ch-open');
+      sfx('chest');
+      chestSparks(n >= 5 ? 26 : n >= 3 ? 18 : 12, '');
+      if (n >= 3) {
+        const b = $('chest-banner');
+        b.textContent = n >= 5 ? '강화 5개!!' : '강화 ' + n + '개!';
+        b.className = 'chest-banner is-on is-count';
+      }
+    });
+    t += 520;
+    chestLater(t, () => screen.classList.add('ch-cards'));
+    cards.forEach((li, i) => {
+      const combo = li.classList.contains('is-combo');
+      chestLater(t + 120 + i * 300 + (combo ? 200 : 0), () => {
+        li.classList.add('is-in');
+        if (combo) {
+          screen.classList.add('ch-burst');
+          chestSparks(30, 'gold');
+          sfx('evolve');
+        } else sfx('gem');
+      });
+    });
+    chestLater(t + 120 + cards.length * 300 + (result.combo ? 700 : 350), finishChest);
+  }
+
+  function finishChest() {
+    if (chestDone) return;
+    chestTimers.forEach(clearTimeout);
+    chestTimers = [];
+    chestDone = true;
+    const r = chestResult;
+    const screen = $('screen-chest');
+    const skipping = !screen.classList.contains('ch-cards') || [...$('chest-list').children].some((li) => !li.classList.contains('is-in'));
+    const n = (r && r.count) || 1;
+    const tier = r && TIERS.indexOf(r.tier) >= 0 ? r.tier : 'wood';
+    setChestTier(tier);
+    screen.className = 'screen screen-chest cnt-' + Math.min(5, n) + ' tier-' + tier + (r && r.combo ? ' has-combo' : '') +
+      ' ch-open ch-cards ch-final' + (skipping ? ' ch-skip' : '');
+    [...$('chest-list').children].forEach((li) => li.classList.add('is-in'));
+    const b = $('chest-banner');
+    if (n >= 3) { b.textContent = n >= 5 ? '강화 5개!!' : '강화 ' + n + '개!'; b.className = 'chest-banner is-on is-count'; }
+    else if (r && TIERS.indexOf(r.tier) > TIERS.indexOf(r.startTier)) { b.textContent = '등급 상승! ' + TIER_NAME[tier]; b.className = 'chest-banner is-on is-upgrade'; }
+    if (skipping && r && r.combo) sfx('evolve');
+    $('btn-chest-ok').classList.remove('is-waiting');
+    setTimeout(() => { if (current === 'chest' && chestDone) $('btn-chest-ok').focus({ preventScroll: true }); }, 80);
   }
 
   function closeChest() {
-    if (!chestRevealed) return;
+    if (!chestDone) { finishChest(); return; }
     const h = chestClose;
     chestClose = null;
     if (h) { sfx('click'); h(); }
@@ -697,8 +1373,13 @@
 
   // ---------- 결과 ----------
 
+  let endResult = null;
+  let endBonus = 0;
+
   function showEnd(g, r) {
     show('end');
+    endResult = r;
+    endBonus = 0;
     const screen = $('screen-end');
     screen.classList.toggle('is-win', !!r.win);
     const st = G.stageById ? G.stageById(r.stageId) : G.STAGES[0];
@@ -711,14 +1392,45 @@
     $('end-gold').textContent = '+' + fmtNum(r.gold);
     const ul = $('end-unlocked');
     ul.textContent = '';
-    (r.newlyUnlocked || []).forEach((t) => ul.appendChild(el('li', 'end-unlock', t)));
+    const unlocked = (r.newlyUnlocked || []).slice();
+    if (r.unlockedDifficulty && !unlocked.some((t) => t.indexOf('난이도가 열렸습니다') !== -1)) unlocked.push(r.unlockedDifficulty + ' 난이도가 열렸습니다');
+    unlocked.forEach((t) => ul.appendChild(el('li', 'end-unlock', t)));
     ul.hidden = !ul.children.length;
+    // 첫 클리어 별빛 결정, 광고 보고 금화 2배
+    const cr = r.crystals || 0;
+    $('end-crystals').hidden = !cr;
+    $('end-crystals-text').textContent = cr ? '+' + fmtNum(cr) + ' 별빛 결정 (첫 클리어)' : '';
+    const dbl = $('btn-double');
+    dbl.hidden = !r.canDoubleGold;
+    dbl.disabled = false;
+    $('double-label').textContent = '광고 보고 금화 2배 (+' + fmtNum(r.gold) + ')';
+    $('end-rewards').hidden = !cr && !r.canDoubleGold;
+    refreshGold();
     pickedStage = r.stageId || pickedStage;
     pickedChampion = r.championId || pickedChampion;
     $('btn-retry').focus({ preventScroll: true });
   }
 
   // ---------- 화면 전환 ----------
+
+  function claimDouble() {
+    const dbl = $('btn-double');
+    if (dbl.disabled || !endResult || !game.claimDoubleGold) return;
+    dbl.disabled = true;
+    sfx('click');
+    game.claimDoubleGold().then((add) => {
+      if (add > 0) {
+        endBonus += add;
+        $('end-gold').textContent = '+' + fmtNum(endResult.gold + endBonus);
+        $('double-label').textContent = '금화 2배 받음';
+        sfx('coin');
+        refreshGold();
+      } else {
+        dbl.disabled = false;
+        $('double-label').textContent = '광고를 끝까지 보면 2배 (+' + fmtNum(endResult.gold) + ')';
+      }
+    }, () => { dbl.disabled = false; });
+  }
 
   function showTitleScreen() {
     renderTitle();
@@ -727,12 +1439,23 @@
 
   function back() {
     if (!$('dialog').hidden) { closeDialog(); return true; }
+    if (!$('odds').hidden) { closeOdds(); return true; }
+    if (!$('pull-fx').hidden) { if (pullPhase === 'done') closePull(); else finishPull(); return true; }
     switch (current) {
       case 'stage': showTitleScreen(); $('btn-new').focus({ preventScroll: true }); return true;
       case 'champion': openStage(); return true;
       case 'shop':
         showTitleScreen();
         $('btn-shop').focus({ preventScroll: true });
+        return true;
+      case 'gacha':
+        showTitleScreen();
+        $('btn-gacha').focus({ preventScroll: true });
+        return true;
+      case 'store':
+        if (storeFrom === 'gacha') { openGacha(gachaFrom); return true; }
+        showTitleScreen();
+        $('btn-store').focus({ preventScroll: true });
         return true;
       case 'settings': closeSettings(); return true;
       case 'pause':
@@ -745,7 +1468,7 @@
 
   // 방향키로 보이는 화면 안의 버튼 사이를 이동
   function moveFocus(dir) {
-    const root = !$('dialog').hidden ? $('dialog') : current && $('screen-' + current);
+    const root = !$('dialog').hidden ? $('dialog') : !$('odds').hidden ? $('odds') : !$('pull-fx').hidden ? $('pull-fx') : current && $('screen-' + current);
     if (!root) return false;
     const items = [...root.querySelectorAll('button:not([disabled]), input:not([disabled])')]
       .filter((n) => n.offsetParent !== null && !n.closest('[hidden]'));
@@ -764,23 +1487,30 @@
       if (back()) { e.preventDefault(); e.stopPropagation(); }
       return;
     }
-    if (current === 'levelup' && /^Digit[1-4]$/.test(e.code)) {
-      const i = Number(e.code.slice(5)) - 1;
+    if (current === 'levelup' && /^(Digit|Numpad)[1-5]$/.test(e.code)) {
+      const i = Number(e.code.slice(-1)) - 1;
       if (i < cardCount) { pickCard(i); e.preventDefault(); }
       return;
     }
-    if (current === 'chest' && (e.key === 'Enter' || e.key === ' ')) {
-      if (tag === 'BUTTON' && e.target.id === 'btn-chest-ok') return; // 버튼이 직접 처리
+    if (current === 'levelup' && e.code === 'KeyR') { reroll(); e.preventDefault(); return; }
+    if (!$('pull-fx').hidden && (e.key === 'Enter' || e.key === ' ')) {
+      if (pullPhase !== 'done') { e.preventDefault(); finishPull(); return; }
+      if (tag === 'BUTTON') return;
       e.preventDefault();
-      if (!chestRevealed) $('chest-stage').click();
-      else closeChest();
+      closePull();
+      return;
+    }
+    if (current === 'chest' && (e.key === 'Enter' || e.key === ' ')) {
+      if (chestDone && tag === 'BUTTON' && e.target.id === 'btn-chest-ok') return; // 버튼이 직접 처리
+      e.preventDefault();
+      closeChest();
       return;
     }
     if (current === 'champion' && e.key === 'Enter' && tag !== 'BUTTON') { startRun(); e.preventDefault(); return; }
     if (current === 'end' && e.key === 'Enter' && tag !== 'BUTTON') { game.retry(); e.preventDefault(); return; }
     if (tag === 'INPUT' && e.target.type === 'range') return;
     const visible = current && current !== null && $('screen-' + current) && !$('screen-' + current).hidden;
-    if (!visible && $('dialog').hidden) return;
+    if (!visible && $('dialog').hidden && $('odds').hidden) return;
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { if (moveFocus(1)) e.preventDefault(); }
     else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { if (moveFocus(-1)) e.preventDefault(); }
   }
@@ -800,12 +1530,31 @@
       $('btn-continue').addEventListener('click', () => { sfx('select'); game.continueRun(); });
       $('btn-new').addEventListener('click', () => { sfx('select'); openStage(); });
       $('btn-shop').addEventListener('click', () => { sfx('click'); openShop('title'); });
+      $('btn-gacha').addEventListener('click', () => { sfx('click'); openGacha('title'); });
+      $('btn-store').addEventListener('click', () => { sfx('click'); openStore('title'); });
+      $('tab-altar').addEventListener('click', () => { sfx('click'); setGachaTab('altar'); });
+      $('tab-coll').addEventListener('click', () => { sfx('click'); setGachaTab('coll'); });
+      document.querySelectorAll('#pane-altar .pull-btn').forEach((b) => b.addEventListener('click', () => doPull(Number(b.dataset.n), b.dataset.cur)));
+      $('btn-odds').addEventListener('click', () => { sfx('click'); openOdds(); });
+      $('odds-close').addEventListener('click', () => { sfx('click'); closeOdds(); });
+      $('odds').addEventListener('click', (e) => { if (e.target === $('odds')) closeOdds(); });
+      $('pull-fx').addEventListener('click', (e) => {
+        if (pullPhase && pullPhase !== 'done') { finishPull(); return; }
+        if (e.target === $('pull-fx')) closePull();
+      });
+      $('pull-ok').addEventListener('click', (e) => { e.stopPropagation(); if (pullPhase === 'done') { sfx('click'); closePull(); } });
+      $('pull-again').addEventListener('click', (e) => { e.stopPropagation(); pullAgain(); });
+      $('btn-reroll').addEventListener('click', reroll);
+      $('btn-double').addEventListener('click', claimDouble);
+      preloadChestArt();
       $('btn-settings').addEventListener('click', () => { sfx('click'); openSettings('title'); });
       $('btn-start').addEventListener('click', startRun);
       document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => { sfx('click'); back(); }));
       bindSettings();
 
-      $('btn-chest-ok').addEventListener('click', closeChest);
+      $('btn-chest-ok').addEventListener('click', (e) => { e.stopPropagation(); closeChest(); });
+      $('chest-stage').addEventListener('click', (e) => { e.stopPropagation(); if (!chestDone) finishChest(); });
+      $('screen-chest').addEventListener('click', () => { if (!chestDone) finishChest(); });
 
       $('tab-build').addEventListener('click', () => { sfx('click'); setTab('build'); });
       $('tab-combo').addEventListener('click', () => { sfx('click'); setTab('combo'); });
@@ -860,6 +1609,8 @@
     showEnd,
     openSettings,
     openShop,
+    openGacha,
+    openStore,
     current() { return current; },
   };
 })(window.G);

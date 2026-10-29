@@ -33,17 +33,22 @@
         <span class="btn-stack"><span>이어하기</span><span id="continue-info" class="btn-sub"></span></span>
       </button>
       <button id="btn-new" class="btn btn-primary" type="button" disabled><span id="new-label">등불을 켜는 중</span></button>
-      <div class="row">
+      <div class="title-grid">
+        <button id="btn-gacha" class="btn btn-ghost btn-gacha" type="button"><span class="btn-gem" aria-hidden="true"></span>뽑기</button>
+        <button id="btn-store" class="btn btn-ghost" type="button">상점</button>
         <button id="btn-shop" class="btn btn-ghost" type="button">업그레이드</button>
         <button id="btn-settings" class="btn btn-ghost" type="button">설정</button>
       </div>
     </div>
     <div class="title-foot">
-      <p class="gold-chip"><span class="coin" aria-hidden="true"></span><span id="title-gold">0</span><span class="sr-only">금화</span></p>
+      <div class="cur-chips">
+        <p class="gold-chip"><span class="coin" aria-hidden="true"></span><span id="title-gold">0</span><span class="sr-only">금화</span></p>
+        <p class="gold-chip crystal-chip"><span class="crystal" aria-hidden="true"></span><span id="title-crystal">0</span><span class="sr-only">별빛 결정</span></p>
+      </div>
       <dl class="controls">
         <div><dt>이동</dt><dd>WASD · 방향키 · 화면 드래그</dd></div>
         <div><dt>일시정지</dt><dd>Esc</dd></div>
-        <div><dt>레벨업</dt><dd>1 · 2 · 3 · 4 또는 클릭</dd></div>
+        <div><dt>레벨업</dt><dd>1~5 또는 클릭 · R 다시 뽑기</dd></div>
       </dl>
     </div>
   </div>
@@ -87,6 +92,90 @@
     <div class="menu-foot">
       <p id="champion-pick" class="pick-line"></p>
       <button id="btn-start" class="btn btn-primary" type="button">밤 속으로 <kbd>Enter</kbd></button>
+    </div>
+  </div>
+</section>
+
+<!-- 뽑기 (등불 제단) -->
+<section id="screen-gacha" class="screen screen-menu screen-gacha" hidden>
+  <div class="menu-wrap">
+    <header class="menu-head">
+      <button class="back-btn" type="button" data-back aria-label="뒤로">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="menu-title">
+        <p class="eyebrow">뽑기 · 모든 챔피언 공통 영구 강화</p>
+        <h2>등불 제단</h2>
+      </div>
+      <div class="cur-chips">
+        <p class="gold-chip"><span class="coin" aria-hidden="true"></span><span class="js-gold">0</span><span class="sr-only">금화</span></p>
+        <p class="gold-chip crystal-chip"><span class="crystal" aria-hidden="true"></span><span class="js-crystal">0</span><span class="sr-only">별빛 결정</span></p>
+      </div>
+    </header>
+    <div class="tabs gacha-tabs" role="tablist" aria-label="보기">
+      <button id="tab-altar" class="tab" type="button" role="tab" aria-selected="true" aria-controls="pane-altar">뽑기</button>
+      <button id="tab-coll" class="tab" type="button" role="tab" aria-selected="false" aria-controls="pane-coll">도감 <span id="coll-count" class="tab-count"></span></button>
+    </div>
+    <div id="pane-altar" class="gacha-pane" role="tabpanel" aria-labelledby="tab-altar">
+      <div class="altar">
+        <img class="altar-banner" src="assets/sprites/gacha_banner.svg" alt="">
+        <div class="altar-shade" aria-hidden="true"></div>
+        <div class="altar-info">
+          <p class="altar-pity"><span class="star-txt">★★★</span>까지 <strong id="gacha-pity">100</strong>회</p>
+          <p class="altar-rates">★★★ 1.5% · ★★ 15% · ★ 83.5% · 10회 뽑기는 ★★ 이상 1개 보장</p>
+        </div>
+        <button id="btn-odds" class="btn btn-ghost btn-small altar-odds" type="button">확률 정보</button>
+      </div>
+      <div class="pull-grid">
+        <div class="pull-group">
+          <p class="pull-label"><span class="coin" aria-hidden="true"></span>금화로 뽑기</p>
+          <div class="pull-btns">
+            <button id="pull-gold-1" class="btn btn-ghost pull-btn" type="button" data-n="1" data-cur="gold"><span class="btn-stack"><span>1회</span><span class="btn-sub js-cost"></span></span></button>
+            <button id="pull-gold-10" class="btn btn-primary pull-btn" type="button" data-n="10" data-cur="gold"><span class="btn-stack"><span>10회</span><span class="btn-sub js-cost"></span></span></button>
+          </div>
+        </div>
+        <div class="pull-group pull-group-crystal">
+          <p class="pull-label"><span class="crystal" aria-hidden="true"></span>별빛 결정으로 뽑기</p>
+          <div class="pull-btns">
+            <button id="pull-crystal-1" class="btn btn-ghost pull-btn" type="button" data-n="1" data-cur="crystal"><span class="btn-stack"><span>1회</span><span class="btn-sub js-cost"></span></span></button>
+            <button id="pull-crystal-10" class="btn btn-crystal pull-btn" type="button" data-n="10" data-cur="crystal"><span class="btn-stack"><span>10회</span><span class="btn-sub js-cost"></span></span></button>
+          </div>
+        </div>
+      </div>
+      <div class="pull-extra">
+        <button id="pull-ticket" class="btn btn-ghost btn-small pull-btn" type="button" data-n="1" data-cur="ticket2" hidden><span class="ticket" aria-hidden="true"></span><span id="ticket-label">★★ 확정권 사용</span></button>
+        <button id="pull-free" class="btn btn-ghost btn-small pull-btn btn-ad" type="button" data-n="1" data-cur="free" hidden>광고 보고 무료 1회</button>
+      </div>
+      <p id="gacha-msg" class="gacha-msg" role="status" aria-live="polite"></p>
+    </div>
+    <div id="pane-coll" class="gacha-pane" role="tabpanel" aria-labelledby="tab-coll" hidden>
+      <p class="menu-note">모은 업그레이드는 모든 챔피언에게 늘 적용됩니다. ★★★는 한 번만 얻으면 되고, ★★는 Lv 5, ★는 Lv 100까지 오릅니다.</p>
+      <div id="gacha-coll" class="coll"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 상점 -->
+<section id="screen-store" class="screen screen-menu screen-store" hidden>
+  <div class="menu-wrap">
+    <header class="menu-head">
+      <button class="back-btn" type="button" data-back aria-label="뒤로">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="menu-title">
+        <p class="eyebrow">별빛 결정 · 패키지 · 혜택</p>
+        <h2>상점</h2>
+      </div>
+      <div class="cur-chips">
+        <p class="gold-chip"><span class="coin" aria-hidden="true"></span><span class="js-gold">0</span><span class="sr-only">금화</span></p>
+        <p class="gold-chip crystal-chip"><span class="crystal" aria-hidden="true"></span><span class="js-crystal">0</span><span class="sr-only">별빛 결정</span></p>
+      </div>
+    </header>
+    <div id="store-body" class="store-body"></div>
+    <div class="store-foot">
+      <p>표시 가격은 부가가치세가 포함된 금액입니다. 결제는 구글 플레이 앱에서만 할 수 있습니다.</p>
+      <p>구매 후 7일 안에 쓰지 않은 상품은 구글 플레이 환불 정책에 따라 환불을 요청할 수 있습니다. 이미 쓴 별빛 결정과 받은 혜택은 환불되지 않습니다.</p>
+      <p>뽑기 확률은 뽑기 화면의 <strong>확률 정보</strong>에서 볼 수 있습니다.</p>
     </div>
   </div>
 </section>
@@ -144,6 +233,15 @@
         <label for="set-numbers">데미지 숫자</label>
         <input id="set-numbers" class="switch" type="checkbox" role="switch">
       </div>
+      <div class="set-row set-quality">
+        <span id="set-quality-label">그래픽 품질</span>
+        <div id="set-quality" class="seg" role="radiogroup" aria-labelledby="set-quality-label">
+          <button class="seg-btn" type="button" role="radio" data-q="auto">자동</button>
+          <button class="seg-btn" type="button" role="radio" data-q="high">높음</button>
+          <button class="seg-btn" type="button" role="radio" data-q="medium">보통</button>
+          <button class="seg-btn" type="button" role="radio" data-q="low">낮음</button>
+        </div>
+      </div>
       <div class="set-row">
         <label for="set-fps">FPS 표시</label>
         <input id="set-fps" class="switch" type="checkbox" role="switch">
@@ -169,21 +267,44 @@
       <p class="lv-sub">하나를 골라 등불을 키우세요</p>
     </header>
     <div id="cards" class="cards"></div>
+    <div class="lv-foot">
+      <button id="btn-reroll" class="btn btn-ghost btn-small" type="button" hidden>
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M15.5 7.5A6 6 0 0 0 4.6 6.2M4.5 12.5a6 6 0 0 0 10.9 1.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4.2 2.8v3.8H8M15.8 17.2v-3.8H12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="reroll-label">다시 뽑기</span><kbd>R</kbd>
+      </button>
+    </div>
   </div>
 </section>
 
 <!-- 상자 -->
 <section id="screen-chest" class="screen screen-chest" hidden>
   <div class="chest-wrap">
-    <button id="chest-stage" class="chest-stage" type="button" aria-label="상자 열기">
+    <p id="chest-banner" class="chest-banner" aria-live="polite"></p>
+    <button id="chest-stage" class="chest-stage" type="button" aria-label="상자 열기 (누르면 바로 결과)">
+      <span class="chest-aura" aria-hidden="true"></span>
       <span class="chest-rays" aria-hidden="true"></span>
-      <img id="chest-closed" class="chest-img chest-closed" src="assets/sprites/chest.svg" alt="">
-      <img id="chest-open" class="chest-img chest-open" src="assets/sprites/chest_open.svg" alt="">
+      <span class="chest-box" aria-hidden="true">
+        <span class="chest-drop">
+          <span class="chest-shaker">
+            <img class="cp cp-lidopen" alt="">
+            <img class="cp cp-body" alt="">
+            <img class="cp cp-lid" alt="">
+            <span class="cp-seam"></span>
+            <img class="cp cp-lock" alt="">
+            <img class="cp cp-beam" alt="">
+            <img class="cp cp-old cp-old-closed" src="assets/sprites/chest.svg" alt="">
+            <img class="cp cp-old cp-old-open" src="assets/sprites/chest_open.svg" alt="">
+          </span>
+        </span>
+      </span>
+      <span class="chest-flash" aria-hidden="true"></span>
+      <span class="chest-sparks" aria-hidden="true"></span>
     </button>
-    <div id="chest-result" class="chest-result" hidden>
+    <div id="chest-result" class="chest-result">
       <p class="eyebrow" id="chest-eyebrow">상자</p>
-      <h2 class="chest-title" id="chest-title">강화 3개</h2>
-      <ul id="chest-list" class="chest-list"></ul>
+      <h2 class="chest-title" id="chest-title"></h2>
+      <ul id="chest-list" class="chest-cards"></ul>
+      <p id="chest-gold" class="chest-gold" hidden></p>
       <button id="btn-chest-ok" class="btn btn-primary" type="button">받기 <kbd>Enter</kbd></button>
     </div>
   </div>
@@ -231,12 +352,51 @@
       <div><dt>처치</dt><dd id="end-kills"></dd></div>
       <div class="stat-gold"><dt>얻은 금화</dt><dd id="end-gold"></dd></div>
     </dl>
+    <div id="end-rewards" class="end-rewards" hidden>
+      <p id="end-crystals" class="end-reward" hidden><span class="crystal" aria-hidden="true"></span><span id="end-crystals-text"></span></p>
+      <button id="btn-double" class="btn btn-ghost btn-small btn-ad" type="button" hidden><span class="coin" aria-hidden="true"></span><span id="double-label">광고 보고 금화 2배</span></button>
+    </div>
     <ul id="end-unlocked" class="end-unlocked"></ul>
     <div class="row">
       <button id="btn-retry" class="btn btn-primary" type="button">다시 하기 <kbd>Enter</kbd></button>
       <button id="btn-end-stage" class="btn btn-ghost" type="button">스테이지 선택</button>
       <button id="btn-title" class="btn btn-ghost" type="button">타이틀로</button>
     </div>
+  </div>
+</section>
+
+<!-- 뽑기 연출 -->
+<section id="pull-fx" class="pull-fx" hidden aria-label="뽑기 결과">
+  <div class="pull-stage" aria-hidden="true">
+    <span class="pull-rays"></span>
+    <span class="pull-orb"><span class="pull-orb-core"></span></span>
+    <span class="pull-flash"></span>
+  </div>
+  <div class="pull-results">
+    <div class="pull-head">
+      <p class="eyebrow" id="pull-eyebrow">뽑기 결과</p>
+      <h2 id="pull-title" class="pull-title"></h2>
+    </div>
+    <ul id="pull-cards" class="pull-cards"></ul>
+    <p id="pull-note" class="pull-note"></p>
+    <div class="pull-actions">
+      <button id="pull-again" class="btn btn-ghost" type="button">한 번 더</button>
+      <button id="pull-ok" class="btn btn-primary" type="button">확인 <kbd>Enter</kbd></button>
+    </div>
+  </div>
+  <p class="pull-skip" aria-hidden="true">화면을 누르면 건너뜁니다</p>
+</section>
+
+<!-- 확률 정보 -->
+<section id="odds" class="screen screen-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="odds-title">
+  <div class="panel odds-panel">
+    <div class="odds-head">
+      <h2 id="odds-title" class="panel-title dialog-title">확률 정보</h2>
+      <button id="odds-close" class="back-btn" type="button" aria-label="닫기">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="odds-body" class="odds-body" tabindex="0"></div>
   </div>
 </section>
 
@@ -263,7 +423,11 @@
 <script src="src/data/combos.js"></script>
 <script src="src/data/champions.js"></script>
 <script src="src/data/stages.js"></script>
+<script src="src/data/gacha.js"></script>
+<script src="src/data/store.js"></script>
 <script src="src/systems/meta.js"></script>
+<script src="src/systems/gacha.js"></script>
+<script src="src/systems/billing.js"></script>
 <script src="src/player.js"></script>
 <script src="src/enemies.js"></script>
 <script src="src/systems/weapons/core.js"></script>

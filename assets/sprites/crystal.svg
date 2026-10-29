@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs><radialGradient id="cry-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9b7fd1" stop-opacity="0.42"/><stop offset="0.55" stop-color="#9b7fd1" stop-opacity="0.19"/><stop offset="1" stop-color="#9b7fd1" stop-opacity="0"/></radialGradient><filter id="cry-b" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
+<circle cx="32" cy="32" r="30" fill="url(#cry-back)"/>
+<path d="M32 4 L39 25 L52 32 L39 39 L32 60 L25 39 L12 32 L25 25 Z" fill="#9b7fd1" opacity="0.65" filter="url(#cry-b)"/>
+<path d="M32 4 38.8 25.2 52 32 38.8 38.8 32 60 25.2 38.8 12 32 25.2 25.2 Z" fill="#0a1110" stroke="#0a1110" stroke-width="5.5" stroke-linejoin="round"/>
+<path d="M32 4 32 32 25.2 25.2 Z" fill="#ffffff"/>
+<path d="M32 4 32 32 38.8 25.2 Z" fill="#b9d4ff"/>
+<path d="M52 32 32 32 38.8 25.2 Z" fill="#9aa8f2"/>
+<path d="M52 32 32 32 38.8 38.8 Z" fill="#6d58c6"/>
+<path d="M32 60 32 32 38.8 38.8 Z" fill="#46348f"/>
+<path d="M32 60 32 32 25.2 38.8 Z" fill="#7a62c9"/>
+<path d="M12 32 32 32 25.2 38.8 Z" fill="#a88ee0"/>
+<path d="M12 32 32 32 25.2 25.2 Z" fill="#dceeff"/>
+<path d="M32 4 L32 32 M12 32 L32 32" stroke="#ffffff" stroke-width="0.84" stroke-linecap="round" opacity="0.55"/>
+<path d="M32 4 38.8 25.2 52 32 38.8 38.8 32 60 25.2 38.8 12 32 25.2 25.2 Z" fill="none" stroke="#0a1110" stroke-width="1.35" stroke-linejoin="round"/>
+<path d="M26.4 15.2 L28 19.76 L32.56 21.36 L28 22.96 L26.4 27.52 L24.8 22.96 L20.24 21.36 L24.8 19.76 Z" fill="#ffffff"/>
+<path d="M51 7.6 L52.14 10.86 L55.4 12 L52.14 13.14 L51 16.4 L49.86 13.14 L46.6 12 L49.86 10.86 Z" fill="#ffffff"/>
+<circle cx="12.5" cy="50" r="1.5" fill="#cfe6ff"/>
+</svg>

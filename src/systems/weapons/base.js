@@ -16,7 +16,7 @@
       for (let i = 0; i < count; i++) {
         G.fireProjectile(game, {
           x: p.x, y: p.y - 6, angle: base + (i - (count - 1) / 2) * 0.16, speed: s.speed,
-          dmg: s.dmg, pierce: s.pierce, r: 7 * game.player.stats.area, life: 1.5,
+          dmg: s.dmg, pierce: s.pierce, r: 7 * G.areaMul(game), life: 1.5,
         });
       }
       G.sfx && G.sfx.play('shoot');
@@ -25,9 +25,10 @@
   });
 
   // 은빛 검: 가장 가까운 적 쪽(없으면 바라보는 쪽)을 부채꼴로 벤다
+  const slashList = [];
   G.slashAt = function (game, angle, range, arc, dmg) {
     const p = game.player;
-    const list = G.enemiesInCircle(game, p.x, p.y, range, []);
+    const list = G.enemiesInCircle(game, p.x, p.y, range, slashList);
     for (const e of list) {
       const dx = e.x - p.x, dy = e.y - p.y;
       const d = Math.hypot(dx, dy);
@@ -108,6 +109,7 @@
   });
 
   // 등불 오라: 주변 원 안의 적을 주기적으로 태우고 느리게
+  const auraList = [];
   G.auraUpdate = function (game, w, s, dt, radius, dmg, tick, onKill) {
     const p = game.player;
     const st = w.state;
@@ -115,7 +117,7 @@
     w.timer -= dt;
     const fire = w.timer <= 0;
     if (fire) { w.timer = G.cd(game, tick); st.pulse = 1; }
-    const list = G.enemiesInCircle(game, p.x, p.y, radius, []);
+    const list = G.enemiesInCircle(game, p.x, p.y, radius, auraList);
     for (const e of list) {
       e.slow = Math.max(e.slow || 0, 0.15);
       if (fire && G.damageEnemy(game, e, dmg, 0, 0, true) && onKill) onKill(e);

@@ -4,24 +4,34 @@
   'use strict';
 
   const BASE = 'assets/sprites/';
-  const RES = 3; // 게임 크기의 몇 배 해상도로 굽는지 (확대·고해상도 화면 대비)
+  // 게임 크기의 몇 배 해상도로 굽는지. 화면에서 월드 1단위가 차지하는 픽셀 수에 맞춰 1.5~3배로 정한다
+  // (휴대폰처럼 작게 그려지는 화면은 작게 구워서 그리기가 가볍고, 거의 1:1로 그려지므로 빠른 보간으로도 깨끗하다)
+  const RES_MAX = 3;
+  G.spriteRes = RES_MAX;
+
+  function pickRes() {
+    const g = G.game;
+    const px = g && g.dpr && g.zoom ? g.dpr * g.zoom : RES_MAX;
+    return Math.max(1.5, Math.min(RES_MAX, px * 1.15));
+  }
 
   // 이름: { frames, w, h (월드 단위), ax, ay (기준점 비율), res(굽기 배율) }
   const LIST = {
-    bolt: { w: 34, h: 17, ax: 48 / 64, ay: 0.5 },
-    orb: { w: 26, h: 26 },
+    bolt: { w: 28, h: 14, ax: 48 / 64, ay: 0.5 },
+    orb: { w: 22, h: 22 },
     slash: { w: 128, h: 128 },
-    scythe: { w: 34, h: 34 },
-    meteor: { w: 30, h: 45, ay: 72 / 96 },
+    scythe: { w: 28, h: 28 },
+    meteor: { w: 25, h: 38, ay: 72 / 96 },
     poison_pool: { w: 128, h: 128, res: 2 },
-    spark: { w: 24, h: 24 },
-    sun: { w: 48, h: 48 },
+    spark: { w: 20, h: 20 },
+    sun: { w: 40, h: 40 },
     gem_0: { w: 13, h: 16 },
     gem_1: { w: 15, h: 19 },
     gem_2: { w: 18, h: 22 },
     item_heal: { w: 28, h: 28 },
     item_magnet: { w: 28, h: 28 },
     chest: { w: 44, h: 44, ay: 86 / 96 },
+    chest_boss: { w: 52, h: 52, ay: 86 / 96 },
     coin: { w: 14, h: 14 },
   };
   // 데이터 파일(적·스테이지·무기)은 이 파일보다 늦게 불러오므로, 목록은 불러오기 직전에 채운다
@@ -64,7 +74,7 @@
   }
 
   function bake(img, def) {
-    const res = def.res || RES;
+    const res = (def.res || RES_MAX) * (G.spriteRes / RES_MAX);
     const c = document.createElement('canvas');
     c.width = Math.max(1, Math.round(def.w * res));
     c.height = Math.max(1, Math.round(def.h * res));
@@ -90,6 +100,7 @@
   // 모든 그림을 불러온다. 없는 그림은 건너뛰고 게임은 대체 도형으로 그린다.
   G.loadSprites = function (onProgress) {
     addDataSprites();
+    G.spriteRes = pickRes();
     const jobs = [];
     Object.keys(LIST).forEach((name) => {
       const def = LIST[name];
@@ -112,18 +123,36 @@
     },
   };
 
+  // 좌우 반전 그림은 처음 쓸 때 한 번 구워 둔다 (매번 save·scale·restore 하지 않게)
+  function mirror(src) {
+    const c = document.createElement('canvas');
+    c.width = src.width;
+    c.height = src.height;
+    const cx = c.getContext('2d');
+    cx.translate(c.width, 0);
+    cx.scale(-1, 1);
+    cx.drawImage(src, 0, 0);
+    return c;
+  }
+
   // 기준점이 (x, y)에 오도록 그린다. flash(0~1)만큼 흰 실루엣을 겹친다.
   G.drawSprite = function (ctx, spr, x, y, scale, flipX, flash) {
     const w = spr.w * scale, h = spr.h * scale;
-    ctx.save();
-    ctx.translate(x, y);
-    if (flipX) ctx.scale(-1, 1);
-    ctx.drawImage(spr.img, -spr.ax * w, -spr.ay * h, w, h);
-    if (flash > 0) {
-      ctx.globalAlpha *= Math.min(1, flash);
-      ctx.drawImage(spr.flash, -spr.ax * w, -spr.ay * h, w, h);
+    let img = spr.img, fl = spr.flash, ax = spr.ax;
+    if (flipX) {
+      if (!spr.imgFlip) { spr.imgFlip = mirror(spr.img); spr.flashFlip = mirror(spr.flash); }
+      img = spr.imgFlip;
+      fl = spr.flashFlip;
+      ax = 1 - ax;
     }
-    ctx.restore();
+    const dx = x - ax * w, dy = y - spr.ay * h;
+    ctx.drawImage(img, dx, dy, w, h);
+    if (flash > 0) {
+      const a = ctx.globalAlpha;
+      ctx.globalAlpha = a * Math.min(1, flash);
+      ctx.drawImage(fl, dx, dy, w, h);
+      ctx.globalAlpha = a;
+    }
   };
 
   // 빛 번짐용 원형 그라디언트 (가산 합성으로 그린다)

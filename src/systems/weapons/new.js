@@ -672,7 +672,7 @@
     const p = game.player;
     const o = {
       x: p.x, y: p.y, radius: G.area(game, s.radius), dmg: s.dmg, knock: s.knock,
-      width: s.width * game.player.stats.area, stun: s.stun || 0, look,
+      width: s.width * G.areaMul(game), stun: s.stun || 0, look,
     };
     const count = G.amount(game, 1);
     G.ringWave(fx, o);
@@ -722,7 +722,7 @@
     const p = game.player;
     const fx = G.fxList(w, 'blades');
     const count = G.amount(game, s.count);
-    const scale = s.size * p.stats.area;
+    const scale = s.size * G.areaMul(game);
     let base;
     if (around) {
       w.state.spinBase = (w.state.spinBase || 0) + 0.45;

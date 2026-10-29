@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs><radialGradient id="gch-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb547" stop-opacity="0.32"/><stop offset="0.55" stop-color="#ffb547" stop-opacity="0.14"/><stop offset="1" stop-color="#ffb547" stop-opacity="0"/></radialGradient><radialGradient id="gch-glass" cx="0.5" cy="0.55" r="0.65"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#ffe2a0"/><stop offset="0.75" stop-color="#ffb547"/><stop offset="1" stop-color="#e07a2a"/></radialGradient><linearGradient id="gch-bronze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6b871"/><stop offset="0.5" stop-color="#a0662c"/><stop offset="1" stop-color="#5a3418"/></linearGradient><linearGradient id="gch-c1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb3c9"/><stop offset="0.6" stop-color="#2b6a78"/><stop offset="1" stop-color="#173c45"/></linearGradient><linearGradient id="gch-c2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9b3f2"/><stop offset="0.55" stop-color="#8a6bd0"/><stop offset="1" stop-color="#4a3290"/></linearGradient><linearGradient id="gch-c3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="0.55" stop-color="#e0843a"/><stop offset="1" stop-color="#8a3f1c"/></linearGradient><linearGradient id="gch-c4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe6"/><stop offset="0.5" stop-color="#ffe08a"/><stop offset="1" stop-color="#e6a640"/></linearGradient><radialGradient id="gch-halo" cx="32" cy="44" r="19" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe2a0" stop-opacity="0.95"/><stop offset="0.4" stop-color="#ffb547" stop-opacity="0.45"/><stop offset="1" stop-color="#ffb547" stop-opacity="0"/></radialGradient><filter id="gch-b" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+<circle cx="32" cy="32" r="30" fill="url(#gch-back)"/>
+<g transform="rotate(-24 32 56)">
+<rect x="22" y="6" width="20" height="28" rx="3.2" fill="url(#gch-c1)" stroke="#0a1110" stroke-width="2.6"/>
+<rect x="24.6" y="8.6" width="14.8" height="22.8" rx="1.8" fill="none" stroke="#ffe2a0" stroke-width="1.1" opacity="0.75"/>
+<path d="M32 10.3 L33.3 13.2 L36.2 14.5 L33.3 15.8 L32 18.7 L30.7 15.8 L27.8 14.5 L30.7 13.2 Z" fill="#ffe2a0" opacity="0.95"/>
+</g>
+<g transform="rotate(-8 32 56)">
+<rect x="22" y="6" width="20" height="28" rx="3.2" fill="url(#gch-c2)" stroke="#0a1110" stroke-width="2.6"/>
+<rect x="24.6" y="8.6" width="14.8" height="22.8" rx="1.8" fill="none" stroke="#ffe2a0" stroke-width="1.1" opacity="0.75"/>
+<path d="M32 10.3 L33.3 13.2 L36.2 14.5 L33.3 15.8 L32 18.7 L30.7 15.8 L27.8 14.5 L30.7 13.2 Z" fill="#ffe2a0" opacity="0.95"/>
+</g>
+<g transform="rotate(8 32 56)">
+<rect x="22" y="6" width="20" height="28" rx="3.2" fill="url(#gch-c3)" stroke="#0a1110" stroke-width="2.6"/>
+<rect x="24.6" y="8.6" width="14.8" height="22.8" rx="1.8" fill="none" stroke="#ffe2a0" stroke-width="1.1" opacity="0.75"/>
+<path d="M32 10.3 L33.3 13.2 L36.2 14.5 L33.3 15.8 L32 18.7 L30.7 15.8 L27.8 14.5 L30.7 13.2 Z" fill="#ffe2a0" opacity="0.95"/>
+</g>
+<g transform="rotate(24 32 56)">
+<rect x="22" y="6" width="20" height="28" rx="3.2" fill="url(#gch-c4)" stroke="#0a1110" stroke-width="2.6"/>
+<rect x="24.6" y="8.6" width="14.8" height="22.8" rx="1.8" fill="none" stroke="#ffffff" stroke-width="1.1" opacity="0.75"/>
+<path d="M32 10.3 L33.3 13.2 L36.2 14.5 L33.3 15.8 L32 18.7 L30.7 15.8 L27.8 14.5 L30.7 13.2 Z" fill="#ffffff" opacity="0.95"/>
+</g>
+<circle cx="32" cy="44" r="19" fill="url(#gch-halo)"/>
+<path d="M26 34.5 Q32 26.7 38 34.5" fill="none" stroke="#0a1110" stroke-width="4.08" stroke-linecap="round"/>
+<path d="M26 34.5 Q32 26.7 38 34.5" fill="none" stroke="#f0c56e" stroke-width="1.68" stroke-linecap="round"/>
+<path d="M26.6 33.3 L37.4 33.3 L41.6 38.7 L22.4 38.7 Z" fill="url(#gch-bronze)" stroke="#0a1110" stroke-width="2.88" stroke-linejoin="round"/>
+<rect x="23.6" y="38.7" width="16.8" height="18" rx="3.12" fill="url(#gch-glass)" stroke="#0a1110" stroke-width="3.12"/>
+<path d="M29.12 39.9 L29.12 55.5 M34.88 39.9 L34.88 55.5" stroke="#6b4422" stroke-width="1.56" stroke-linecap="round" opacity="0.85"/>
+<path d="M32 41.7 C35.12 45.3 35.36 51.3 32 52.5 C28.64 51.3 28.88 45.3 32 41.7 Z" fill="#ffffff"/>
+<path d="M21.8 56.7 L42.2 56.7 L39.2 61.5 L24.8 61.5 Z" fill="url(#gch-bronze)" stroke="#0a1110" stroke-width="2.88" stroke-linejoin="round"/>
+<path d="M24.2 35.22 L35.6 35.22" stroke="#ffe9b0" stroke-width="1.08" stroke-linecap="round" opacity="0.8"/>
+<path d="M54 41.6 L55.14 44.86 L58.4 46 L55.14 47.14 L54 50.4 L52.86 47.14 L49.6 46 L52.86 44.86 Z" fill="#ffffff"/>
+<path d="M10 44.2 L10.73 46.27 L12.8 47 L10.73 47.73 L10 49.8 L9.27 47.73 L7.2 47 L9.27 46.27 Z" fill="#ffe2a0" opacity="0.9"/>
+</svg>

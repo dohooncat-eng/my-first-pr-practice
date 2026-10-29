@@ -17,7 +17,8 @@
       kills: game.kills,
       runGold: game.runGold,
       pendingLevelUps: game.pendingLevelUps,
-      pendingChests: game.pendingChests,
+      chestQueue: game.chestQueue.slice(),
+      rerollsLeft: game.rerollsLeft,
       director: Object.assign({}, game.director),
       player: {
         champion: p.champion, x: r1(p.x), y: r1(p.y), hp: p.hp,
@@ -78,7 +79,8 @@
     game.kills = d.kills;
     game.runGold = d.runGold || 0;
     game.pendingLevelUps = d.pendingLevelUps || 0;
-    game.pendingChests = d.pendingChests || 0;
+    game.chestQueue = Array.isArray(d.chestQueue) ? d.chestQueue.slice() : Array(d.pendingChests || 0).fill('elite');
+    if (typeof d.rerollsLeft === 'number') game.rerollsLeft = d.rerollsLeft;
     Object.assign(game.director, d.director);
 
     d.enemies.forEach((s) => {

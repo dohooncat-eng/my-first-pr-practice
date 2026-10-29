@@ -3,8 +3,10 @@
   'use strict';
 
   // 필요 경험치: Lv 10 약 160 · Lv 30 약 900 · Lv 50 약 2,100 (레벨이 높을수록 가파르게)
+  // 초반엔 적이 적게 나오므로 Lv 10까지는 덜 필요하다 (Lv 1은 절반)
   G.xpToNext = function (level) {
-    return Math.floor(5 + (level - 1) * 10 + Math.pow(level - 1, 1.9));
+    const early = Math.min(1, 0.45 + 0.055 * level);
+    return Math.max(2, Math.floor((5 + (level - 1) * 10 + Math.pow(level - 1, 1.9)) * early));
   };
 
   G.baseStats = function () {
@@ -12,6 +14,7 @@
       maxHp: 100, speed: 1, damage: 1, cooldown: 1, magnet: 85, area: 1, amount: 0,
       armor: 0, regen: 0, luck: 1, crit: 0.05, critMult: 1.5, xpMul: 1, revive: 0,
       choices: 3, retaliate: 0, extraWeapon: 0,
+      goldMul: 1, startLevel: 0, rerolls: 0, chestBonus: 0,
     };
   };
 
@@ -33,13 +36,14 @@
     return p;
   };
 
-  // 챔피언 기본값 + 챔피언 능력 업그레이드 + 패시브 + 패시브 조합으로 스탯을 처음부터 다시 계산
+  // 챔피언 기본값 + 챔피언 능력 업그레이드 + 가챠 + 패시브 + 패시브 조합으로 스탯을 처음부터 다시 계산
   G.recalcStats = function (game) {
     const p = game.player;
     const champ = G.CHAMPIONS[p.champion];
     const s = G.baseStats();
     s.maxHp = champ.base.maxHp;
     champ.apply(s, (G.meta.champLv && G.meta.champLv[p.champion]) || 0);
+    if (G.applyGachaStats) G.applyGachaStats(s);
     Object.keys(p.passives).forEach((k) => G.PASSIVES[k].apply(s, p.passives[k]));
     p.fusions.forEach((k) => G.FUSIONS[k].apply(s));
     s.armor = Math.min(0.75, s.armor);
@@ -90,13 +94,13 @@
       G.hitCircle(game, p.x, p.y, G.area(game, 115), 45, { knock: 320 });
     }
     if (p.hp <= 0 && p.revivesUsed < p.stats.revive) {
-      // 불멸의 심장: 한 번 되살아난다
+      // 불멸의 심장·불사조 깃털: 하나에 한 번씩 되살아난다
       p.revivesUsed++;
       p.hp = p.maxHp * 0.5;
       p.invuln = 2.5;
       G.burst(game, p.x, p.y, 'rgba(255, 120, 140, 0.9)', 40, 280, true);
       G.hitCircle(game, p.x, p.y, 260, 200, { knock: 600 });
-      G.announce(game, '불멸의 심장이 다시 뜁니다!');
+      G.announce(game, p.fusions.indexOf('heart') !== -1 ? '불멸의 심장이 다시 뜁니다!' : '불사조 깃털이 타오릅니다!');
       if (G.sfx) G.sfx.play('evolve');
     }
   };

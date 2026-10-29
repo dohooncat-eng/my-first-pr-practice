@@ -51,7 +51,7 @@
       for (let i = 0; i < count; i++) {
         G.fireProjectile(game, {
           x: p.x, y: p.y - 6, angle: base + (i - (count - 1) / 2) * 0.2, speed: s.speed,
-          dmg: s.dmg, pierce: s.pierce, r: 9 * p.stats.area, scale: 1.35, life: 1.4,
+          dmg: s.dmg, pierce: s.pierce, r: 9 * G.areaMul(game), scale: 1.35, life: 1.4,
           glow: 'rgba(255, 110, 40, 0.95)', glowR: 26,
           onHit(g, b, e) {
             G.hitCircle(g, e.x, e.y, boomR, s.dmg * 0.45, { soft: true, knock: 120 });
@@ -102,7 +102,7 @@
       for (let i = 0; i < n; i++) {
         G.fireProjectile(game, {
           x: p.x, y: p.y - 6, angle: base + (i - (n - 1) / 2) * 0.3, speed: s.waveSpeed,
-          dmg: s.waveDmg, pierce: 999, r: 24 * p.stats.area, sprite: 'slash', scale: 0.45 * p.stats.area,
+          dmg: s.waveDmg, pierce: 999, r: 24 * G.areaMul(game), sprite: 'slash', scale: 0.45 * G.areaMul(game),
           life: 0.9, glow: 'rgba(170, 210, 255, 0.85)', glowR: 60, knock: 0.35,
         });
       }
@@ -179,7 +179,8 @@
       if (st.healT <= 0) {
         st.healT = 0.6;
         const p = game.player;
-        if (st.heal > 0 && p.hp < p.maxHp) G.healPlayer(game, st.heal);
+        // 한 번에 최대 2까지만 (적이 많을 때 회복이 너무 커지지 않게)
+        if (st.heal > 0 && p.hp < p.maxHp) G.healPlayer(game, Math.min(2, st.heal));
         st.heal = 0;
       }
     },
@@ -293,7 +294,7 @@
       for (let i = 0; i < count; i++) {
         G.fireProjectile(game, {
           x: p.x, y: p.y - 6, angle: base + (i - (count - 1) / 2) * 0.14, speed: s.speed,
-          dmg: s.dmg, pierce: s.pierce, r: 8 * p.stats.area, scale: 1.25, life: 1.3,
+          dmg: s.dmg, pierce: s.pierce, r: 8 * G.areaMul(game), scale: 1.25, life: 1.3,
           glow: 'rgba(140, 190, 255, 0.95)', glowR: 26, owner: w,
           onHit(g, b, e) {
             // 화살 하나당 처음 두 번 맞힐 때 번개가 튄다

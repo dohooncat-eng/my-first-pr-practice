@@ -71,7 +71,7 @@
       p.passives[c.key] = c.level;
       G.recalcStats(game);
     } else if (c.kind === 'heal') {
-      G.healPlayer(game, 40);
+      G.healPlayer(game, 25);
     } else if (c.kind === 'gold') {
       game.runGold += 25;
     }
@@ -133,6 +133,6 @@
     if (c.kind === 'gold') {
       return { title: '금화 주머니', tag: '금화', isNew: false, text: '금화 25개를 얻습니다.', icon: 'heal', comboHint: '' };
     }
-    return { title: '약초', tag: '회복', isNew: false, text: '체력을 40 회복합니다.', icon: 'heal', comboHint: '' };
+    return { title: '약초', tag: '회복', isNew: false, text: '체력을 25 회복합니다.', icon: 'heal', comboHint: '' };
   };
 })(window.G);

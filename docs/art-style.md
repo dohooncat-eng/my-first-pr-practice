@@ -147,3 +147,33 @@ viewBox 0 0 192 192, 발 (96,180), **게임 120×120**, 4프레임(걷기/떠 �
 | `ground_marsh.svg` `ground_ruins.svg` `ground_abyss.svg` | 0 0 256 256 | 256 반복 | 기존 `ground_tile`과 같은 규칙: **이음매 없이 반복**, 어둡고 대비 낮게, 캐릭터보다 튀지 않게. 늪: 진흙·물웅덩이·물풀. 폐허: 깨진 돌바닥·재·이끼 낀 틈. 심연: 검푸른 바위·별가루·보라 균열. |
 | `decal_marsh_0..3.svg` `decal_ruins_0..3.svg` `decal_abyss_0..3.svg` | 0 0 64 64 | 40×40 | 스테이지별 바닥 장식 4종씩. 늪: 갈대, 연잎, 썩은 그루터기, 거품. 폐허: 부서진 기둥 조각, 해골, 꺼진 촛대, 재 더미. 심연: 빛나는 수정, 떠 있는 돌, 별 웅덩이, 보라 버섯. |
 | `stage_forest.svg` `stage_marsh.svg` `stage_ruins.svg` `stage_abyss.svg` | 0 0 640 360 | 스테이지 선택 카드 | 스테이지 대표 풍경. 각 스테이지의 분위기 색과 대표 적의 실루엣. 아래쪽 1/3은 글자가 올라가므로 어둡게. 파일 하나 150KB 이하. |
+
+---
+
+# 3차 업데이트: 상자 · 가챠 · 상점 그림
+
+화풍·팔레트·SVG 규칙은 위와 같다. 추가 규칙: **흐림 필터를 쓰는 빛 번짐이 완전히 수평인 선이면** 크롬이 그리지 않으므로 필터에 고정 영역(`x="-64" y="-64" width="320" height="320" filterUnits="userSpaceOnUse"` 같은)을 준다.
+
+## 상자 (게임 바닥용 + 여는 연출용)
+| 파일 | viewBox | 기준점 | 크기 | 내용 |
+|---|---|---|---|---|
+| `chest.svg` | 0 0 96 96 | 바닥 (48,86) | 게임 44 | 닫힌 나무 상자(엘리트) |
+| `chest_boss.svg` | 0 0 96 96 | 바닥 (48,86) | 게임 52 | 닫힌 은 상자(보스) |
+| `chest_open.svg` | 0 0 96 96 | 바닥 (48,86) | UI | 열린 나무 상자(그림이 없을 때 대체용) |
+| `chest_{wood,silver,gold}_body.svg` | 0 0 256 256 | 바닥 y=226 | UI | 몸통. 앞면 x 44–212, 앞 테두리 y=132 |
+| `chest_{tier}_lid.svg` | 0 0 256 256 | 같은 틀 | UI | 닫힌 뚜껑 (y 72–136) |
+| `chest_{tier}_lid_open.svg` | 0 0 256 256 | 같은 틀 | UI | 뒤로 열린 뚜껑 (y 18–122), 몸통 뒤에 그린다 |
+| `chest_{tier}_lock.svg` | 0 0 256 256 | 같은 틀 | UI | 자물쇠 (x 108–148, y 112–168) |
+| `chest_beam.svg` | 0 0 256 256 | 같은 틀 | UI | 빛기둥, 밑변 y≈130에서 위로 퍼짐 |
+
+쌓는 순서: 닫힘 = 몸통 + 뚜껑 + 자물쇠, 열림 = 열린 뚜껑 + 몸통 + 빛기둥.
+
+## 가챠 · 상점
+| 파일 | viewBox | 내용 |
+|---|---|---|
+| `g_choice` `g_reroll` `g_phoenix` `g_twinstar` `g_goldchest` `g_book` `g_goldbag` `g_firststep` `g_critdmg` | 0 0 64 64 | 가챠 업그레이드 아이콘 (선택의 등불, 운명 바꾸기, 불사조 깃털, 쌍둥이 별, 황금 상자, 배움, 황금 주머니, 첫걸음, 치명타 피해) |
+| `crystal.svg` | 0 0 64 64 | 별빛 결정 화폐 |
+| `ticket2.svg` | 0 0 96 64 | ★★ 확정 뽑기권 |
+| `gacha_banner.svg` | 0 0 1200 600 | 등불 제단 배너 (cover로 잘림, 위 22%·양옆은 어둡게) |
+| `card_frame_1` `card_frame_2` `card_frame_3` | 0 0 240 320 | 등급 카드 테두리 (★ 강철 파랑 · ★★ 보라 · ★★★ 금). 안쪽 판 x 22–218, y 28–294 |
+| `store_crystal_s` `store_crystal_m` `store_crystal_l` `store_starter` `store_noads` `store_pass` | 0 0 256 256 | 상점 상품 그림 |

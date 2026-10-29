@@ -31,9 +31,10 @@
     const roster = game.stage.enemies;
     const t = game.time, m = t / 60;
 
-    // 1초에 나오는 적 수(보통): 처음 2마리 남짓 → 10분 16마리 → 20분 46마리, 마지막 2분은 더 몰려온다
+    // 1초에 나오는 적 수(보통): 처음엔 적게, 중반에 가파르게, 후반엔 완만하게(S자).
+    // 0분 0.5 → 2분 1.9 → 4분 4.6 → 6분 8.3 → 8분 13 → 10분 18 → 15분 31 → 20분 43마리, 마지막 2분은 더 몰려온다
     const diff = game.difficulty;
-    const rate = (0.8 + m * 0.4 + m * m * 0.035 + (m >= 18 ? 3 : 0)) * 2 * diff.spawn;
+    const rate = (0.5 + m * 0.3 + m * m * 0.2 - m * m * m * 0.0055 + (m >= 18 ? 3 : 0)) * diff.spawn;
     if (game.enemies.length < G.MAX_ENEMIES) d.acc += rate * dt;
     while (d.acc >= 1) {
       d.acc -= 1;
@@ -59,7 +60,7 @@
     if (t >= d.nextSwarm) {
       d.nextSwarm += 90;
       // 빠른 적 떼가 사방에서 원을 그리며 조여 온다
-      const count = Math.round(Math.min(120, (24 + Math.floor(m * 4)) * diff.spawn));
+      const count = Math.round(Math.min(120, (12 + Math.floor(m * 5)) * diff.spawn));
       const r = game.viewRadius + 20;
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2;

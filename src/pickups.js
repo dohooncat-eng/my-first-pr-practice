@@ -17,8 +17,14 @@
     game.gems.push({ x: x + G.rand(-5, 5), y: y + G.rand(-5, 5), value, tier: gemTier(value), pull: false, sp: 0, phase: Math.random() * 6 });
   };
 
-  // kind: heal | magnet | coin(value=금화 수) | chest
+  // kind: heal | magnet | coin(value=금화 수) | chest(value='elite'|'boss')
+  const MAX_COINS = 80;
   G.dropItem = function (game, x, y, kind, value) {
+    if (kind === 'coin' && game.items.length > MAX_COINS) {
+      // 바닥에 금화가 너무 많으면 이미 있는 금화에 합친다
+      const coins = game.items.filter((it) => it.kind === 'coin');
+      if (coins.length >= MAX_COINS) { G.pick(coins).value += value || 0; return; }
+    }
     game.items.push({ x, y, kind, value: value || 0, pull: false, sp: 0, phase: Math.random() * 6 });
   };
 
@@ -35,14 +41,14 @@
 
   function collect(game, it) {
     if (it.kind === 'heal') {
-      G.healPlayer(game, 30);
+      G.healPlayer(game, 20);
       if (G.sfx) G.sfx.play('heal');
     } else if (it.kind === 'coin') {
       game.runGold += it.value;
       G.addDamageNumber(game, game.player.x, game.player.y - 40, '+' + it.value + 'G', 'big');
       if (G.sfx) G.sfx.play('coin');
     } else if (it.kind === 'chest') {
-      game.pendingChests++;
+      game.chestQueue.push(it.value === 'boss' ? 'boss' : 'elite');
       if (G.sfx) G.sfx.play('pickupChest');
     } else {
       for (const g of game.gems) g.pull = true;
@@ -92,8 +98,8 @@
     }
     for (const it of game.items) {
       if (!G.inView(game, it.x, it.y, 40)) continue;
-      const name = it.kind === 'heal' || it.kind === 'magnet' ? 'item_' + it.kind : it.kind;
-      const spr = G.art.get(name);
+      const name = it.kind === 'heal' || it.kind === 'magnet' ? 'item_' + it.kind : it.kind === 'chest' && it.value === 'boss' ? 'chest_boss' : it.kind;
+      const spr = G.art.get(name) || G.art.get(it.kind);
       const bob = it.kind === 'chest' ? 0 : Math.sin(game.clock * 2.5 + it.phase) * 3;
       const scale = it.kind === 'coin' ? Math.min(1.8, 1 + it.value / 40) : 1;
       if (spr) G.drawSprite(ctx, spr, it.x, it.y + bob, scale, false, 0);
@@ -111,9 +117,13 @@
     heal: 'rgba(255, 120, 120, 0.7)', magnet: 'rgba(127, 212, 255, 0.8)',
     coin: 'rgba(255, 210, 110, 0.7)', chest: 'rgba(255, 200, 90, 0.9)',
   };
+  const MAX_GEM_GLOWS = 120;
   G.drawPickupGlow = function (ctx, game) {
-    for (const g of game.gems) {
-      if (G.inView(game, g.x, g.y, 30)) G.drawGlow(ctx, GEM_GLOW[g.tier], g.x, g.y, 10 + g.tier * 4, 0.55);
+    // 결정이 많을 때는 빛 번짐을 일부만 그린다 (큰 결정 먼저 보이게 뒤에서부터)
+    let n = 0;
+    for (let i = game.gems.length - 1; i >= 0 && n < MAX_GEM_GLOWS; i--) {
+      const g = game.gems[i];
+      if (G.inView(game, g.x, g.y, 30)) { G.drawGlow(ctx, GEM_GLOW[g.tier], g.x, g.y, 10 + g.tier * 4, 0.55); n++; }
     }
     for (const it of game.items) {
       if (!G.inView(game, it.x, it.y, 40)) continue;

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+<defs><radialGradient id="sna-glow" cx="128" cy="120" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7fd4ff" stop-opacity="0.4"/><stop offset="0.45" stop-color="#7fd4ff" stop-opacity="0.16000000000000003"/><stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/></radialGradient><radialGradient id="sna-glass" cx="0.5" cy="0.55" r="0.65"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#ffe2a0"/><stop offset="0.75" stop-color="#ffb547"/><stop offset="1" stop-color="#e07a2a"/></radialGradient><linearGradient id="sna-bronze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6b871"/><stop offset="0.5" stop-color="#a0662c"/><stop offset="1" stop-color="#5a3418"/></linearGradient><linearGradient id="sna-scr" x1="0" y1="40" x2="0" y2="170" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2a3a52"/><stop offset="1" stop-color="#121a28"/></linearGradient><linearGradient id="sna-frame" x1="0" y1="30" x2="0" y2="180" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5a6a80"/><stop offset="1" stop-color="#252f3e"/></linearGradient><linearGradient id="sna-play" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fb4c8"/></linearGradient><linearGradient id="sna-shield" x1="0" y1="120" x2="0" y2="240" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3f8a8a"/><stop offset="0.5" stop-color="#235a5e"/><stop offset="1" stop-color="#0f2e30"/></linearGradient><linearGradient id="sna-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6cc"/><stop offset="0.45" stop-color="#ffd27a"/><stop offset="1" stop-color="#b8742a"/></linearGradient><radialGradient id="sna-lamp" cx="168" cy="190" r="40" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe2a0" stop-opacity="0.8"/><stop offset="1" stop-color="#ffb547" stop-opacity="0"/></radialGradient></defs>
+<circle cx="128" cy="120" r="120" fill="url(#sna-glow)"/>
+<g transform="rotate(-6 110 104)">
+<rect x="24" y="44" width="172" height="118" rx="16" fill="url(#sna-frame)" stroke="#0a1110" stroke-width="7"/>
+<rect x="38" y="56" width="144" height="94" rx="8" fill="url(#sna-scr)" stroke="#0a1110" stroke-width="3"/>
+<path d="M42 60 L110 60 L60 146 L42 146 Z" fill="#ffffff" opacity="0.06"/>
+<path d="M120 64 L150 81 L120 98 Z" fill="url(#sna-play)" stroke="#0a1110" stroke-width="5" stroke-linejoin="round"/>
+<rect x="46" y="136" width="58" height="6" rx="3" fill="#0a1110" opacity="0.6"/><rect x="46" y="136" width="24" height="6" rx="3" fill="#7fd4ff" opacity="0.8"/>
+</g>
+<circle cx="110" cy="102" r="74" fill="none" stroke="#0a1110" stroke-width="25"/>
+<path d="M58 50 L162 154" stroke="#0a1110" stroke-width="25" stroke-linecap="round"/>
+<circle cx="110" cy="102" r="74" fill="none" stroke="#e0445a" stroke-width="14"/>
+<path d="M58 50 L162 154" stroke="#e0445a" stroke-width="14" stroke-linecap="round"/>
+<path d="M52 72 A74 74 0 0 1 120 28" fill="none" stroke="#ff9aa6" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+<circle cx="176" cy="186" r="56" fill="url(#sna-lamp)"/>
+<path d="M176 122 C196 132 214 134 232 132 C234 178 218 222 176 246 C134 222 118 178 120 132 C138 134 156 132 176 122 Z" fill="url(#sna-shield)" stroke="#0a1110" stroke-width="7" stroke-linejoin="round"/>
+<path d="M176 131 C193 140 208 142 223 141 C224 180 211 216 176 236 C141 216 128 180 129 141 C144 142 159 140 176 131 Z" fill="none" stroke="url(#sna-gold)" stroke-width="4" stroke-linejoin="round"/>
+<path d="M164 160 Q176 144.4 188 160" fill="none" stroke="#0a1110" stroke-width="8.16" stroke-linecap="round"/>
+<path d="M164 160 Q176 144.4 188 160" fill="none" stroke="#f0c56e" stroke-width="3.36" stroke-linecap="round"/>
+<path d="M165.2 157.6 L186.8 157.6 L195.2 168.4 L156.8 168.4 Z" fill="url(#sna-bronze)" stroke="#0a1110" stroke-width="5.76" stroke-linejoin="round"/>
+<rect x="159.2" y="168.4" width="33.6" height="36" rx="6.24" fill="url(#sna-glass)" stroke="#0a1110" stroke-width="6.24"/>
+<path d="M170.24 170.8 L170.24 202 M181.76 170.8 L181.76 202" stroke="#6b4422" stroke-width="3.12" stroke-linecap="round" opacity="0.85"/>
+<path d="M176 174.4 C182.24 181.6 182.72 193.6 176 196 C169.28 193.6 169.76 181.6 176 174.4 Z" fill="#ffffff"/>
+<path d="M155.6 204.4 L196.4 204.4 L190.4 214 L161.6 214 Z" fill="url(#sna-bronze)" stroke="#0a1110" stroke-width="5.76" stroke-linejoin="round"/>
+<path d="M160.4 161.44 L183.2 161.44" stroke="#ffe9b0" stroke-width="2.16" stroke-linecap="round" opacity="0.8"/>
+<path d="M232 31 L234.34 37.66 L241 40 L234.34 42.34 L232 49 L229.66 42.34 L223 40 L229.66 37.66 Z" fill="#ffffff"/>
+<path d="M20 190 L21.56 194.44 L26 196 L21.56 197.56 L20 202 L18.44 197.56 L14 196 L18.44 194.44 Z" fill="#ffffff"/>
+<circle cx="240" cy="100" r="2.6" fill="#cfe6ff"/>
+</svg>

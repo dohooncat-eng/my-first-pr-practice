@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs><radialGradient id="gtw-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe2a0" stop-opacity="0.3"/><stop offset="0.55" stop-color="#ffe2a0" stop-opacity="0.14"/><stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/></radialGradient><radialGradient id="gtw-gold" cx="0.42" cy="0.38" r="0.75"><stop offset="0" stop-color="#fffbe6"/><stop offset="0.35" stop-color="#ffe08a"/><stop offset="0.75" stop-color="#f0b648"/><stop offset="1" stop-color="#b8742a"/></radialGradient><radialGradient id="gtw-blue" cx="0.42" cy="0.38" r="0.75"><stop offset="0" stop-color="#ffffff"/><stop offset="0.4" stop-color="#dceeff"/><stop offset="0.8" stop-color="#7fd4ff"/><stop offset="1" stop-color="#3a7fb8"/></radialGradient><filter id="gtw-b" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
+<circle cx="32" cy="32" r="30" fill="url(#gtw-back)"/>
+<path d="M25 8 L29.94 20.2 L43.07 21.13 L32.99 29.6 L36.17 42.37 L25 35.4 L13.83 42.37 L17.01 29.6 L6.93 21.13 L20.06 20.2 Z" fill="#ffd27a" opacity="0.6" filter="url(#gtw-b)"/>
+<path d="M47.64 27.73 L48.34 38.12 L58 42 L48.34 45.88 L47.64 56.27 L40.96 48.28 L30.86 50.82 L36.4 42 L30.86 33.18 L40.96 35.72 Z" fill="#7fd4ff" opacity="0.6" filter="url(#gtw-b)"/>
+<path d="M25 8 L29.94 20.2 L43.07 21.13 L32.99 29.6 L36.17 42.37 L25 35.4 L13.83 42.37 L17.01 29.6 L6.93 21.13 L20.06 20.2 Z" fill="url(#gtw-gold)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+<path d="M25 16 L28.29 23.97 L36.89 24.64 L30.33 30.23 L32.35 38.61 L25 34.1 L17.65 38.61 L19.67 30.23 L13.11 24.64 L21.71 23.97 Z" fill="none" stroke="#fffbe6" stroke-width="1.3" stroke-linejoin="round" opacity="0.75"/>
+<path d="M47.64 27.73 L48.34 38.12 L58 42 L48.34 45.88 L47.64 56.27 L40.96 48.28 L30.86 50.82 L36.4 42 L30.86 33.18 L40.96 35.72 Z" fill="url(#gtw-blue)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+<path d="M45.97 33.87 L46.48 40.47 L52.6 43 L46.48 45.53 L45.97 52.13 L41.67 47.09 L35.23 48.64 L38.7 43 L35.23 37.36 L41.67 38.91 Z" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round" opacity="0.7"/>
+<circle cx="21.5" cy="23" r="2.4" fill="#ffffff"/>
+<circle cx="40" cy="38.5" r="1.9" fill="#ffffff"/>
+<path d="M53 7.4 L54.2 10.8 L57.6 12 L54.2 13.2 L53 16.6 L51.8 13.2 L48.4 12 L51.8 10.8 Z" fill="#ffffff"/>
+<path d="M9 46.8 L9.83 49.17 L12.2 50 L9.83 50.83 L9 53.2 L8.17 50.83 L5.8 50 L8.17 49.17 Z" fill="#cfe6ff" opacity="0.9"/>
+<circle cx="56" cy="26" r="1.2" fill="#ffe2a0"/>
+</svg>

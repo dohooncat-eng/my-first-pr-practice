@@ -12,8 +12,8 @@
     const st = stage(game);
     const minutes = game.time / 60;
     const scale = elite ? 1.8 : 1;
-    // 체력 배율: 5분 2.6배 · 10분 9배 · 15분 24배 · 20분 50배 (뒤 스테이지는 더 가파르게)
-    const growth = (0.06 * minutes + 0.03 * minutes * minutes + 0.0045 * minutes * minutes * minutes) * st.growth;
+    // 체력 배율: 5분 4.9배 · 8분 11배 · 10분 18배 · 15분 44배 · 20분 87배 (중반부터 가파르게, 뒤 스테이지는 더)
+    const growth = (0.1 * minutes + 0.11 * minutes * minutes + 0.005 * minutes * minutes * minutes) * st.growth;
     const diff = game.difficulty || G.DIFFICULTIES[0];
     // 난이도 체력 배율은 처음엔 1/4만 걸리고 8분에 걸쳐 끝까지 오른다 (첫 무기로도 시작할 수 있게)
     const diffHp = 1 + (diff.hp - 1) * (0.25 + 0.75 * Math.min(1, minutes / 8));
@@ -22,8 +22,8 @@
       id: nextId++, type, x, y, scale,
       r: t.r * scale,
       hp, maxHp: hp,
-      speed: t.speed * st.speedMul * diff.speed * (1 + minutes * 0.015) * (elite ? 0.85 : 1),
-      damage: t.damage * st.dmgMul * diff.dmg * (1 + minutes * 0.07) * (elite ? 1.6 : 1),
+      speed: t.speed * st.speedMul * diff.speed * (1 + Math.min(0.35, minutes * 0.02)) * (elite ? 0.85 : 1),
+      damage: t.damage * st.dmgMul * diff.dmg * (1 + minutes * 0.09) * (elite ? 1.6 : 1),
       xp: elite ? 25 : t.xp,
       elite: !!elite,
       flash: 0, kx: 0, ky: 0, slow: 0, stun: 0,
@@ -86,16 +86,17 @@
     if (G.sfx) G.sfx.play('kill');
     if (e.elite) {
       G.burst(game, e.x, e.y, 'rgba(255, 150, 70, 0.9)', 16, 220, true);
-      G.dropItem(game, e.x + 14, e.y, 'heal');
+      if (Math.random() < 0.3) G.dropItem(game, e.x + 14, e.y, 'heal');
       G.dropItem(game, e.x - 14, e.y, 'coin', 5);
-      // 엘리트도 가끔 상자를 떨어뜨린다
-      if (Math.random() < 0.15) G.dropItem(game, e.x, e.y + 16, 'chest');
+      // 엘리트는 항상 상자를 떨어뜨린다
+      G.dropItem(game, e.x, e.y + 16, 'chest', 'elite');
       G.addShake(game, 8);
     } else {
       const r = Math.random();
+      // 약초는 아주 드물게 (0.06%)
       if (r < 0.003) G.dropItem(game, e.x, e.y, 'magnet');
-      else if (r < 0.011) G.dropItem(game, e.x, e.y, 'heal');
-      else if (r < 0.026) G.dropItem(game, e.x, e.y, 'coin', 1);
+      else if (r < 0.0036) G.dropItem(game, e.x, e.y, 'heal');
+      else if (r < 0.0186) G.dropItem(game, e.x, e.y, 'coin', 1);
     }
     if (game.onKill) game.onKill(e);
   };
@@ -103,6 +104,8 @@
   G.updateEnemies = function (game, dt) {
     const p = game.player;
     const grid = game.grid;
+    const tick = game._sepTick = ((game._sepTick || 0) + 1) & 1;
+    const sepRange = game.viewRadius + 80;
     for (const e of game.enemies) {
       if (e.dead) continue;
       e.flash -= dt;
@@ -136,25 +139,32 @@
         }
       }
 
-      // 서로 겹치지 않게 밀어내기
-      grid.query(e.x, e.y, e.r + 26, near);
-      let sx = 0, sy = 0;
-      for (let i = 0; i < near.length; i++) {
-        const o = near[i];
-        if (o === e) continue;
-        const ox = e.x - o.x, oy = e.y - o.y;
-        const rr = (e.r + o.r) * 0.9;
-        const dd = ox * ox + oy * oy;
-        if (dd < rr * rr && dd > 0.0001) {
-          const dl = Math.sqrt(dd);
-          const push = (rr - dl) / rr;
-          sx += (ox / dl) * push;
-          sy += (oy / dl) * push;
+      // 서로 겹치지 않게 밀어내기: 화면 근처 적만, 한 마리마다 2프레임에 한 번 계산하고 사이 프레임은 앞의 값을 쓴다
+      if (d > sepRange) {
+        e.sx = 0;
+        e.sy = 0;
+      } else if ((e.id & 1) === tick || e.sx === undefined) {
+        grid.query(e.x, e.y, e.r + 26, near);
+        let sx = 0, sy = 0;
+        for (let i = 0; i < near.length; i++) {
+          const o = near[i];
+          if (o === e) continue;
+          const ox = e.x - o.x, oy = e.y - o.y;
+          const rr = (e.r + o.r) * 0.9;
+          const dd = ox * ox + oy * oy;
+          if (dd < rr * rr && dd > 0.0001) {
+            const dl = Math.sqrt(dd);
+            const push = (rr - dl) / rr;
+            sx += (ox / dl) * push;
+            sy += (oy / dl) * push;
+          }
         }
+        e.sx = sx;
+        e.sy = sy;
       }
       const sepK = e.elite ? 25 : 70;
-      vx += sx * sepK;
-      vy += sy * sepK;
+      vx += e.sx * sepK;
+      vy += e.sy * sepK;
 
       e.x += (vx + e.kx) * dt;
       e.y += (vy + e.ky) * dt;

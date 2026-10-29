@@ -60,3 +60,72 @@ src/ui/hud.js  src/ui/screens.js  src/game.js  src/main.js
 
 ## 저장
 - 영구: `localStorage['hollowlight.meta']`, 진행 중인 판: `localStorage['hollowlight.run']`. 모든 접근은 `G.storage`(try/catch)로. 저장소가 막혀도 게임은 돈다.
+
+---
+
+# 3차 업데이트: 가챠 · 상점 · 광고 · 난이도 해금 · 다시 뽑기 · 상자 연출 · 그래픽 품질
+
+새 파일(스크립트 순서는 `stages.js` 뒤에 `data/gacha.js` `data/store.js`, `meta.js` 뒤에 `systems/gacha.js` `systems/billing.js`):
+- `src/data/gacha.js` — `G.GACHA`(가격·확률·천장·환급·첫 클리어 결정), `G.GACHA_ITEMS`(23종), `G.GACHA_ORDER`, `G.GACHA_STAR_LABEL`, `G.gachaKeysByStar(star)`
+- `src/data/store.js` — `G.STORE`(상품·정액제·교환), `G.storeProduct(id)`
+- `src/systems/gacha.js`(메인), `src/systems/billing.js`(메인: `G.billing` `G.store` `G.ads`)
+
+## 메타 저장에 늘어난 것
+`G.meta.crystals`(별빛 결정), `G.meta.gacha = { pulls, pity, items:{키:레벨}, tickets2, freeDay }`, `G.meta.purchases = {상품id: 횟수}`, `G.meta.noAds`, `G.meta.pass = { until, lastClaim }`(날짜 번호), `G.meta.settings.quality = 'auto'|'high'|'medium'|'low'`, `G.meta.runsSinceAd`
+
+## 가챠 (UI가 쓰는 함수)
+- `G.GACHA_ITEMS[키] = { star(1~3), max, name, icon(스프라이트 이름: G.spriteUrl(icon)), desc(lv) → 효과 문구, apply(s, lv) }`
+- `G.gachaLevel(키)` → 지금 레벨(0 = 없음)
+- `G.gachaCost(n, currency)` → 가격. `n` 1 또는 10, `currency` `'gold'|'crystal'`
+- `G.gachaCanAfford(n, currency)` → bool
+- `G.gachaPull(n, currency)` → `{ ok, reason, results, best, pityLeft }`
+  - `currency`: `'gold'` `'crystal'` `'ticket2'`(★★ 확정권, n=1) `'free'`(하루 1회 무료, n=1. 먼저 `await G.ads.rewarded('free_pull')`이 true여야 함)
+  - `reason`(ok가 false일 때): `'gold'` `'crystals'` `'ticket'` `'free'`
+  - `results`: `[{ key, star, name, icon, from, to, isNew, refund }]` — `refund`는 최대 레벨이라 돌려받은 것 `{ gold }` 또는 `{ crystals }`(3성 다 모은 뒤), 아니면 null. 3성 다 모은 뒤 3성 자리는 `key: null, star: 3, name: '별빛 결정 50'`, `refund: { crystals: 50 }`
+  - `best`: 이번 뽑기에서 가장 높은 등급(연출 색: 1 파랑 · 2 보라 · 3 금빛)
+- `G.gachaPityLeft()` → 3성 확정까지 남은 횟수(1~100)
+- `G.gachaFreeAvailable()` → 오늘 무료 뽑기를 쓸 수 있는지(광고를 볼 수 있거나 광고 제거를 샀을 때만 true)
+- `G.gachaOdds()` → `{ groups: [{ star, rate, items: [{ key, name, rate }] }], rules: [문구] }` (확률 정보 창)
+- `G.gachaCollection()` → `[{ key, star, name, icon, level, max, desc, next }]` — `desc` 지금 효과(없으면 Lv 1 효과), `next` 다음 레벨 효과(최대면 null)
+- 뽑을 때 효과음은 UI가 낸다.
+
+## 상점·결제·광고 (`G.billing` `G.store` `G.ads`)
+- `G.STORE.products[] = { id, kind('crystals'|'pack'|'noads'|'pass'), name, art(스프라이트 이름), price(원), limit?, desc?, grant, firstBonus? }`
+- `G.store.priceLabel(product)` → `'₩1,000'`
+- `G.store.status(id)` → `{ bought, limitLeft(null = 무제한), canBuy, firstBonus(첫 구매 2배가 남았는지), note }`
+- `G.billing.available()` → 실제 결제를 할 수 있는지(웹 false, `?debug`는 시험 지급이라 true, 앱에서는 Play Billing)
+- `G.billing.purchase(id)` → `Promise<{ ok, reason('unavailable'|'limit'|'cancelled'), granted: { crystals, gold, tickets2, noAds, passDays } }>`. 웹에서는 `{ ok:false, reason:'unavailable' }` — UI는 "구글 플레이 앱에서 구매할 수 있습니다"를 보여 준다.
+- `G.store.exchange()` → bool (결정 50 → 금화 1,000)
+- `G.store.passStatus()` → `{ active, daysLeft, claimedToday }`, `G.store.claimPassDaily()` → 받은 결정 수(0이면 이미 받음)
+- `G.ads.available()` → 광고를 띄울 수 있는지(웹 false). `G.ads.rewardedReady()` → 보상형 버튼을 보여 줄지(광고 가능 또는 광고 제거 구매). `G.ads.rewarded(placement)` → `Promise<bool>`(광고 제거면 광고 없이 바로 true). `placement`: `'double_gold'` `'free_pull'`
+- 전면 광고는 게임이 결과 화면을 떠날 때 부른다(UI 할 일 없음).
+
+## 난이도 해금 (스테이지마다)
+- `G.isDifficultyUnlocked(stageId, diffId)` → bool, `G.difficultyLockText(stageId, diffId)` → `'보통을 깨면 열립니다'` 같은 문구 또는 null
+- 잠긴 난이도로 `game.newRun`을 부르면 보통으로 시작한다(UI가 먼저 막는다).
+
+## 레벨업 카드
+- 카드는 3~5장(기본 3, 등불지기 각성 4, 가챠 ★★★ 선택의 등불 +1). 1~5 키로 고른다.
+- 다시 뽑기: `game.rerollsLeft`(이번 판 남은 횟수). `game.rerollChoices()` → 새 카드 배열 또는 null(남은 횟수 없음). UI는 카드를 다시 그린다. R 키로도.
+- `G.ui.showLevelUp(game, choices, onPick)`는 그대로. 다시 뽑기 버튼은 `game.rerollsLeft > 0`일 때만.
+
+## 상자
+- `G.ui.showChest(game, result, onClose)`의 `result`에 더해진 것: `source('elite'|'boss'|'debug')`, `startTier`(바닥에 있던 상자 등급), `tier`(열 때 등급: `'wood'|'silver'|'gold'`, 개수 1~2 나무 · 3~4 은 · 5 금), `count`(1~5)
+  - `tier`가 `startTier`보다 높으면 "등급 상승" 연출(번쩍이며 상자가 바뀜). 3개는 보라 빛, 5개는 무지갯빛·황금 연출.
+- 연출용 그림(모두 viewBox 0 0 256 256, 같은 자리에 겹치면 맞물림): `chest_{tier}_body` `chest_{tier}_lid` `chest_{tier}_lid_open` `chest_{tier}_lock`, 빛기둥 `chest_beam`. 바닥용: `chest`(나무, 엘리트) `chest_boss`(금, 보스).
+
+## 결과 화면
+- `G.ui.showEnd(game, result)`의 `result`에 더해진 것: `difficultyId`, `crystals`(첫 클리어 결정, 0이면 표시 안 함), `canDoubleGold`(true면 "광고 보고 금화 2배" 버튼), `unlockedDifficulty`(새로 열린 난이도 이름 또는 null)
+- `game.claimDoubleGold()` → `Promise<number>`(더 받은 금화, 0이면 실패·이미 받음)
+
+## 그래픽 품질
+- `G.meta.settings.quality`: `'auto'`(기본, FPS가 낮으면 해상도를 낮춤) `'high'` `'medium'` `'low'`. 바꾼 뒤 `G.saveMeta()`와 `G.applyQuality()`.
+
+## 무기 크기 · 성능 규칙
+- 모든 무기 범위·반지름은 `G.area(game, r)`, 크기 배율은 `G.areaMul(game)`(= 플레이어 범위 스탯 × `G.WEAPON_SIZE` 0.8)로 쓴다. 무기 코드에서 `stats.area`를 직접 곱하지 않는다.
+- 새 스탯: `goldMul`(정산 금화 배율), `startLevel`(시작 레벨 +n, 그만큼 카드를 먼저 고름), `rerolls`(판마다 다시 뽑기), `chestBonus`(상자 강화 개수 +n)
+- 상자 대기열 `game.chestQueue = ['elite' | 'boss', ...]`. 바닥 상자는 `G.dropItem(game, x, y, 'chest', 'elite' | 'boss')`.
+- 그림은 화면 배율에 맞춰 1.5~3배로 굽는다(`G.spriteRes`). `G.drawSprite`는 save/restore 없이 그리며 좌우 반전 그림을 따로 구워 둔다.
+- 데미지 숫자는 글자판을 미리 구워 `drawImage`로 찍는다(최대 60개). 파티클 최대 300, 결정 빛 번짐 최대 120.
+- 적끼리 밀어내기는 화면 근처 적만, 한 마리당 2프레임에 한 번 계산한다.
+- `game.render()`는 테스트·성능 측정용으로 열어 둔 그리기 함수다.

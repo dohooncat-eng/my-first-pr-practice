@@ -50,13 +50,20 @@ window.G = window.G || {};
     constructor(cellSize) {
       this.cellSize = cellSize;
       this.cells = new Map();
+      this.used = [];
     }
-    clear() { this.cells.clear(); }
+    // 칸 배열은 지우지 않고 길이만 0으로 (매 프레임 새 배열을 만들지 않게). 오래 빈 칸은 가끔 정리한다.
+    clear() {
+      for (let i = 0; i < this.used.length; i++) this.used[i].length = 0;
+      this.used.length = 0;
+      if (this.cells.size > 4000) this.cells.clear();
+    }
     key(cx, cy) { return cx * 100003 + cy; }
     insert(obj) {
       const k = this.key(Math.floor(obj.x / this.cellSize), Math.floor(obj.y / this.cellSize));
       let cell = this.cells.get(k);
       if (!cell) { cell = []; this.cells.set(k, cell); }
+      if (!cell.length) this.used.push(cell);
       cell.push(obj);
     }
     // (x, y) 반경 r 안의 칸에 든 후보를 out에 담는다. 정확한 거리 검사는 호출한 쪽에서 한다.
