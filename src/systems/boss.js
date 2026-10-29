@@ -7,13 +7,14 @@
     const type = st.boss;
     const bt = G.BOSS_TYPES[type];
     const pt = G.spawnPoint(game, 40);
-    const hp = bt.hp * st.hpMul * G.BOSS_HP_SCALE[Math.min(index, G.BOSS_HP_SCALE.length - 1)];
+    const diff = game.difficulty || G.DIFFICULTIES[0];
+    const hp = bt.hp * st.hpMul * diff.bossHp * G.BOSS_HP_SCALE[Math.min(index, G.BOSS_HP_SCALE.length - 1)];
     const e = {
       id: G.nextEnemyId(), type, boss: true, index, name: bt.name,
       x: pt.x, y: pt.y, scale: 1, r: bt.r,
       hp, maxHp: hp,
       speed: bt.speed * st.speedMul,
-      damage: bt.damage * st.dmgMul * (1 + index * 0.25),
+      damage: bt.damage * st.dmgMul * diff.dmg * (1 + index * 0.25),
       xp: 0, elite: false,
       flash: 0, kx: 0, ky: 0, slow: 0, stun: 0,
       phase: Math.random() * 10, hitUntil: {}, dead: false,

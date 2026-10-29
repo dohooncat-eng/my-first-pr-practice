@@ -1485,3 +1485,61 @@ input[type="range"]:focus-visible {
   .title-art, .card, .chest-item, .chest-stage .chest-img, .chest-rays, .chest-stage::before { animation: none !important; }
   .btn, .card, .stage-card, .champ-pick { transition: none; }
 }
+
+/* ---------- 난이도 고르기 ---------- */
+
+.diff-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.diff-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+}
+
+.diff-list {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(9, 15, 13, 0.7);
+}
+
+.diff-btn {
+  min-height: 40px;
+  min-width: 72px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--dim);
+  font: 16px/1 var(--font-display);
+  cursor: pointer;
+}
+
+.diff-btn:hover { color: var(--bone); }
+.diff-btn:focus-visible { outline: 2px solid var(--bone); outline-offset: 2px; }
+.diff-btn.is-on { background: var(--lamp); color: #1d1305; }
+.diff-btn.diff-hard.is-on { background: #ff9a5c; }
+.diff-btn.diff-max { letter-spacing: 0.06em; }
+.diff-btn.diff-max.is-on {
+  background: var(--ember);
+  color: #fff3e6;
+  box-shadow: 0 0 18px rgba(255, 107, 61, 0.55);
+}
+
+.diff-desc {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--dim);
+}
+
+.badge-diff-hard { background: rgba(255, 154, 92, 0.18); color: #ffb98a; }
+.badge-diff-max { background: rgba(255, 107, 61, 0.22); color: #ff9a7a; }

@@ -44,4 +44,22 @@
   ];
 
   G.stageById = function (id) { return G.STAGES.find((s) => s.id === id) || G.STAGES[0]; };
+
+  // 난이도: 적 등장량·체력·피해·속도, 엘리트 간격, 보스 체력, 금화 배율
+  G.DIFFICULTIES = [
+    {
+      id: 'normal', name: '보통', desc: '적이 쏟아지는 기본 밤',
+      spawn: 1, hp: 1, dmg: 1, speed: 1, eliteEvery: 60, bossHp: 1, gold: 1,
+    },
+    {
+      id: 'hard', name: '어려움', desc: '적 1.5배·체력 1.8배·피해 1.3배, 금화 1.8배',
+      spawn: 1.5, hp: 1.8, dmg: 1.3, speed: 1.06, eliteEvery: 45, bossHp: 1.8, gold: 1.8,
+    },
+    {
+      id: 'max', name: 'MAX', desc: '적 2배·체력 3배·피해 1.5배, 엘리트 30초마다, 금화 3배',
+      spawn: 2, hp: 3, dmg: 1.5, speed: 1.12, eliteEvery: 30, bossHp: 3, gold: 3,
+    },
+  ];
+
+  G.difficultyById = function (id) { return G.DIFFICULTIES.find((d) => d.id === id) || G.DIFFICULTIES[0]; };
 })(window.G);

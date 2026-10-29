@@ -119,10 +119,39 @@
 
   const LOCK_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="2" fill="currentColor"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
+  // 난이도: 보통 / 어려움 / MAX
+  function pickedDiff() {
+    const id = game.pickedDifficulty || (G.meta && G.meta.lastDifficulty) || 'normal';
+    return G.difficultyById ? G.difficultyById(id) : { id: 'normal', name: '보통', desc: '' };
+  }
+
+  function renderDifficulty() {
+    const box = $('diff-list');
+    if (!box || !G.DIFFICULTIES) return;
+    box.textContent = '';
+    const cur = pickedDiff();
+    G.DIFFICULTIES.forEach((d) => {
+      const b = el('button', 'diff-btn diff-' + d.id + (d.id === cur.id ? ' is-on' : ''), d.name);
+      b.type = 'button';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', d.id === cur.id ? 'true' : 'false');
+      b.addEventListener('click', () => {
+        sfx('click');
+        game.pickedDifficulty = d.id;
+        if (G.meta) { G.meta.lastDifficulty = d.id; if (G.saveMeta) G.saveMeta(); }
+        renderDifficulty();
+        renderStages();
+      });
+      box.appendChild(b);
+    });
+    $('diff-desc').textContent = cur.desc;
+  }
+
   function renderStages() {
     const list = $('stage-list');
     list.textContent = '';
     const m = meta();
+    const diff = pickedDiff();
     G.STAGES.forEach((st, i) => {
       const unlocked = G.isStageUnlocked ? G.isStageUnlocked(st.id) : i === 0;
       const btn = el('button', 'stage-card' + (unlocked ? '' : ' is-locked'));
@@ -136,10 +165,13 @@
       const top = el('span', 'stage-top');
       top.appendChild(el('span', 'stage-num', 'STAGE ' + (i + 1)));
       if (m.cleared && m.cleared[st.id]) top.appendChild(el('span', 'badge badge-clear', '클리어'));
+      (G.DIFFICULTIES || []).forEach((d) => {
+        if (d.id !== 'normal' && m.cleared && m.cleared[st.id + ':' + d.id]) top.appendChild(el('span', 'badge badge-diff-' + d.id, d.name));
+      });
       body.appendChild(top);
       body.appendChild(el('span', 'stage-name', st.name));
       body.appendChild(el('span', 'stage-desc', st.desc));
-      const best = m.best && m.best[st.id];
+      const best = m.best && (m.best[st.id + ':' + diff.id] || (diff.id === 'normal' && m.best[st.id] && !m.best[st.id].difficulty ? m.best[st.id] : null));
       if (!unlocked) {
         const lock = el('span', 'stage-lock');
         lock.innerHTML = LOCK_SVG;
@@ -165,6 +197,7 @@
   }
 
   function openStage() {
+    renderDifficulty();
     renderStages();
     show('stage');
     const first = document.querySelector('#stage-list .stage-card:not([disabled])');
@@ -241,7 +274,8 @@
     });
     const ch = G.CHAMPIONS[pickedChampion];
     const st = G.stageById ? G.stageById(pickedStage) : G.STAGES[0];
-    $('champion-pick').textContent = st.name + ' · ' + ch.name;
+    const diff = pickedDiff();
+    $('champion-pick').textContent = st.name + (diff.id === 'normal' ? '' : ' ' + diff.name) + ' · ' + ch.name;
   }
 
   function openChampion() {
@@ -254,7 +288,7 @@
   function startRun() {
     if (!pickedStage || !pickedChampion) return;
     sfx('select');
-    game.newRun(pickedStage, pickedChampion);
+    game.newRun(pickedStage, pickedChampion, pickedDiff().id);
   }
 
   // ---------- 업그레이드 상점 ----------
@@ -668,7 +702,8 @@
     const screen = $('screen-end');
     screen.classList.toggle('is-win', !!r.win);
     const st = G.stageById ? G.stageById(r.stageId) : G.STAGES[0];
-    $('end-eyebrow').textContent = st.name + ' · ' + (r.win ? '20:00 생존' : G.formatTime(r.time) + '에 쓰러짐');
+    const dName = r.difficultyId && r.difficultyId !== 'normal' && G.difficultyById ? ' ' + G.difficultyById(r.difficultyId).name : '';
+    $('end-eyebrow').textContent = st.name + dName + ' · ' + (r.win ? '20:00 생존' : G.formatTime(r.time) + '에 쓰러짐');
     $('end-title').textContent = r.win ? '새벽이 밝았습니다' : '등불이 꺼졌습니다';
     $('end-time').textContent = G.formatTime(r.time);
     $('end-level').textContent = r.level;
@@ -680,7 +715,6 @@
     ul.hidden = !ul.children.length;
     pickedStage = r.stageId || pickedStage;
     pickedChampion = r.championId || pickedChampion;
-    sfx(r.win ? 'evolve' : 'hurt');
     $('btn-retry').focus({ preventScroll: true });
   }
 

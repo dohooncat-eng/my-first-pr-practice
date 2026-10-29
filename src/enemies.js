@@ -12,15 +12,18 @@
     const st = stage(game);
     const minutes = game.time / 60;
     const scale = elite ? 1.8 : 1;
-    // 체력 배율: 5분 2.4배 · 10분 7.4배 · 15분 18배 · 20분 37배 (뒤 스테이지는 더 가파르게)
-    const growth = (0.06 * minutes + 0.03 * minutes * minutes + 0.0028 * minutes * minutes * minutes) * st.growth;
-    const hp = t.hp * st.hpMul * (1 + growth) * (elite ? 14 : 1);
+    // 체력 배율: 5분 2.6배 · 10분 9배 · 15분 24배 · 20분 50배 (뒤 스테이지는 더 가파르게)
+    const growth = (0.06 * minutes + 0.03 * minutes * minutes + 0.0045 * minutes * minutes * minutes) * st.growth;
+    const diff = game.difficulty || G.DIFFICULTIES[0];
+    // 난이도 체력 배율은 처음엔 1/4만 걸리고 8분에 걸쳐 끝까지 오른다 (첫 무기로도 시작할 수 있게)
+    const diffHp = 1 + (diff.hp - 1) * (0.25 + 0.75 * Math.min(1, minutes / 8));
+    const hp = t.hp * st.hpMul * diffHp * (1 + growth) * (elite ? 14 : 1);
     const e = {
       id: nextId++, type, x, y, scale,
       r: t.r * scale,
       hp, maxHp: hp,
-      speed: t.speed * st.speedMul * (1 + minutes * 0.015) * (elite ? 0.85 : 1),
-      damage: t.damage * st.dmgMul * (1 + minutes * 0.04) * (elite ? 1.6 : 1),
+      speed: t.speed * st.speedMul * diff.speed * (1 + minutes * 0.015) * (elite ? 0.85 : 1),
+      damage: t.damage * st.dmgMul * diff.dmg * (1 + minutes * 0.07) * (elite ? 1.6 : 1),
       xp: elite ? 25 : t.xp,
       elite: !!elite,
       flash: 0, kx: 0, ky: 0, slow: 0, stun: 0,

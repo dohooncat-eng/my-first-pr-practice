@@ -2,10 +2,16 @@
 (function (G) {
   'use strict';
 
-  const MAX_ENEMIES = 420;
+  G.MAX_ENEMIES = 800;
 
   G.createDirector = function () {
     return { acc: 0, nextElite: 60, nextSwarm: 90, bossIndex: 0, finalWave: false };
+  };
+
+  G.createDirectorFor = function (diff) {
+    const d = G.createDirector();
+    d.nextElite = diff.eliteEvery;
+    return d;
   };
 
   function pickRole(m) {
@@ -25,9 +31,10 @@
     const roster = game.stage.enemies;
     const t = game.time, m = t / 60;
 
-    // 1초에 나오는 적 수: 처음 1마리 남짓 → 10분 8마리 → 20분 23마리, 마지막 2분은 더 몰려온다
-    const rate = 0.8 + m * 0.4 + m * m * 0.035 + (m >= 18 ? 3 : 0);
-    if (game.enemies.length < MAX_ENEMIES) d.acc += rate * dt;
+    // 1초에 나오는 적 수(보통): 처음 2마리 남짓 → 10분 16마리 → 20분 46마리, 마지막 2분은 더 몰려온다
+    const diff = game.difficulty;
+    const rate = (0.8 + m * 0.4 + m * m * 0.035 + (m >= 18 ? 3 : 0)) * 2 * diff.spawn;
+    if (game.enemies.length < G.MAX_ENEMIES) d.acc += rate * dt;
     while (d.acc >= 1) {
       d.acc -= 1;
       const pt = G.spawnPoint(game);
@@ -36,7 +43,7 @@
 
     if (t >= d.nextElite) {
       const at = d.nextElite;
-      d.nextElite += 60;
+      d.nextElite += diff.eliteEvery;
       // 중간 보스가 나오는 때에는 엘리트를 쉬게 한다
       if (G.BOSS_TIMES.indexOf(at) === -1) {
         const role = m < 3 ? 'basic' : G.pick(['basic', 'tank', 'fast']);
@@ -52,7 +59,7 @@
     if (t >= d.nextSwarm) {
       d.nextSwarm += 90;
       // 빠른 적 떼가 사방에서 원을 그리며 조여 온다
-      const count = Math.min(70, 18 + Math.floor(m * 3));
+      const count = Math.round(Math.min(120, (24 + Math.floor(m * 4)) * diff.spawn));
       const r = game.viewRadius + 20;
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2;

@@ -2,8 +2,9 @@
 (function (G) {
   'use strict';
 
+  // 필요 경험치: Lv 10 약 160 · Lv 30 약 900 · Lv 50 약 2,100 (레벨이 높을수록 가파르게)
   G.xpToNext = function (level) {
-    return Math.floor(5 + (level - 1) * 7 + Math.pow(level - 1, 1.6));
+    return Math.floor(5 + (level - 1) * 10 + Math.pow(level - 1, 1.9));
   };
 
   G.baseStats = function () {

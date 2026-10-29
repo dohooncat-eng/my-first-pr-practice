@@ -5,6 +5,7 @@
   const game = G.game;
   G.loadMeta();
   game.settings = G.meta.settings;
+  game.pickedDifficulty = G.meta.lastDifficulty || 'normal';
   game.canvas = document.getElementById('game');
   game.ctx = game.canvas.getContext('2d');
   game.debug = new URLSearchParams(location.search).has('debug');

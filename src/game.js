@@ -12,8 +12,9 @@
     clock: 0, time: 0, kills: 0, runGold: 0, fps: 60,
     player: null, stage: null, boss: null,
     debug: false, xpMul: 1, reducedMotion: false,
-    shake: 0, settings: { sfx: 0.7, shake: true, numbers: true, fps: false },
-    lastRun: { stageId: 'forest', championId: 'keeper' },
+    shake: 0, settings: { sfx: 0.7, music: 0.5, shake: true, numbers: true, fps: false },
+    lastRun: { stageId: 'forest', championId: 'keeper', difficultyId: 'normal' },
+    difficulty: null, pickedDifficulty: 'normal',
   };
 
   const AUTOSAVE_EVERY = 10;
@@ -26,8 +27,9 @@
   }
   const SAVE_STATES = ['playing', 'paused', 'levelup', 'chest'];
 
-  function resetWorld(stageId, championId) {
+  function resetWorld(stageId, championId, difficultyId) {
     game.stage = G.stageById(stageId);
+    game.difficulty = G.difficultyById(difficultyId);
     game.player = G.createPlayer(championId);
     game.enemies = [];
     game.projectiles = [];
@@ -42,7 +44,7 @@
     game.heartbeat = 0;
     game._visEnemies = [];
     game.grid = new G.SpatialGrid(64);
-    game.director = G.createDirector();
+    game.director = G.createDirectorFor(game.difficulty);
     game.time = 0;
     game.kills = 0;
     game.runGold = 0;
@@ -56,14 +58,14 @@
     game.autosave = AUTOSAVE_EVERY;
     game.cam.x = 0;
     game.cam.y = 0;
-    game.lastRun = { stageId: game.stage.id, championId: game.player.champion };
+    game.lastRun = { stageId: game.stage.id, championId: game.player.champion, difficultyId: game.difficulty.id };
     G.recalcStats(game);
     game.player.hp = game.player.maxHp;
   }
 
-  game.newRun = function (stageId, championId) {
+  game.newRun = function (stageId, championId, difficultyId) {
     if (game.state === 'loading') return;
-    resetWorld(stageId, championId);
+    resetWorld(stageId, championId, difficultyId || game.pickedDifficulty || 'normal');
     const p = game.player;
     const champ = G.CHAMPIONS[p.champion];
     G.addWeapon(p, champ.weapon, champ.weaponLevel || 1);
@@ -79,14 +81,14 @@
     music('play', game.stage.id);
     music('setBoss', false);
     music('duck', false);
-    G.announce(game, game.stage.name + ' · 20분을 버티세요');
+    G.announce(game, game.stage.name + (game.difficulty.id === 'normal' ? '' : ' · ' + game.difficulty.name) + ' · 20분을 버티세요');
     G.saveRun(game);
   };
 
   game.continueRun = function () {
     const d = G.loadRunData();
     if (!d || game.state === 'loading') return false;
-    resetWorld(d.stageId, d.player.champion);
+    resetWorld(d.stageId, d.player.champion, d.difficultyId);
     G.restoreRun(game, d);
     G.input.clear();
     game.state = 'paused';
@@ -96,7 +98,7 @@
     return true;
   };
 
-  game.retry = function () { game.newRun(game.lastRun.stageId, game.lastRun.championId); };
+  game.retry = function () { game.newRun(game.lastRun.stageId, game.lastRun.championId, game.lastRun.difficultyId); };
 
   game.pause = function () {
     if (game.state !== 'playing') return;
@@ -168,14 +170,13 @@
     game.state = 'end';
     music('setBoss', false);
     music('stinger', win ? 'victory' : 'defeat');
-    music('play', 'title');
     const settle = G.settleRun(game, win);
     G.clearRun();
     const p = game.player;
     G.ui.showEnd(game, {
       win, time: Math.floor(game.time), level: p.level, kills: game.kills,
       gold: settle.gold, isBest: settle.isBest,
-      stageId: game.stage.id, championId: p.champion, newlyUnlocked: settle.newlyUnlocked,
+      stageId: game.stage.id, championId: p.champion, difficultyId: game.difficulty.id, newlyUnlocked: settle.newlyUnlocked,
     });
   }
 

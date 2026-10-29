@@ -12,6 +12,7 @@
     return {
       v: 1,
       stageId: game.stage.id,
+      difficultyId: game.difficulty.id,
       time: game.time,
       kills: game.kills,
       runGold: game.runGold,
@@ -51,7 +52,7 @@
     const d = G.loadRunData();
     if (!d) return null;
     return {
-      stageName: G.stageById(d.stageId).name,
+      stageName: G.stageById(d.stageId).name + (d.difficultyId && d.difficultyId !== 'normal' ? ' ' + G.difficultyById(d.difficultyId).name : ''),
       championName: G.CHAMPIONS[d.player.champion].name,
       time: d.time,
       level: d.player.level,
