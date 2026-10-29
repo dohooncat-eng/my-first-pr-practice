@@ -14,6 +14,25 @@
   }
 
   G.fxPush = push;
+
+  // 색을 덧입힌 그림 (처음 쓸 때 한 번 만들어 둔다)
+  const tintCache = {};
+  G.tintedSprite = function (name, color) {
+    const key = name + '|' + color;
+    if (tintCache[key]) return tintCache[key];
+    const spr = G.art.get(name);
+    if (!spr) return null;
+    const c = document.createElement('canvas');
+    c.width = spr.img.width;
+    c.height = spr.img.height;
+    const x = c.getContext('2d');
+    x.drawImage(spr.img, 0, 0);
+    x.globalCompositeOperation = 'source-atop';
+    x.fillStyle = color;
+    x.fillRect(0, 0, c.width, c.height);
+    tintCache[key] = Object.assign({}, spr, { img: c });
+    return tintCache[key];
+  };
   G.fxList = function (w, name) { return w.state[name] || (w.state[name] = []); };
 
   // ---------- 번개 ----------
@@ -67,7 +86,7 @@
       if (!next) break;
       hit.push(next);
       nodes.push(next.x, next.y - 6);
-      G.damageEnemy(game, next, dmg * 0.85, 0, 0);
+      G.damageEnemy(game, next, dmg * 0.9, 0, 0);
       cur = next;
     }
     if (nodes.length >= 4) push(fx, { nodes, style, sky: !skipFirst, life: 0.26, max: 0.26 }, 36);
@@ -183,9 +202,9 @@
   };
 
   const BLADE_LOOK = {
-    scythe: { sprite: 'scythe', glow: 'rgba(190, 220, 255, 0.5)', light: '#eef3f8', dark: '#6f7d92' },
-    reaper: { sprite: 'scythe', glow: 'rgba(255, 70, 120, 0.75)', light: '#ffd6e0', dark: '#8a2a4a', tint: 'rgba(255, 60, 110, 0.55)' },
-    moon: { sprite: null, glow: 'rgba(170, 210, 255, 0.85)', light: '#ffffff', dark: '#9cbcff' },
+    scythe: { sprite: 'scythe', glow: 'rgba(200, 228, 255, 0.7)', glowR: 22, light: '#eef3f8', dark: '#6f7d92', trail: 'rgba(214, 232, 255, ' },
+    reaper: { sprite: 'scythe', tint: 'rgba(110, 8, 44, 0.5)', glow: 'rgba(255, 60, 110, 0.5)', glowR: 15, light: '#ffd6e0', dark: '#8a2a4a', trail: 'rgba(255, 70, 120, ' },
+    moon: { sprite: null, glow: 'rgba(170, 210, 255, 0.85)', glowR: 20, light: '#ffffff', dark: '#9cbcff', trail: 'rgba(190, 220, 255, ' },
   };
 
   // 초승달 날: 바깥 호에서 안쪽 호를 파낸 모양
@@ -218,11 +237,21 @@
     for (const b of fx) {
       if (!G.inView(game, b.x, b.y, 60)) continue;
       const look = BLADE_LOOK[b.look];
-      const spr = look.sprite && G.art.get(look.sprite);
-      // 잔상
-      for (let i = 6; i < b.trail.length; i += 6) {
-        drawBladeAt(ctx, b, look, spr, b.trail[i], b.trail[i + 1], b.trail[i + 2], 0.32 * (1 - i / b.trail.length));
+      const spr = look.sprite && (look.tint ? G.tintedSprite(look.sprite, look.tint) : G.art.get(look.sprite));
+      // 지나간 궤적을 옅은 선으로
+      const tr = b.trail;
+      if (tr.length >= 6) {
+        ctx.lineCap = 'round';
+        for (let i = 0; i + 3 < tr.length; i += 3) {
+          ctx.strokeStyle = look.trail + (0.5 * (1 - i / tr.length)) + ')';
+          ctx.lineWidth = b.r * 0.9 * (1 - i / tr.length);
+          ctx.beginPath();
+          ctx.moveTo(tr[i], tr[i + 1]);
+          ctx.lineTo(tr[i + 3], tr[i + 4]);
+          ctx.stroke();
+        }
       }
+      drawBladeAt(ctx, b, look, spr, tr[6] === undefined ? b.x : tr[6], tr[7] === undefined ? b.y : tr[7], tr[8] || b.rot, 0.3);
       drawBladeAt(ctx, b, look, spr, b.x, b.y, b.rot, 1);
     }
   };
@@ -231,8 +260,7 @@
     for (const b of fx) {
       if (!G.inView(game, b.x, b.y, 60)) continue;
       const look = BLADE_LOOK[b.look];
-      G.drawGlow(ctx, look.glow, b.x, b.y, 24 * b.scale, 0.55);
-      if (look.tint) G.drawGlow(ctx, look.tint, b.trail[6] || b.x, b.trail[7] || b.y, 20 * b.scale, 0.4);
+      G.drawGlow(ctx, look.glow, b.x, b.y, look.glowR * b.scale, 0.6);
     }
   };
 
@@ -270,7 +298,7 @@
       if (pool.t <= 0) {
         pool.t = pool.tick;
         G.hitCircle(game, pool.x, pool.y, pool.r * poolGrow(pool), pool.dmg, {
-          soft: true, slow: pool.slow ? pool.tick + 0.25 : 0,
+          soft: true, slow: pool.slow ? pool.tick + 0.25 : 0, slowMul: pool.slow ? 1 - pool.slow * 1.4 : 0,
         });
       }
       if (pool.bubbles.length < 6 && Math.random() < dt * 6) {
@@ -320,28 +348,24 @@
         ctx.beginPath();
         ctx.arc(0, 0, r * 0.98, 0, TAU);
         ctx.stroke();
+        ctx.fillStyle = '#3f7a2a';
+        ctx.beginPath();
         for (let k = 0; k < 9; k++) {
           const ang = pool.rot + (k / 9) * TAU;
           const lx = Math.cos(ang) * r * 0.98, ly = Math.sin(ang) * r * 0.98;
-          ctx.save();
-          ctx.translate(lx, ly);
-          ctx.rotate(ang + 0.8);
-          ctx.fillStyle = '#3f7a2a';
-          ctx.beginPath();
-          ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
-          ctx.fill();
-          ctx.restore();
-          if (k % 3 === 0) {
-            ctx.fillStyle = '#d86cc0';
-            ctx.beginPath();
-            ctx.arc(lx, ly, 3.2, 0, TAU);
-            ctx.fill();
-            ctx.fillStyle = '#ffe2f6';
-            ctx.beginPath();
-            ctx.arc(lx, ly, 1.2, 0, TAU);
-            ctx.fill();
-          }
+          ctx.moveTo(lx + 7, ly);
+          ctx.ellipse(lx, ly, 7, 3, ang + 0.8, 0, TAU);
         }
+        ctx.fill();
+        ctx.fillStyle = '#d86cc0';
+        ctx.beginPath();
+        for (let k = 0; k < 9; k += 3) {
+          const ang = pool.rot + (k / 9) * TAU;
+          const lx = Math.cos(ang) * r * 0.98, ly = Math.sin(ang) * r * 0.98;
+          ctx.moveTo(lx + 3.2, ly);
+          ctx.arc(lx, ly, 3.2, 0, TAU);
+        }
+        ctx.fill();
       }
       // 거품
       ctx.lineWidth = 1.2;

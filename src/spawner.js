@@ -12,7 +12,7 @@
     const w = {
       basic: 1,
       fast: m >= 1 ? 0.45 + m * 0.05 : 0,
-      tank: m >= 2 ? 0.2 + m * 0.035 : 0,
+      tank: m >= 3 ? 0.12 + m * 0.035 : 0,
     };
     let r = Math.random() * (w.basic + w.fast + w.tank);
     if ((r -= w.basic) < 0) return 'basic';
@@ -25,8 +25,8 @@
     const roster = game.stage.enemies;
     const t = game.time, m = t / 60;
 
-    // 1초에 나오는 적 수: 처음 1마리 남짓 → 10분 7마리 → 20분 13마리, 마지막 2분은 더 몰려온다
-    const rate = 0.7 + m * 0.62 + (m >= 18 ? 2.5 : 0);
+    // 1초에 나오는 적 수: 처음 1마리 남짓 → 10분 8마리 → 20분 23마리, 마지막 2분은 더 몰려온다
+    const rate = 0.8 + m * 0.4 + m * m * 0.035 + (m >= 18 ? 3 : 0);
     if (game.enemies.length < MAX_ENEMIES) d.acc += rate * dt;
     while (d.acc >= 1) {
       d.acc -= 1;
@@ -35,13 +35,17 @@
     }
 
     if (t >= d.nextElite) {
+      const at = d.nextElite;
       d.nextElite += 60;
-      const role = m < 3 ? 'basic' : G.pick(['basic', 'tank', 'fast']);
-      const pt = G.spawnPoint(game);
-      G.spawnEnemy(game, roster[role], pt.x, pt.y, true);
-      const name = G.ENEMY_TYPES[roster[role]].name;
-      const hasBatchim = (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0;
-      G.announce(game, '강한 ' + name + (hasBatchim ? '이' : '가') + ' 다가옵니다');
+      // 중간 보스가 나오는 때에는 엘리트를 쉬게 한다
+      if (G.BOSS_TIMES.indexOf(at) === -1) {
+        const role = m < 3 ? 'basic' : G.pick(['basic', 'tank', 'fast']);
+        const pt = G.spawnPoint(game);
+        G.spawnEnemy(game, roster[role], pt.x, pt.y, true);
+        const name = G.ENEMY_TYPES[roster[role]].name;
+        const hasBatchim = (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0;
+        G.announce(game, '강한 ' + name + (hasBatchim ? '이' : '가') + ' 다가옵니다');
+      }
     }
 
     if (t >= d.nextSwarm) {

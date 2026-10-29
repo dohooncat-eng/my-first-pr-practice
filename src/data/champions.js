@@ -30,9 +30,9 @@
       },
     },
     witch: {
-      name: '반딧불 마녀', sprite: 'witch', weapon: 'orb', price: 400,
+      name: '반딧불 마녀', sprite: 'witch', weapon: 'orb', weaponLevel: 2, price: 400,
       desc: '반딧불을 부리는 마녀. 몸은 약하지만 손이 빠르다.',
-      trait: '최대 체력 85, 공격 대기 시간 -5%',
+      trait: '최대 체력 85, 공격 대기 시간 -5%, 반딧불 Lv 2로 시작',
       base: { maxHp: 85, speed: 155 },
       ability: { name: '반딧불 의식', perLevel: '공격 대기 시간 -3%', awaken: '무기 하나를 더 들고 시작합니다' },
       apply(s, lv) {

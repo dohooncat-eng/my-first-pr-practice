@@ -68,18 +68,25 @@
     }
   };
 
+  // 받침에 맞는 '로/으로' (ㄹ 받침은 '로')
+  function ro(word) {
+    const code = word.charCodeAt(word.length - 1) - 0xac00;
+    const jong = code >= 0 && code < 11172 ? code % 28 : 0;
+    return word + (jong && jong !== 8 ? '으로' : '로');
+  }
+
   // 이 선택이 조합에 어떻게 이어지는지 한 줄
   function comboHint(p, c) {
     if (c.kind === 'weapon') {
       for (const cb of G.COMBOS) {
         if (cb.type === 'evolve' && cb.weapon === c.key && c.level === G.WEAPON_MAX) {
           const has = p.passives[cb.passive] || passiveInFusion(p, cb.passive);
-          return has ? '상자를 열면 ' + G.WEAPONS[cb.result].name + '(으)로 진화' : G.PASSIVES[cb.passive].name + ' 있으면 진화';
+          return has ? '상자를 열면 ' + ro(G.WEAPONS[cb.result].name) + ' 진화' : G.PASSIVES[cb.passive].name + ' 있으면 진화';
         }
         if (cb.type === 'union' && cb.weapons.indexOf(c.key) !== -1 && c.level === G.WEAPON_MAX) {
           const other = cb.weapons[0] === c.key ? cb.weapons[1] : cb.weapons[0];
           const ow = p.weapons.find((w) => w.key === other);
-          if (ow && ow.level === G.WEAPON_MAX) return '상자를 열면 ' + G.WEAPONS[cb.result].name + '(으)로 조합';
+          if (ow && ow.level === G.WEAPON_MAX) return '상자를 열면 ' + ro(G.WEAPONS[cb.result].name) + ' 조합';
         }
       }
     } else if (c.kind === 'passive') {
@@ -90,7 +97,7 @@
         }
         if (cb.type === 'fusion' && cb.passives.indexOf(c.key) !== -1 && c.level === G.PASSIVE_MAX) {
           const other = cb.passives[0] === c.key ? cb.passives[1] : cb.passives[0];
-          if (p.passives[other] === G.PASSIVE_MAX) return '상자를 열면 ' + G.FUSIONS[cb.result].name + '(으)로 조합';
+          if (p.passives[other] === G.PASSIVE_MAX) return '상자를 열면 ' + ro(G.FUSIONS[cb.result].name) + ' 조합';
         }
       }
     }

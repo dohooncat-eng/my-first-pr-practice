@@ -54,7 +54,8 @@
     if (game.state === 'loading') return;
     resetWorld(stageId, championId);
     const p = game.player;
-    G.addWeapon(p, G.CHAMPIONS[p.champion].weapon, 1);
+    const champ = G.CHAMPIONS[p.champion];
+    G.addWeapon(p, champ.weapon, champ.weaponLevel || 1);
     // 반딧불 마녀 각성: 무기 하나를 더 들고 시작
     if (p.stats.extraWeapon) {
       const options = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k) && !p.weapons.some((w) => w.key === k));
@@ -240,7 +241,8 @@
     };
   }
 
-  const HUD_STATES = ['playing', 'levelup', 'chest', 'paused', 'dying'];
+  // 레벨업·상자·일시정지 화면이 떠 있을 때는 HUD 글자가 겹쳐 보이지 않게 그리지 않는다
+  const HUD_STATES = ['playing', 'dying'];
 
   function render() {
     const ctx = game.ctx;

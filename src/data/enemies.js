@@ -12,29 +12,29 @@
   G.ENEMY_TYPES = {
     slime: { name: '이끼 슬라임', role: 'basic', hp: 12, speed: 62, r: 13, damage: 8, xp: 1, color: '#6fbf73' },
     bat: { name: '그림자 박쥐', role: 'fast', hp: 6, speed: 112, r: 11, damage: 5, xp: 1, wobble: true, color: '#9b7fd1' },
-    golem: { name: '바위 골렘', role: 'tank', hp: 55, speed: 36, r: 21, damage: 14, xp: 3, color: '#a39a8c' },
+    golem: { name: '바위 골렘', role: 'tank', hp: 55, speed: 36, r: 21, damage: 12, xp: 3, color: '#a39a8c' },
 
     toad: { name: '독두꺼비', role: 'basic', hp: 14, speed: 60, r: 14, damage: 9, xp: 1, hop: true, color: '#7fae4a' },
-    wisp: { name: '도깨비불', role: 'fast', hp: 6, speed: 122, r: 10, damage: 6, xp: 1, wobble: true, color: '#7fe8d0' },
-    wraith: { name: '늪 망령', role: 'tank', hp: 60, speed: 34, r: 22, damage: 15, xp: 3, color: '#5f8a6e' },
+    wisp: { name: '도깨비불', role: 'fast', hp: 6, speed: 114, r: 10, damage: 6, xp: 1, wobble: true, color: '#7fe8d0' },
+    wraith: { name: '늪 망령', role: 'tank', hp: 60, speed: 34, r: 22, damage: 13, xp: 3, color: '#5f8a6e' },
 
     skeleton: { name: '해골 병사', role: 'basic', hp: 15, speed: 64, r: 13, damage: 9, xp: 1, color: '#d9d2c0' },
-    gargoyle: { name: '돌 가고일', role: 'fast', hp: 8, speed: 116, r: 11, damage: 6, xp: 1, wobble: true, color: '#8a8580' },
-    armor: { name: '저주받은 갑옷', role: 'tank', hp: 70, speed: 32, r: 22, damage: 16, xp: 3, color: '#8e7bc4' },
+    gargoyle: { name: '돌 가고일', role: 'fast', hp: 8, speed: 112, r: 11, damage: 6, xp: 1, wobble: true, color: '#8a8580' },
+    armor: { name: '저주받은 갑옷', role: 'tank', hp: 70, speed: 32, r: 22, damage: 14, xp: 3, color: '#8e7bc4' },
 
     voideye: { name: '공허의 눈', role: 'basic', hp: 16, speed: 62, r: 13, damage: 10, xp: 1, color: '#a98be0' },
-    wolf: { name: '그림자 늑대', role: 'fast', hp: 9, speed: 132, r: 12, damage: 7, xp: 1, color: '#5b6fb0' },
-    stareater: { name: '별 먹는 자', role: 'tank', hp: 80, speed: 36, r: 23, damage: 17, xp: 3, color: '#cfe6ff' },
+    wolf: { name: '그림자 늑대', role: 'fast', hp: 9, speed: 110, r: 12, damage: 7, xp: 1, color: '#5b6fb0' },
+    stareater: { name: '별 먹는 자', role: 'tank', hp: 80, speed: 36, r: 23, damage: 15, xp: 3, color: '#cfe6ff' },
   };
 
   // 중간 보스: 5:00, 10:00, 15:00에 같은 보스가 점점 강해져서 나온다
   G.BOSS_SPRITE = { w: 120, h: 120, ay: 180 / 192, feet: 40, shadow: 46, fps: 5 };
   G.BOSS_TYPES = {
-    treant: { name: '고목 수호자', hp: 900, speed: 40, r: 44, damage: 22, pattern: 'treant', color: '#8fb36a' },
-    marshqueen: { name: '늪의 여왕', hp: 1000, speed: 44, r: 44, damage: 24, pattern: 'marshqueen', color: '#b6e35a' },
-    ashknight: { name: '잿빛 기사', hp: 1100, speed: 52, r: 40, damage: 26, pattern: 'ashknight', color: '#ff6b3d' },
-    eclipse: { name: '월식의 군주', hp: 1250, speed: 42, r: 40, damage: 28, pattern: 'eclipse', color: '#cfe6ff' },
+    treant: { name: '고목 수호자', hp: 1400, speed: 40, r: 44, damage: 22, pattern: 'treant', color: '#8fb36a' },
+    marshqueen: { name: '늪의 여왕', hp: 1500, speed: 44, r: 44, damage: 24, pattern: 'marshqueen', color: '#b6e35a' },
+    ashknight: { name: '잿빛 기사', hp: 1650, speed: 52, r: 40, damage: 26, pattern: 'ashknight', color: '#ff6b3d' },
+    eclipse: { name: '월식의 군주', hp: 1850, speed: 42, r: 40, damage: 28, pattern: 'eclipse', color: '#cfe6ff' },
   };
   G.BOSS_TIMES = [300, 600, 900];
-  G.BOSS_HP_SCALE = [1, 2.6, 5.5];
+  G.BOSS_HP_SCALE = [1, 4, 12];
 })(window.G);

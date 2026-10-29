@@ -83,7 +83,7 @@
         if (k >= 1) {
           ai.mode = 'walk';
           e.lift = 0;
-          ring(game, e, 12 + e.index * 4, 170, e.damage * 0.6, 'rgba(182, 227, 90, 0.95)');
+          ring(game, e, 10 + e.index * 4, 150, e.damage * 0.5, 'rgba(182, 227, 90, 0.95)');
           G.burst(game, e.x, e.y, 'rgba(182, 227, 90, 0.9)', 26, 260);
           G.addShake(game, 9);
         }

@@ -1,6 +1,7 @@
 // 무기 시스템 공통: 동작 등록, 스탯 적용 도우미, 적 찾기·범위 피해, 공용 투사체
 // 무기 하나의 동작 = G.defineWeapon(키, { update, under, over, glow })
 //   update(game, w, s, dt): s는 현재 레벨 수치(G.WEAPONS[키].levels[레벨-1])
+//   적 감속: e.slow(남은 초) 동안 속도 × e.slowMul(기본 0.55)
 //   under/over(ctx, game, w, s): 캐릭터 아래/위에 그리기 (월드 좌표)
 //   glow(ctx, game, w, s): 어둠 위 가산 합성 빛 (월드 좌표)
 //   w.state: 무기가 자유롭게 쓰는 객체 (저장되지 않음)
@@ -68,7 +69,7 @@
     return pool.slice(0, n);
   };
 
-  // 원 안의 적 모두에게 피해. opts: { knock(바깥으로 미는 힘), soft, cdKey, cd(같은 적 재타격 간격), stun, slow }
+  // 원 안의 적 모두에게 피해. opts: { knock(바깥으로 미는 힘), soft, cdKey, cd(같은 적 재타격 간격), stun, slow(초), slowMul(속도 배율) }
   // 맞힌 적 수를 돌려준다
   const hitList = [];
   G.hitCircle = function (game, x, y, r, dmg, opts) {
@@ -88,7 +89,10 @@
         ky = dy * k;
       }
       if (o.stun) e.stun = Math.max(e.stun || 0, o.stun);
-      if (o.slow) e.slow = Math.max(e.slow || 0, o.slow);
+      if (o.slow) {
+        e.slow = Math.max(e.slow || 0, o.slow);
+        if (o.slowMul) e.slowMul = Math.min(e.slowMul || 1, o.slowMul);
+      }
       G.damageEnemy(game, e, dmg, kx, ky, o.soft);
       count++;
     }

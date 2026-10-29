@@ -12,7 +12,9 @@
     const st = stage(game);
     const minutes = game.time / 60;
     const scale = elite ? 1.8 : 1;
-    const hp = t.hp * st.hpMul * (1 + minutes * 0.2) * (elite ? 14 : 1);
+    // 체력 배율: 5분 2.4배 · 10분 7.4배 · 15분 18배 · 20분 37배 (뒤 스테이지는 더 가파르게)
+    const growth = (0.06 * minutes + 0.03 * minutes * minutes + 0.0028 * minutes * minutes * minutes) * st.growth;
+    const hp = t.hp * st.hpMul * (1 + growth) * (elite ? 14 : 1);
     const e = {
       id: nextId++, type, x, y, scale,
       r: t.r * scale,
@@ -110,7 +112,8 @@
       if (e.stun > 0) {
         e.stun -= dt;
       } else {
-        let sp = e.speed * (e.slow > 0 ? 0.55 : 1);
+        if (e.slow <= 0) e.slowMul = 0;
+        let sp = e.speed * (e.slow > 0 ? (e.slowMul || 0.55) : 1);
         if (t.hop) sp *= 0.55 + Math.max(0, Math.sin(game.time * 5 + e.phase)) * 1.1;
         vx = (dx / d) * sp;
         vy = (dy / d) * sp;
