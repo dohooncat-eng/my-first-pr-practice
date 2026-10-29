@@ -55,6 +55,8 @@
     if (!d || d.v !== 1 || !d.player || !G.CHAMPIONS[d.player.champion] || !Array.isArray(d.player.weapons)) return null;
     // 숫자가 깨진 저장은 화면 그리기에서 멈추므로 버린다
     if (![d.time, d.player.x, d.player.y, d.player.hp, d.player.level].every(Number.isFinite)) return null;
+    // 판 시간이 난이도별로 줄기 전의 저장은 이미 끝난 시간일 수 있다
+    if (G.difficultyById && d.time >= G.difficultyById(d.difficultyId).time) return null;
     ['enemies', 'gems', 'items'].forEach((k) => { if (!Array.isArray(d[k])) d[k] = []; });
     return d;
   };

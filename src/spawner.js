@@ -62,7 +62,7 @@
     if (t >= d.nextSwarm) {
       d.nextSwarm += 90;
       // 빠른 적 떼가 사방에서 원을 그리며 조여 온다
-      const count = Math.round(Math.min(160, (18 + Math.floor(m * 7)) * diff.spawn));
+      const count = Math.max(0, Math.min(G.MAX_ENEMIES - game.enemies.length, Math.round(Math.min(160, (18 + Math.floor(m * 7)) * diff.spawn))));
       const r = game.viewRadius + 20;
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2;
