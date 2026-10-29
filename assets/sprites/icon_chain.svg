@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ichain-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#7fd4ff" stop-opacity="0.32"/>
+    <stop offset="0.55" stop-color="#7fd4ff" stop-opacity="0.14400000000000002"/>
+    <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+  </radialGradient>
+    <radialGradient id="ichain-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#7fd4ff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ichain-node" cx="0.4" cy="0.38" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#bfeaff"/>
+      <stop offset="0.85" stop-color="#7fd4ff"/>
+      <stop offset="1" stop-color="#2f84bb"/>
+    </radialGradient><filter id="ichain-bl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2"/></filter></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#ichain-back)"/>
+  
+    <path d="M12 13 L19.33 20.38 L33.37 13.53 L38.76 26.29 L49 24" fill="none" stroke="#bfeaff" stroke-width="9" stroke-linejoin="round" opacity="0.35" filter="url(#ichain-bl)"/>
+    <path d="M49 24 L37.36 24.72 L38.33 43.56 L22.84 40.82 L20 52" fill="none" stroke="#bfeaff" stroke-width="9" stroke-linejoin="round" opacity="0.35" filter="url(#ichain-bl)"/>
+    
+    <path d="M12 13 L19.33 20.38 L33.37 13.53 L38.76 26.29 L49 24" fill="none" stroke="#0a1110" stroke-width="8.4" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M12 13 L19.33 20.38 L33.37 13.53 L38.76 26.29 L49 24" fill="none" stroke="#9fe0ff" stroke-width="5" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M12 13 L19.33 20.38 L33.37 13.53 L38.76 26.29 L49 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    
+    <path d="M49 24 L37.36 24.72 L38.33 43.56 L22.84 40.82 L20 52" fill="none" stroke="#0a1110" stroke-width="8.4" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M49 24 L37.36 24.72 L38.33 43.56 L22.84 40.82 L20 52" fill="none" stroke="#9fe0ff" stroke-width="5" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M49 24 L37.36 24.72 L38.33 43.56 L22.84 40.82 L20 52" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    
+    <circle cx="12" cy="13" r="10.8" fill="url(#ichain-halo)"/>
+    <circle cx="12" cy="13" r="5.4" fill="url(#ichain-node)" stroke="#0a1110" stroke-width="2.2"/>
+    <circle cx="10.38" cy="11.27" r="1.73" fill="#ffffff"/>
+    
+    <circle cx="49" cy="24" r="12.4" fill="url(#ichain-halo)"/>
+    <circle cx="49" cy="24" r="6.2" fill="url(#ichain-node)" stroke="#0a1110" stroke-width="2.2"/>
+    <circle cx="47.14" cy="22.02" r="1.98" fill="#ffffff"/>
+    
+    <circle cx="20" cy="52" r="10.8" fill="url(#ichain-halo)"/>
+    <circle cx="20" cy="52" r="5.4" fill="url(#ichain-node)" stroke="#0a1110" stroke-width="2.2"/>
+    <circle cx="18.38" cy="50.27" r="1.73" fill="#ffffff"/>
+    <path d="M54 45.6 L55.14 48.86 L58.4 50 L55.14 51.14 L54 54.4 L52.86 51.14 L49.6 50 L52.86 48.86 Z" fill="#ffffff" opacity="1"/>
+    <path d="M46 5.2 L46.73 7.27 L48.8 8 L46.73 8.73 L46 10.8 L45.27 8.73 L43.2 8 L45.27 7.27 Z" fill="#bfeaff" opacity="0.9"/>
+</svg>

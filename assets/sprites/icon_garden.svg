@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="igarden-back" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#b6e35a" stop-opacity="0.5"/>
+    <stop offset="0.55" stop-color="#b6e35a" stop-opacity="0.225"/>
+    <stop offset="1" stop-color="#b6e35a" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="igarden-ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="igarden-rays" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0.3" stop-color="#ffe2a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="igarden-rimglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    
+    <radialGradient id="igarden-petal" cx="32" cy="18" r="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f1c6ff"/>
+      <stop offset="0.5" stop-color="#b86ae0"/>
+      <stop offset="1" stop-color="#5b2a80"/>
+    </radialGradient>
+    <radialGradient id="igarden-center" cx="0.42" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.4" stop-color="#e6ff94"/>
+      <stop offset="1" stop-color="#5c9a2a"/>
+    </radialGradient>
+    <linearGradient id="igarden-vine" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#2f5a2a"/>
+      <stop offset="1" stop-color="#7fb04a"/>
+    </linearGradient></defs>
+  <circle cx="32" cy="32" r="31" fill="url(#igarden-back)"/>
+  <path d="M32 32 L62.43 37.91 L61.31 42.1 Z M32 32 L55.4 52.33 L52.33 55.4 Z M32 32 L42.1 61.31 L37.91 62.43 Z M32 32 L26.09 62.43 L21.9 61.31 Z M32 32 L11.67 55.4 L8.6 52.33 Z M32 32 L2.69 42.1 L1.57 37.91 Z M32 32 L1.57 26.09 L2.69 21.9 Z M32 32 L8.6 11.67 L11.67 8.6 Z M32 32 L21.9 2.69 L26.09 1.57 Z M32 32 L37.91 1.57 L42.1 2.69 Z M32 32 L52.33 8.6 L55.4 11.67 Z M32 32 L61.31 21.9 L62.43 26.09 Z" fill="url(#igarden-rays)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="#ffd27a" stroke-width="3" opacity="0.55" filter="url(#igarden-rimglow)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="url(#igarden-ring)" stroke-width="1.7"/>
+  
+    <ellipse cx="32" cy="57" rx="22" ry="4.4" fill="#b6e35a" opacity="0.45"/>
+    <path d="M32 33 C32 42 22 44 17 50 C13 55 19 60 24 57" fill="none" stroke="#0a1110" stroke-width="10.2" stroke-linecap="round"/>
+    <path d="M32 33 C32 42 22 44 17 50 C13 55 19 60 24 57" fill="none" stroke="url(#igarden-vine)" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M32 33 C33 41 42 45 47 50 C51 54 46 59 42 56" fill="none" stroke="#0a1110" stroke-width="10.2" stroke-linecap="round"/>
+    <path d="M32 33 C33 41 42 45 47 50 C51 54 46 59 42 56" fill="none" stroke="url(#igarden-vine)" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M21 46 l-3.37 -2.83 l2.08 -1.2 Z" fill="#c9e88a" stroke="#0a1110" stroke-width="1.3" stroke-linejoin="round"/><path d="M15.4 53 l-4.33 0.76 l0.42 -2.36 Z" fill="#c9e88a" stroke="#0a1110" stroke-width="1.3" stroke-linejoin="round"/><path d="M43 46 l3.37 -2.83 l0.82 2.26 Z" fill="#c9e88a" stroke="#0a1110" stroke-width="1.3" stroke-linejoin="round"/><path d="M49 53 l4.33 0.76 l-1.2 2.08 Z" fill="#c9e88a" stroke="#0a1110" stroke-width="1.3" stroke-linejoin="round"/>
+    <path d="M24 40 C19 35 12 37 10 41 C15 44 21 43 24 40 Z" fill="#9ad86a" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M40 40 C45 35 52 37 54 41 C49 44 43 43 40 40 Z" fill="#9ad86a" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    <g transform="rotate(0 32 27)"><path d="M32 27 C25 22 25 11 32 6.5 C39 11 39 22 32 27 Z" fill="url(#igarden-petal)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 24 L32 11" stroke="#f1c6ff" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/></g><g transform="rotate(72 32 27)"><path d="M32 27 C25 22 25 11 32 6.5 C39 11 39 22 32 27 Z" fill="url(#igarden-petal)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 24 L32 11" stroke="#f1c6ff" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/></g><g transform="rotate(144 32 27)"><path d="M32 27 C25 22 25 11 32 6.5 C39 11 39 22 32 27 Z" fill="url(#igarden-petal)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 24 L32 11" stroke="#f1c6ff" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/></g><g transform="rotate(216 32 27)"><path d="M32 27 C25 22 25 11 32 6.5 C39 11 39 22 32 27 Z" fill="url(#igarden-petal)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 24 L32 11" stroke="#f1c6ff" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/></g><g transform="rotate(288 32 27)"><path d="M32 27 C25 22 25 11 32 6.5 C39 11 39 22 32 27 Z" fill="url(#igarden-petal)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 24 L32 11" stroke="#f1c6ff" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/></g>
+    <circle cx="32" cy="27" r="6" fill="url(#igarden-center)" stroke="#0a1110" stroke-width="2.2"/>
+    <circle cx="30.4" cy="25.4" r="1.6" fill="#ffffff"/>
+    <path d="M36.5 31.5 C38 34 38.6 35.6 38.6 37 C38.6 38.4 37.6 39.4 36.4 39.4 C35.2 39.4 34.2 38.4 34.2 37 C34.2 35.6 35 34 36.5 31.5 Z" fill="#b6e35a" stroke="#0a1110" stroke-width="1.3"/>
+  <path d="M55 7.8 L56.09 10.91 L59.2 12 L56.09 13.09 L55 16.2 L53.91 13.09 L50.8 12 L53.91 10.91 Z" fill="#fff6da" opacity="1"/>
+  <path d="M9 19 L9.78 21.22 L12 22 L9.78 22.78 L9 25 L8.22 22.78 L6 22 L8.22 21.22 Z" fill="#fff6da" opacity="1"/>
+</svg>

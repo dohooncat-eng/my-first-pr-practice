@@ -5,10 +5,13 @@
   const MAX_NUMBERS = 90;
   const MAX_PARTICLES = 500;
 
-  G.addDamageNumber = function (game, x, y, n, big, soft) {
+  // style: '' 보통, 'big' 큰 피해, 'soft' 지속 피해, 'crit' 치명타, 'heal' 회복
+  G.addDamageNumber = function (game, x, y, n, style) {
+    if (game.settings && !game.settings.numbers && style !== 'heal') return;
     const arr = game.numbers;
     if (arr.length >= MAX_NUMBERS) arr.shift();
-    arr.push({ x: x + G.rand(-6, 6), y, n, big, soft, life: soft ? 0.45 : 0.65, max: soft ? 0.45 : 0.65 });
+    const life = style === 'soft' ? 0.45 : style === 'heal' ? 0.9 : 0.65;
+    arr.push({ x: x + G.rand(-6, 6), y, n, style, life, max: life });
   };
 
   // 한 점에서 사방으로 튀는 파티클. glow면 가산 합성으로 빛난다.
@@ -26,6 +29,7 @@
   };
 
   G.addShake = function (game, amount) {
+    if (game.settings && !game.settings.shake) return;
     if (game.reducedMotion) amount *= 0.3;
     game.shake = Math.min(14, game.shake + amount);
   };
@@ -84,13 +88,14 @@
       const t = d.life / d.max;
       // 처음에 살짝 커졌다 작아지는 팝
       const pop = t > 0.8 ? 1 + (t - 0.8) * 2.5 : 1;
-      const size = (d.big ? 17 : d.soft ? 10 : 13) * pop;
+      const st = d.style;
+      const size = (st === 'crit' ? 20 : st === 'big' || st === 'heal' ? 17 : st === 'soft' ? 10 : 13) * pop;
       ctx.font = size + 'px "Black Han Sans", "IBM Plex Sans KR", sans-serif';
-      ctx.globalAlpha = Math.min(1, t * 2.2) * (d.soft ? 0.6 : 1);
+      ctx.globalAlpha = Math.min(1, t * 2.2) * (st === 'soft' ? 0.6 : 1);
       ctx.lineWidth = 3.5;
       ctx.strokeStyle = 'rgba(8, 12, 11, 0.9)';
       ctx.strokeText(d.n, d.x, d.y);
-      ctx.fillStyle = d.heal ? '#8affb0' : d.big ? '#ffd27a' : d.soft ? '#ffcf8a' : '#fff6e4';
+      ctx.fillStyle = st === 'heal' ? '#8affb0' : st === 'crit' ? '#ff8a5c' : st === 'big' ? '#ffd27a' : st === 'soft' ? '#ffcf8a' : '#fff6e4';
       ctx.fillText(d.n, d.x, d.y);
     }
     ctx.globalAlpha = 1;

@@ -1,0 +1,212 @@
+// 무기 시스템 공통: 동작 등록, 스탯 적용 도우미, 적 찾기·범위 피해, 공용 투사체
+// 무기 하나의 동작 = G.defineWeapon(키, { update, under, over, glow })
+//   update(game, w, s, dt): s는 현재 레벨 수치(G.WEAPONS[키].levels[레벨-1])
+//   under/over(ctx, game, w, s): 캐릭터 아래/위에 그리기 (월드 좌표)
+//   glow(ctx, game, w, s): 어둠 위 가산 합성 빛 (월드 좌표)
+//   w.state: 무기가 자유롭게 쓰는 객체 (저장되지 않음)
+(function (G) {
+  'use strict';
+
+  G.WEAPON_BEHAVIORS = {};
+  G.defineWeapon = function (key, behavior) { G.WEAPON_BEHAVIORS[key] = behavior; };
+
+  G.weaponStats = function (w) {
+    const levels = G.WEAPONS[w.key].levels;
+    return levels[Math.min(w.level, levels.length) - 1];
+  };
+
+  G.addWeapon = function (player, key, level) {
+    const w = { key, level: level || 1, timer: 0.3, state: {} };
+    player.weapons.push(w);
+    return w;
+  };
+
+  // ---------- 스탯 도우미 ----------
+  G.cd = function (game, base) { return base * game.player.stats.cooldown; };
+  G.area = function (game, r) { return r * game.player.stats.area; };
+  G.amount = function (game, n) { return n + game.player.stats.amount; };
+
+  G.inView = function (game, x, y, margin) {
+    const m = margin || 0;
+    return Math.abs(x - game.cam.x) < game.viewW / 2 + m && Math.abs(y - game.cam.y) < game.viewH / 2 + m;
+  };
+
+  // ---------- 적 찾기 ----------
+  const near = [];
+
+  // (x, y) 반경 r 안(적의 몸 반지름 포함)에 있는 살아 있는 적을 out에 담는다
+  G.enemiesInCircle = function (game, x, y, r, out) {
+    out.length = 0;
+    game.grid.query(x, y, r + 50, near);
+    for (let i = 0; i < near.length; i++) {
+      const e = near[i];
+      if (e.dead) continue;
+      const dx = e.x - x, dy = e.y - y, rr = r + e.r;
+      if (dx * dx + dy * dy <= rr * rr) out.push(e);
+    }
+    return out;
+  };
+
+  G.nearestEnemy = function (game, maxDist, x, y, exclude) {
+    const px = x === undefined ? game.player.x : x;
+    const py = y === undefined ? game.player.y : y;
+    let best = null, bestD = maxDist * maxDist;
+    for (const e of game.enemies) {
+      if (e.dead || (exclude && exclude.indexOf(e) !== -1)) continue;
+      const dx = e.x - px, dy = e.y - py;
+      const d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = e; }
+    }
+    return best;
+  };
+
+  // 화면 안의 적 중 n마리를 무작위로 (겹치지 않게)
+  G.randomEnemies = function (game, n) {
+    const pool = [];
+    for (const e of game.enemies) if (!e.dead && G.inView(game, e.x, e.y, -20)) pool.push(e);
+    G.shuffle(pool);
+    return pool.slice(0, n);
+  };
+
+  // 원 안의 적 모두에게 피해. opts: { knock(바깥으로 미는 힘), soft, cdKey, cd(같은 적 재타격 간격), stun, slow }
+  // 맞힌 적 수를 돌려준다
+  const hitList = [];
+  G.hitCircle = function (game, x, y, r, dmg, opts) {
+    const o = opts || {};
+    G.enemiesInCircle(game, x, y, r, hitList);
+    let count = 0;
+    for (const e of hitList) {
+      if (o.cdKey) {
+        if ((e.hitUntil[o.cdKey] || 0) > game.time) continue;
+        e.hitUntil[o.cdKey] = game.time + (o.cd || 0.4);
+      }
+      let kx = 0, ky = 0;
+      if (o.knock) {
+        const dx = e.x - x, dy = e.y - y;
+        const k = o.knock / (Math.hypot(dx, dy) || 1);
+        kx = dx * k;
+        ky = dy * k;
+      }
+      if (o.stun) e.stun = Math.max(e.stun || 0, o.stun);
+      if (o.slow) e.slow = Math.max(e.slow || 0, o.slow);
+      G.damageEnemy(game, e, dmg, kx, ky, o.soft);
+      count++;
+    }
+    return count;
+  };
+
+  // ---------- 공용 투사체 ----------
+  // p: { x, y, angle, speed, dmg, pierce, life, r, sprite, scale, spin, glow, glowR, knock,
+  //      onHit(game, p, e), update(game, p, dt) }  update가 있으면 이동은 update가 맡는다
+  G.fireProjectile = function (game, p) {
+    const b = Object.assign({
+      r: 7, pierce: 1, life: 1.5, sprite: 'bolt', scale: 1, spin: 0, knock: 0.3,
+      glow: 'rgba(255, 150, 60, 0.9)', glowR: 22, hits: [], age: 0,
+    }, p);
+    if (b.vx === undefined) {
+      b.vx = Math.cos(b.angle || 0) * (b.speed || 400);
+      b.vy = Math.sin(b.angle || 0) * (b.speed || 400);
+    }
+    if (b.angle === undefined) b.angle = Math.atan2(b.vy, b.vx);
+    game.projectiles.push(b);
+    return b;
+  };
+
+  G.updateProjectiles = function (game, dt) {
+    for (const b of game.projectiles) {
+      if (b.dead) continue;
+      b.age += dt;
+      if (b.update) b.update(game, b, dt);
+      else {
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+        b.life -= dt;
+        if (b.life <= 0) b.dead = true;
+      }
+      if (b.spin) b.angle += b.spin * dt;
+      if (b.dead) continue;
+      game.grid.query(b.x, b.y, b.r + 50, near);
+      for (const e of near) {
+        if (e.dead || b.hits.indexOf(e.id) !== -1) continue;
+        const dx = e.x - b.x, dy = e.y - b.y;
+        if (dx * dx + dy * dy > (e.r + b.r) * (e.r + b.r)) continue;
+        b.hits.push(e.id);
+        G.damageEnemy(game, e, b.dmg, b.vx * b.knock, b.vy * b.knock);
+        if (b.onHit) b.onHit(game, b, e);
+        if (--b.pierce <= 0) { b.dead = true; break; }
+      }
+    }
+    G.compact(game.projectiles);
+  };
+
+  G.drawProjectiles = function (ctx, game) {
+    for (const b of game.projectiles) {
+      if (!G.inView(game, b.x, b.y, 60)) continue;
+      const spr = b.sprite && G.art.get(b.sprite);
+      if (spr) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.angle);
+        if (b.alpha !== undefined) ctx.globalAlpha = b.alpha;
+        G.drawSprite(ctx, spr, 0, 0, b.scale, false, 0);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = '#ffd27a';
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  };
+
+  G.drawProjectileGlow = function (ctx, game) {
+    for (const b of game.projectiles) {
+      if (b.glow && G.inView(game, b.x, b.y, 60)) G.drawGlow(ctx, b.glow, b.x, b.y, b.glowR * b.scale, 0.7);
+    }
+  };
+
+  // 은빛 검기 그림 (검·월광검·쌍월이 함께 쓴다). t: 0→1 진행도
+  G.drawSlash = function (ctx, x, y, angle, range, t, tint) {
+    const spr = G.art.get('slash');
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle - 0.35 + t * 0.7);
+    ctx.globalAlpha = Math.min(1, (1 - t) * 1.6);
+    if (spr) {
+      const size = (range / (118 / 256)) * (0.88 + t * 0.14);
+      ctx.drawImage(spr.img, -size / 2, -size / 2, size, size);
+      if (tint) {
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha *= 0.5;
+        ctx.drawImage(spr.img, -size / 2, -size / 2, size, size);
+      }
+    } else {
+      ctx.strokeStyle = tint || '#e6f0ff';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(0, 0, range * 0.85, -1, 1);
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
+
+  // ---------- 매 프레임 ----------
+  G.updateWeapons = function (game, dt) {
+    for (const w of game.player.weapons) {
+      const b = G.WEAPON_BEHAVIORS[w.key];
+      if (b && b.update) b.update(game, w, G.weaponStats(w), dt);
+    }
+  };
+
+  function drawPass(pass) {
+    return function (ctx, game) {
+      for (const w of game.player.weapons) {
+        const b = G.WEAPON_BEHAVIORS[w.key];
+        if (b && b[pass]) b[pass](ctx, game, w, G.weaponStats(w));
+      }
+    };
+  }
+  G.drawWeaponsUnder = drawPass('under');
+  G.drawWeaponsOver = drawPass('over');
+  G.drawWeaponGlow = drawPass('glow');
+})(window.G);

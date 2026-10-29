@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ibell-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#7fd4ff" stop-opacity="0.24"/>
+    <stop offset="0.55" stop-color="#7fd4ff" stop-opacity="0.108"/>
+    <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ibell-bronze" x1="0" y1="0" x2="1" y2="0.4">
+    <stop offset="0" stop-color="#ffe7a6"/>
+    <stop offset="0.35" stop-color="#ffb547"/>
+    <stop offset="0.75" stop-color="#b8742a"/>
+    <stop offset="1" stop-color="#5e3a14"/>
+  </linearGradient></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#ibell-back)"/>
+  
+    
+    <path d="M51.49 18.75 A22.5 22.5 0 0 1 51.49 41.25" fill="none" stroke="#9fe0ff" stroke-width="3.2" stroke-linecap="round" opacity="0.95"/>
+    <path d="M12.51 41.25 A22.5 22.5 0 0 1 12.51 18.75" fill="none" stroke="#9fe0ff" stroke-width="3.2" stroke-linecap="round" opacity="0.95"/>
+    
+    <path d="M58.04 18.41 A28.5 28.5 0 0 1 58.04 41.59" fill="none" stroke="#9fe0ff" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+    <path d="M5.96 41.59 A28.5 28.5 0 0 1 5.96 18.41" fill="none" stroke="#9fe0ff" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+    
+    <path d="M28.6 13.6 C28.6 9.4 35.4 9.4 35.4 13.6" fill="none" stroke="#0a1110" stroke-width="8.6" stroke-linecap="round"/>
+    <path d="M28.6 13.6 C28.6 9.4 35.4 9.4 35.4 13.6" fill="none" stroke="#c99550" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="32" cy="49.5" r="4" fill="#6e4620" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+    <path d="M18.5 43 C19.5 37 19.5 31 20.5 25 C21.8 17.6 26.4 13.6 32 13.6 C37.6 13.6 42.2 17.6 43.5 25 C44.5 31 44.5 37 45.5 43 C47.6 44 49 45.4 49 47 L15 47 C15 45.4 16.4 44 18.5 43 Z" fill="url(#ibell-bronze)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M19 40.6 C25 42.2 39 42.2 45 40.6" fill="none" stroke="#7a4c18" stroke-width="1.6" opacity="0.8"/>
+    <path d="M20.6 29.4 C26 30.6 38 30.6 43.4 29.4" fill="none" stroke="#7a4c18" stroke-width="1.2" opacity="0.55"/>
+    <path d="M24.6 22 C23.6 27 23.6 33 23.2 38" fill="none" stroke="#fff6da" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+</svg>

@@ -1,4 +1,4 @@
-// 줍는 것들: 경험치 결정, 약초(회복), 끌림의 부적(모든 결정 끌어오기)
+// 줍는 것들: 경험치 결정, 약초(회복), 끌림의 부적(모든 결정 끌어오기), 금화, 상자
 (function (G) {
   'use strict';
 
@@ -17,8 +17,9 @@
     game.gems.push({ x: x + G.rand(-5, 5), y: y + G.rand(-5, 5), value, tier: gemTier(value), pull: false, sp: 0, phase: Math.random() * 6 });
   };
 
-  G.dropItem = function (game, x, y, kind) {
-    game.items.push({ x, y, kind, pull: false, sp: 0, phase: Math.random() * 6 });
+  // kind: heal | magnet | coin(value=금화 수) | chest
+  G.dropItem = function (game, x, y, kind, value) {
+    game.items.push({ x, y, kind, value: value || 0, pull: false, sp: 0, phase: Math.random() * 6 });
   };
 
   // 플레이어 쪽으로 빨려 들어가는 움직임. 닿으면 true
@@ -32,6 +33,22 @@
     return d < p.r + 10;
   }
 
+  function collect(game, it) {
+    if (it.kind === 'heal') {
+      G.healPlayer(game, 30);
+      if (G.sfx) G.sfx.play('heal');
+    } else if (it.kind === 'coin') {
+      game.runGold += it.value;
+      G.addDamageNumber(game, game.player.x, game.player.y - 40, '+' + it.value + 'G', 'big');
+      if (G.sfx) G.sfx.play('coin');
+    } else if (it.kind === 'chest') {
+      game.pendingChests++;
+    } else {
+      for (const g of game.gems) g.pull = true;
+      G.announce(game, '끌림의 부적! 결정이 모여듭니다');
+    }
+  }
+
   G.updatePickups = function (game, dt) {
     const p = game.player;
     const mag2 = p.stats.magnet * p.stats.magnet;
@@ -42,65 +59,64 @@
         g.dead = true;
         G.gainXp(game, g.value);
         game.gemSparkle = 0.12;
+        if (G.sfx) G.sfx.play('gem');
       }
     }
     G.compact(game.gems);
 
     for (const it of game.items) {
       const dx = p.x - it.x, dy = p.y - it.y;
-      if (!it.pull && dx * dx + dy * dy < mag2 * 0.5) it.pull = true;
+      const reach = it.kind === 'chest' ? (p.r + 30) * (p.r + 30) : mag2 * 0.5;
+      if (!it.pull && dx * dx + dy * dy < reach) it.pull = true;
       if (it.pull && pull(it, p, dt)) {
         it.dead = true;
-        if (it.kind === 'heal') G.healPlayer(game, 30);
-        else {
-          for (const g of game.gems) g.pull = true;
-          G.announce(game, '끌림의 부적! 결정이 모여듭니다');
-        }
+        collect(game, it);
       }
     }
     G.compact(game.items);
     game.gemSparkle = Math.max(0, (game.gemSparkle || 0) - dt);
   };
 
-  function inView(game, o) {
-    return Math.abs(o.x - game.cam.x) < game.viewW / 2 + 30 && Math.abs(o.y - game.cam.y) < game.viewH / 2 + 30;
-  }
-
   G.drawPickups = function (ctx, game) {
     for (const g of game.gems) {
-      if (!inView(game, g)) continue;
+      if (!G.inView(game, g.x, g.y, 30)) continue;
       const spr = G.art.get('gem_' + g.tier);
       const bob = Math.sin(game.clock * 3 + g.phase) * 2;
-      if (spr) G.drawSprite(ctx, spr, g.x, g.y + bob, 1, false, false);
+      if (spr) G.drawSprite(ctx, spr, g.x, g.y + bob, 1, false, 0);
       else {
         ctx.fillStyle = ['#7fd4ff', '#5ef0b4', '#c78bff'][g.tier];
         ctx.fillRect(g.x - 4, g.y - 5 + bob, 8, 10);
       }
     }
     for (const it of game.items) {
-      if (!inView(game, it)) continue;
-      const spr = G.art.get('item_' + it.kind);
-      const bob = Math.sin(game.clock * 2.5 + it.phase) * 3;
-      if (spr) G.drawSprite(ctx, spr, it.x, it.y + bob, 1, false, false);
+      if (!G.inView(game, it.x, it.y, 40)) continue;
+      const name = it.kind === 'heal' || it.kind === 'magnet' ? 'item_' + it.kind : it.kind;
+      const spr = G.art.get(name);
+      const bob = it.kind === 'chest' ? 0 : Math.sin(game.clock * 2.5 + it.phase) * 3;
+      const scale = it.kind === 'coin' ? Math.min(1.8, 1 + it.value / 40) : 1;
+      if (spr) G.drawSprite(ctx, spr, it.x, it.y + bob, scale, false, 0);
       else {
-        ctx.fillStyle = it.kind === 'heal' ? '#e0445a' : '#7fd4ff';
+        ctx.fillStyle = { heal: '#e0445a', magnet: '#7fd4ff', coin: '#ffd27a', chest: '#b07a3a' }[it.kind];
         ctx.beginPath();
-        ctx.arc(it.x, it.y + bob, 9, 0, Math.PI * 2);
+        ctx.arc(it.x, it.y + bob, it.kind === 'chest' ? 16 : 8, 0, Math.PI * 2);
         ctx.fill();
       }
     }
   };
 
   const GEM_GLOW = ['rgba(127, 212, 255, 0.7)', 'rgba(94, 240, 180, 0.7)', 'rgba(199, 139, 255, 0.8)'];
+  const ITEM_GLOW = {
+    heal: 'rgba(255, 120, 120, 0.7)', magnet: 'rgba(127, 212, 255, 0.8)',
+    coin: 'rgba(255, 210, 110, 0.7)', chest: 'rgba(255, 200, 90, 0.9)',
+  };
   G.drawPickupGlow = function (ctx, game) {
     for (const g of game.gems) {
-      if (!inView(game, g)) continue;
-      G.drawGlow(ctx, GEM_GLOW[g.tier], g.x, g.y, 10 + g.tier * 4, 0.55);
+      if (G.inView(game, g.x, g.y, 30)) G.drawGlow(ctx, GEM_GLOW[g.tier], g.x, g.y, 10 + g.tier * 4, 0.55);
     }
     for (const it of game.items) {
-      if (!inView(game, it)) continue;
+      if (!G.inView(game, it.x, it.y, 40)) continue;
       const pulse = 0.5 + Math.sin(game.clock * 4 + it.phase) * 0.2;
-      G.drawGlow(ctx, it.kind === 'heal' ? 'rgba(255, 120, 120, 0.7)' : 'rgba(127, 212, 255, 0.8)', it.x, it.y, 30, pulse);
+      G.drawGlow(ctx, ITEM_GLOW[it.kind], it.x, it.y - (it.kind === 'chest' ? 14 : 0), it.kind === 'chest' ? 60 : it.kind === 'coin' ? 16 : 30, pulse);
     }
   };
 })(window.G);

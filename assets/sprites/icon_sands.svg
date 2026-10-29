@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="isands-back" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffe2a0" stop-opacity="0.5"/>
+    <stop offset="0.55" stop-color="#ffe2a0" stop-opacity="0.225"/>
+    <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="isands-ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="isands-rays" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0.3" stop-color="#ffe2a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="isands-rimglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    
+    <linearGradient id="isands-feather" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#fff4dc"/>
+      <stop offset="1" stop-color="#7fd4ff"/>
+    </linearGradient>
+    <linearGradient id="isands-wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4cc"/>
+      <stop offset="0.45" stop-color="#f6cf72"/>
+      <stop offset="1" stop-color="#9a5f20"/>
+    </linearGradient>
+    <linearGradient id="isands-sand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#ffe2a0"/>
+      <stop offset="1" stop-color="#ffb547"/>
+    </linearGradient>
+    <filter id="isands-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2"/></filter></defs>
+  <circle cx="32" cy="32" r="31" fill="url(#isands-back)"/>
+  <path d="M32 32 L62.43 37.91 L61.31 42.1 Z M32 32 L55.4 52.33 L52.33 55.4 Z M32 32 L42.1 61.31 L37.91 62.43 Z M32 32 L26.09 62.43 L21.9 61.31 Z M32 32 L11.67 55.4 L8.6 52.33 Z M32 32 L2.69 42.1 L1.57 37.91 Z M32 32 L1.57 26.09 L2.69 21.9 Z M32 32 L8.6 11.67 L11.67 8.6 Z M32 32 L21.9 2.69 L26.09 1.57 Z M32 32 L37.91 1.57 L42.1 2.69 Z M32 32 L52.33 8.6 L55.4 11.67 Z M32 32 L61.31 21.9 L62.43 26.09 Z" fill="url(#isands-rays)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="#ffd27a" stroke-width="3" opacity="0.55" filter="url(#isands-rimglow)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="url(#isands-ring)" stroke-width="1.7"/>
+  
+    <g transform="translate(21 30)"><g transform=""><g transform="rotate(-30)">
+      <path d="M0 0 C-3.75 -4.6 -10.5 -5.06 -15 -1.15 C-10.799999999999999 2.53 -4.5 3.2199999999999998 0 0 Z" fill="url(#isands-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g><g transform="rotate(0)">
+      <path d="M0 0 C-4.25 -5 -11.899999999999999 -5.5 -17 -1.25 C-12.24 2.75 -5.1 3.5 0 0 Z" fill="url(#isands-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g><g transform="rotate(28)">
+      <path d="M0 0 C-3.5 -4.4 -9.799999999999999 -4.840000000000001 -14 -1.1 C-10.08 2.4200000000000004 -4.2 3.08 0 0 Z" fill="url(#isands-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g></g></g>
+    <g transform="translate(43 30)"><g transform="scale(-1 1)"><g transform="rotate(-30)">
+      <path d="M0 0 C-3.75 -4.6 -10.5 -5.06 -15 -1.15 C-10.799999999999999 2.53 -4.5 3.2199999999999998 0 0 Z" fill="url(#isands-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g><g transform="rotate(0)">
+      <path d="M0 0 C-4.25 -5 -11.899999999999999 -5.5 -17 -1.25 C-12.24 2.75 -5.1 3.5 0 0 Z" fill="url(#isands-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g><g transform="rotate(28)">
+      <path d="M0 0 C-3.5 -4.4 -9.799999999999999 -4.840000000000001 -14 -1.1 C-10.08 2.4200000000000004 -4.2 3.08 0 0 Z" fill="url(#isands-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g></g></g>
+    <g transform="translate(32 32) scale(0.86) translate(-32 -32)">
+      <path d="M22.5 14 C22.5 24 30.4 27.6 30.4 32 C30.4 36.4 22.5 40 22.5 50 L41.5 50 C41.5 40 33.6 36.4 33.6 32 C33.6 27.6 41.5 24 41.5 14 Z" fill="#7fd4ff" fill-opacity="0.25"/>
+      <path d="M24.4 18.5 C26.4 25.6 30.8 28.6 31.3 31.2 L32.7 31.2 C33.2 28.6 37.6 25.6 39.6 18.5 Z" fill="url(#isands-sand)"/>
+      <path d="M32 31 L32 45" stroke="#ffffff" stroke-width="3" stroke-linecap="round" filter="url(#isands-glow)"/>
+      <path d="M32 31 L32 45" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round"/>
+      <path d="M23.4 50 C25.4 44.6 29 42.4 32 42.4 C35 42.4 38.6 44.6 40.6 50 Z" fill="url(#isands-sand)"/>
+      <path d="M22.5 14 C22.5 24 30.4 27.6 30.4 32 C30.4 36.4 22.5 40 22.5 50 L41.5 50 C41.5 40 33.6 36.4 33.6 32 C33.6 27.6 41.5 24 41.5 14 Z" fill="none" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M25.6 16.5 C25.8 21 27.6 24 29.4 26" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+      <rect x="17" y="12" width="4.4" height="40" rx="2" fill="url(#isands-wood)" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+      <rect x="42.6" y="12" width="4.4" height="40" rx="2" fill="url(#isands-wood)" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+      <rect x="13.5" y="7" width="37" height="7" rx="2.6" fill="url(#isands-wood)" stroke="#0a1110" stroke-width="3"/>
+      <rect x="13.5" y="50" width="37" height="7" rx="2.6" fill="url(#isands-wood)" stroke="#0a1110" stroke-width="3"/>
+      <circle cx="32" cy="10.5" r="2" fill="#7fd4ff" stroke="#0a1110" stroke-width="1.1"/>
+    </g>
+  <path d="M54 48.2 L54.99 51.01 L57.8 52 L54.99 52.99 L54 55.8 L53.01 52.99 L50.2 52 L53.01 51.01 Z" fill="#fff6da" opacity="1"/>
+  <path d="M10 8.8 L10.83 11.17 L13.2 12 L10.83 12.83 L10 15.2 L9.17 12.83 L6.8 12 L9.17 11.17 Z" fill="#fff6da" opacity="1"/>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="imeteor-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffb547" stop-opacity="0.26"/>
+    <stop offset="0.55" stop-color="#ffb547" stop-opacity="0.117"/>
+    <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+  </radialGradient>
+    <linearGradient id="imeteor-tail" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffe2a0" stop-opacity="1"/>
+      <stop offset="0.3" stop-color="#ffb547" stop-opacity="0.85"/>
+      <stop offset="0.65" stop-color="#7fd4ff" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="imeteor-star" cx="0.42" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#ffe2a0"/>
+      <stop offset="1" stop-color="#ffb547"/>
+    </radialGradient>
+    <radialGradient id="imeteor-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fffdf0" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#ffb547" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="imeteor-tb" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#imeteor-back)"/>
+  
+    <g transform="translate(21 44) rotate(0) scale(1.05)">
+      <path d="M-7 -3 L31 -37 C34 -36 36 -34 37 -31 L3 7 Z" fill="url(#imeteor-tail)" filter="url(#imeteor-tb)"/>
+      <path d="M-4 -4 L31 -35 L34 -32 L4 3.4 Z" fill="url(#imeteor-tail)"/>
+      <path d="M-1 -6 L26 -31" stroke="#fffdf0" stroke-width="2.4" stroke-linecap="round" opacity="0.9"/>
+      <path d="M4 3 L30 -14" stroke="#7fd4ff" stroke-width="1.6" stroke-linecap="round" opacity="0.6"/>
+      <path d="M-7 -5 L12 -34" stroke="#7fd4ff" stroke-width="1.4" stroke-linecap="round" opacity="0.45"/>
+      <circle cx="0" cy="0" r="13" fill="url(#imeteor-halo)"/>
+      <path d="M2.9 -8.94 L3.72 -2.7 L9.4 0 L3.72 2.7 L2.9 8.94 L-1.42 4.37 L-7.6 5.53 L-4.6 0 L-7.6 -5.53 L-1.42 -4.37 Z" fill="url(#imeteor-star)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/>
+      <circle cx="-1" cy="-1" r="2.6" fill="#ffffff"/>
+    </g>
+    <path d="M50 40.6 L50.88 43.12 L53.4 44 L50.88 44.88 L50 47.4 L49.12 44.88 L46.6 44 L49.12 43.12 Z" fill="#ffffff" opacity="0.9"/>
+    <circle cx="14" cy="22" r="1.4" fill="#cfe6ff"/>
+    <circle cx="44" cy="54" r="1.1" fill="#ffe2a0"/>
+</svg>

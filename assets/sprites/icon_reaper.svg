@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ireaper-back" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#9b7fd1" stop-opacity="0.5"/>
+    <stop offset="0.55" stop-color="#9b7fd1" stop-opacity="0.225"/>
+    <stop offset="1" stop-color="#9b7fd1" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ireaper-ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="ireaper-rays" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0.3" stop-color="#ffe2a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ireaper-rimglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    
+  <linearGradient id="ireaper-blade" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="0.4" stop-color="#dbe9f6"/>
+    <stop offset="0.8" stop-color="#8ea6bf"/>
+    <stop offset="1" stop-color="#4f647c"/>
+  </linearGradient>
+    <linearGradient id="ireaper-wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7a5a8a"/>
+      <stop offset="1" stop-color="#2a1a35"/>
+    </linearGradient>
+    <linearGradient id="ireaper-feather" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#e6f6ff"/>
+      <stop offset="1" stop-color="#7fd4ff"/>
+    </linearGradient>
+    <filter id="ireaper-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
+  <circle cx="32" cy="32" r="31" fill="url(#ireaper-back)"/>
+  <path d="M32 32 L62.43 37.91 L61.31 42.1 Z M32 32 L55.4 52.33 L52.33 55.4 Z M32 32 L42.1 61.31 L37.91 62.43 Z M32 32 L26.09 62.43 L21.9 61.31 Z M32 32 L11.67 55.4 L8.6 52.33 Z M32 32 L2.69 42.1 L1.57 37.91 Z M32 32 L1.57 26.09 L2.69 21.9 Z M32 32 L8.6 11.67 L11.67 8.6 Z M32 32 L21.9 2.69 L26.09 1.57 Z M32 32 L37.91 1.57 L42.1 2.69 Z M32 32 L52.33 8.6 L55.4 11.67 Z M32 32 L61.31 21.9 L62.43 26.09 Z" fill="url(#ireaper-rays)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="#ffd27a" stroke-width="3" opacity="0.55" filter="url(#ireaper-rimglow)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="url(#ireaper-ring)" stroke-width="1.7"/>
+  
+    <path d="M7.57 23.11 A26 26 0 0 1 45 9.48" fill="none" stroke="#9b7fd1" stroke-width="3.2" stroke-linecap="round" opacity="0.65"/>
+    <path d="M14 58 L42 10" stroke="#0a1110" stroke-width="11.4" stroke-linecap="round"/>
+    <path d="M14 58 L42 10" stroke="url(#ireaper-wood)" stroke-width="5.4" stroke-linecap="round"/>
+    <path d="M18 51.4 L22 53.6 M21.6 45.2 L25.6 47.4" stroke="#c9b6ff" stroke-width="1.3" stroke-linecap="round" opacity="0.7"/>
+    <g transform="translate(36.5 26)"><g transform="rotate(20)">
+      <path d="M0 0 C-3.75 -4.6 -10.5 -5.06 -15 -1.15 C-10.799999999999999 2.53 -4.5 3.2199999999999998 0 0 Z" fill="url(#ireaper-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g><g transform="rotate(-10)">
+      <path d="M0 0 C-4.25 -5 -11.899999999999999 -5.5 -17 -1.25 C-12.24 2.75 -5.1 3.5 0 0 Z" fill="url(#ireaper-feather)" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g></g>
+    <g transform="translate(9 6) scale(0.9)">
+      <path d="M39 16 C35 -1 9 -3 -3 19 C8 9 26 9.4 34.6 20 Z" fill="#9b7fd1" opacity="0.8" filter="url(#ireaper-glow)"/>
+      <path d="M39 16 C35 -1 9 -3 -3 19 C8 9 26 9.4 34.6 20 Z" fill="url(#ireaper-blade)" stroke="#0a1110" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M2 15.4 C12 4.4 29 4.4 36.4 14.6" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M6 15.6 C16 10.4 27 11.4 33 17.4" fill="none" stroke="#5b3fa0" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    <circle cx="43.4" cy="13.2" r="3.4" fill="#9b7fd1" stroke="#0a1110" stroke-width="1.8"/>
+    <circle cx="42.6" cy="12.3" r="1" fill="#ffffff"/>
+  <path d="M55 45.8 L56.09 48.91 L59.2 50 L56.09 51.09 L55 54.2 L53.91 51.09 L50.8 50 L53.91 48.91 Z" fill="#fff6da" opacity="1"/>
+  <path d="M8 37 L8.78 39.22 L11 40 L8.78 40.78 L8 43 L7.22 40.78 L5 40 L7.22 39.22 Z" fill="#fff6da" opacity="1"/>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="ithunder-back" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#7fd4ff" stop-opacity="0.5"/>
+    <stop offset="0.55" stop-color="#7fd4ff" stop-opacity="0.225"/>
+    <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ithunder-ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="ithunder-rays" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0.3" stop-color="#ffe2a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ithunder-rimglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    
+    <radialGradient id="ithunder-halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#7fd4ff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ithunder-node" cx="0.4" cy="0.38" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#bfeaff"/>
+      <stop offset="0.85" stop-color="#7fd4ff"/>
+      <stop offset="1" stop-color="#2f84bb"/>
+    </radialGradient>
+  <linearGradient id="ithunder-tail" x1="2" y1="0" x2="60" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#4aa8e0" stop-opacity="0"/>
+    <stop offset="0.35" stop-color="#4aa8e0" stop-opacity="0.55"/>
+    <stop offset="0.7" stop-color="#4aa8e0"/>
+    <stop offset="0.86" stop-color="#9fe0ff"/>
+    <stop offset="1" stop-color="#dff4ff"/>
+  </linearGradient>
+  <linearGradient id="ithunder-core" x1="10" y1="0" x2="54" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#dff4ff" stop-opacity="0"/>
+    <stop offset="0.6" stop-color="#dff4ff" stop-opacity="0.85"/>
+    <stop offset="1" stop-color="#fffbea"/>
+  </linearGradient>
+  <radialGradient id="ithunder-head" cx="51" cy="14.5" r="13" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fffdf0"/>
+    <stop offset="0.3" stop-color="#dff4ff"/>
+    <stop offset="0.68" stop-color="#9fe0ff"/>
+    <stop offset="1" stop-color="#4aa8e0"/>
+  </radialGradient>
+  <filter id="ithunder-blur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
+  <circle cx="32" cy="32" r="31" fill="url(#ithunder-back)"/>
+  <path d="M32 32 L62.43 37.91 L61.31 42.1 Z M32 32 L55.4 52.33 L52.33 55.4 Z M32 32 L42.1 61.31 L37.91 62.43 Z M32 32 L26.09 62.43 L21.9 61.31 Z M32 32 L11.67 55.4 L8.6 52.33 Z M32 32 L2.69 42.1 L1.57 37.91 Z M32 32 L1.57 26.09 L2.69 21.9 Z M32 32 L8.6 11.67 L11.67 8.6 Z M32 32 L21.9 2.69 L26.09 1.57 Z M32 32 L37.91 1.57 L42.1 2.69 Z M32 32 L52.33 8.6 L55.4 11.67 Z M32 32 L61.31 21.9 L62.43 26.09 Z" fill="url(#ithunder-rays)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="#ffd27a" stroke-width="3" opacity="0.55" filter="url(#ithunder-rimglow)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="url(#ithunder-ring)" stroke-width="1.7"/>
+  
+    
+    <path d="M8 40 L13.02 40.25 L14.96 33.86 L20 34 L19.57 39.23 L24.04 42.36 L24 48 L29.54 46.64 L30.36 41 L36 40" fill="none" stroke="#0a1110" stroke-width="5.6" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M8 40 L13.02 40.25 L14.96 33.86 L20 34 L19.57 39.23 L24.04 42.36 L24 48 L29.54 46.64 L30.36 41 L36 40" fill="none" stroke="#9fe0ff" stroke-width="3.2" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M8 40 L13.02 40.25 L14.96 33.86 L20 34 L19.57 39.23 L24.04 42.36 L24 48 L29.54 46.64 L30.36 41 L36 40" fill="none" stroke="#ffffff" stroke-width="1.3" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    
+    <path d="M18 56 L22.67 55.17 L25.41 50.32 L30 50 L29.34 53.17 L33.5 54.5 L33 58" fill="none" stroke="#0a1110" stroke-width="5" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M18 56 L22.67 55.17 L25.41 50.32 L30 50 L29.34 53.17 L33.5 54.5 L33 58" fill="none" stroke="#9fe0ff" stroke-width="2.8" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <path d="M18 56 L22.67 55.17 L25.41 50.32 L30 50 L29.34 53.17 L33.5 54.5 L33 58" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linejoin="miter" stroke-miterlimit="6" stroke-linecap="round"/>
+    <g transform="translate(32 30) rotate(-38) scale(1.22) translate(-34 -16)">
+  <ellipse cx="45" cy="16" rx="15" ry="8" fill="#7fd4ff" opacity="0.7" filter="url(#ithunder-blur)"/>
+  <path d="M2 16 C10 14.6 14 15.4 20 13.4 C26 11.3 30 12.6 36 9.8 C42 7.4 52 7.6 58 16 C52 24.4 42 24.6 36 22.2 C30 19.4 26 20.7 20 18.6 C14 16.6 10 17.4 2 16 Z" fill="url(#ithunder-tail)"/>
+  <path d="M12 16 C22 14.6 30 14.4 40 12.6 C47 11.6 51 13 53 16 C51 19 47 20.4 40 19.4 C30 17.6 22 17.4 12 16 Z" fill="url(#ithunder-core)"/>
+  <path d="M61.5 16 C57.5 10.2 50.5 8.8 45.4 9.8 C40.8 10.8 38.6 13.4 38.6 16 C38.6 18.6 40.8 21.2 45.4 22.2 C50.5 23.2 57.5 21.8 61.5 16 Z" fill="url(#ithunder-head)" stroke="#1d4f7a" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M43 13.2 C47 11.6 53 12 57 14.6" fill="none" stroke="#fffdf0" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+  <ellipse cx="50" cy="16" rx="5" ry="2.6" fill="#fffdf0"/>
+  <circle cx="25" cy="9.6" r="1.3" fill="#9fe0ff"/>
+  <circle cx="17" cy="21.6" r="1" fill="#7fd4ff"/>
+  <circle cx="31" cy="23" r="1.1" fill="#ffe2a0" opacity="0.85"/>
+      <path d="M61.5 16 C57.5 10.2 50.5 8.8 45.4 9.8 C40.8 10.8 38.6 13.4 38.6 16 C38.6 18.6 40.8 21.2 45.4 22.2 C50.5 23.2 57.5 21.8 61.5 16 Z" fill="none" stroke="#0a1110" stroke-width="2.2" stroke-linejoin="round"/>
+    </g>
+    
+    <circle cx="50" cy="14" r="7.2" fill="url(#ithunder-halo)"/>
+    <circle cx="50" cy="14" r="3.6" fill="url(#ithunder-node)" stroke="#0a1110" stroke-width="2.2"/>
+    <circle cx="48.92" cy="12.85" r="1.15" fill="#ffffff"/>
+  <path d="M12 10 L13.04 12.96 L16 14 L13.04 15.04 L12 18 L10.96 15.04 L8 14 L10.96 12.96 Z" fill="#fff6da" opacity="1"/>
+  <path d="M54 48.6 L54.88 51.12 L57.4 52 L54.88 52.88 L54 55.4 L53.12 52.88 L50.6 52 L53.12 51.12 Z" fill="#fff6da" opacity="1"/>
+</svg>

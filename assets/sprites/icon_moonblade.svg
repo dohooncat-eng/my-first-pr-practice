@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="imoonblade-back" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#7fd4ff" stop-opacity="0.5"/>
+    <stop offset="0.55" stop-color="#7fd4ff" stop-opacity="0.225"/>
+    <stop offset="1" stop-color="#7fd4ff" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="imoonblade-ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="imoonblade-rays" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0.3" stop-color="#ffe2a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="imoonblade-rimglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    
+  <linearGradient id="imoonblade-gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="imoonblade-moon" cx="0.35" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#cdeeff"/>
+      <stop offset="1" stop-color="#7fd4ff"/>
+    </radialGradient>
+    <linearGradient id="imoonblade-bl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cdeeff"/>
+    </linearGradient>
+    <mask id="imoonblade-cres" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <circle cx="32" cy="32" r="24" fill="#fff"/>
+      <circle cx="40" cy="27" r="21" fill="#000"/>
+    </mask>
+    <filter id="imoonblade-bglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6"/></filter></defs>
+  <circle cx="32" cy="32" r="31" fill="url(#imoonblade-back)"/>
+  <path d="M32 32 L62.43 37.91 L61.31 42.1 Z M32 32 L55.4 52.33 L52.33 55.4 Z M32 32 L42.1 61.31 L37.91 62.43 Z M32 32 L26.09 62.43 L21.9 61.31 Z M32 32 L11.67 55.4 L8.6 52.33 Z M32 32 L2.69 42.1 L1.57 37.91 Z M32 32 L1.57 26.09 L2.69 21.9 Z M32 32 L8.6 11.67 L11.67 8.6 Z M32 32 L21.9 2.69 L26.09 1.57 Z M32 32 L37.91 1.57 L42.1 2.69 Z M32 32 L52.33 8.6 L55.4 11.67 Z M32 32 L61.31 21.9 L62.43 26.09 Z" fill="url(#imoonblade-rays)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="#ffd27a" stroke-width="3" opacity="0.55" filter="url(#imoonblade-rimglow)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="url(#imoonblade-ring)" stroke-width="1.7"/>
+  
+    <g mask="url(#imoonblade-cres)">
+      <circle cx="32" cy="32" r="24" fill="url(#imoonblade-moon)"/>
+    </g>
+    <path d="M14.2 46 A24 24 0 0 1 21 11.4" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+    <g transform="rotate(45 32 32)">
+      <rect x="25.5" y="3" width="13" height="40" rx="5" fill="#7fd4ff" opacity="0.7" filter="url(#imoonblade-bglow)"/>
+      
+      <path d="M32 4.5 L37.2 12 L37.2 40 L26.8 40 L26.8 12 Z" fill="none" stroke="#0a1110" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M32 4.5 L26.8 12 L26.8 40 L32 40 Z" fill="#ffffff"/>
+      <path d="M32 4.5 L37.2 12 L37.2 40 L32 40 Z" fill="#b8d8f0"/>
+      <path d="M32 13 L32 37" stroke="#6f86a0" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M28.4 13 L28.4 38" stroke="#7fd4ff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+      <rect x="29" y="44" width="6" height="11" rx="1.6" fill="#6b3f24" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+      <rect x="17.5" y="39" width="29" height="6.4" rx="3" fill="url(#imoonblade-gold)" stroke="#0a1110" stroke-width="2.55"/>
+      <circle cx="32" cy="42.2" r="2.4" fill="#ff6b3d" stroke="#0a1110" stroke-width="1.2"/>
+      <circle cx="32" cy="57.6" r="3.6" fill="url(#imoonblade-gold)" stroke="#0a1110" stroke-width="2.4000000000000004"/>
+    </g>
+  <path d="M53 4.2 L54.25 7.75 L57.8 9 L54.25 10.25 L53 13.8 L51.75 10.25 L48.2 9 L51.75 7.75 Z" fill="#fff6da" opacity="1"/>
+  <path d="M10 48.6 L10.88 51.12 L13.4 52 L10.88 52.88 L10 55.4 L9.12 52.88 L6.6 52 L9.12 51.12 Z" fill="#fff6da" opacity="1"/>
+  <path d="M50 51.4 L50.68 53.32 L52.6 54 L50.68 54.68 L50 56.6 L49.32 54.68 L47.4 54 L49.32 53.32 Z" fill="#fff6da" opacity="1"/>
+</svg>

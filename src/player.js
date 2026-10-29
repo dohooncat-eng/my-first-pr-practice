@@ -1,4 +1,4 @@
-// 플레이어(등불지기): 이동, 체력, 경험치, 그리기
+// 플레이어(챔피언): 스탯 계산, 이동, 체력·회복·부활, 경험치, 그리기
 (function (G) {
   'use strict';
 
@@ -6,18 +6,50 @@
     return Math.floor(5 + (level - 1) * 7 + Math.pow(level - 1, 1.6));
   };
 
-  G.createPlayer = function () {
+  G.baseStats = function () {
     return {
+      maxHp: 100, speed: 1, damage: 1, cooldown: 1, magnet: 85, area: 1, amount: 0,
+      armor: 0, regen: 0, luck: 1, crit: 0.05, critMult: 1.5, xpMul: 1, revive: 0,
+      choices: 3, retaliate: 0, extraWeapon: 0,
+    };
+  };
+
+  G.createPlayer = function (championId) {
+    const champ = G.CHAMPIONS[championId] || G.CHAMPIONS.keeper;
+    const p = {
+      champion: G.CHAMPIONS[championId] ? championId : 'keeper',
       x: 0, y: 0, r: 14,
-      hp: 100, maxHp: 100,
-      baseSpeed: 155,
+      hp: champ.base.maxHp, maxHp: champ.base.maxHp,
+      baseSpeed: champ.base.speed,
       face: { x: 1, y: 0 }, flip: false, moving: false, walk: 0,
-      invuln: 0, hurt: 0,
+      invuln: 0, hurt: 0, revivesUsed: 0, retaliateCd: 0,
       level: 1, xp: 0, xpNext: G.xpToNext(1),
-      stats: { damage: 1, cooldown: 1, speed: 1, magnet: 85 },
+      stats: G.baseStats(),
       weapons: [],
       passives: {},
+      fusions: [],
     };
+    return p;
+  };
+
+  // 챔피언 기본값 + 챔피언 능력 업그레이드 + 패시브 + 패시브 조합으로 스탯을 처음부터 다시 계산
+  G.recalcStats = function (game) {
+    const p = game.player;
+    const champ = G.CHAMPIONS[p.champion];
+    const s = G.baseStats();
+    s.maxHp = champ.base.maxHp;
+    champ.apply(s, (G.meta.champLv && G.meta.champLv[p.champion]) || 0);
+    Object.keys(p.passives).forEach((k) => G.PASSIVES[k].apply(s, p.passives[k]));
+    p.fusions.forEach((k) => G.FUSIONS[k].apply(s));
+    s.armor = Math.min(0.75, s.armor);
+    s.crit = Math.min(0.9, s.crit);
+    const oldMax = p.maxHp;
+    p.stats = s;
+    p.baseSpeed = champ.base.speed;
+    p.maxHp = Math.round(s.maxHp);
+    // 최대 체력이 늘어난 만큼 현재 체력도 채운다
+    if (p.maxHp > oldMax) p.hp += p.maxHp - oldMax;
+    p.hp = Math.min(p.hp, p.maxHp);
   };
 
   G.updatePlayer = function (game, dt) {
@@ -36,16 +68,36 @@
     }
     p.invuln = Math.max(0, p.invuln - dt);
     p.hurt = Math.max(0, p.hurt - dt);
+    p.retaliateCd = Math.max(0, p.retaliateCd - dt);
+    if (p.stats.regen > 0 && p.hp > 0) p.hp = Math.min(p.maxHp, p.hp + p.stats.regen * dt);
   };
 
-  G.damagePlayer = function (game, amount) {
+  G.damagePlayer = function (game, amount, source) {
     const p = game.player;
     if (p.invuln > 0 || p.hp <= 0) return;
-    p.hp = Math.max(0, p.hp - amount);
+    const dmg = amount * (1 - p.stats.armor);
+    p.hp = Math.max(0, p.hp - dmg);
     p.invuln = 0.45;
     p.hurt = 0.25;
     G.addShake(game, 5);
     G.burst(game, p.x, p.y - 6, '#e0445a', 7, 140);
+    if (G.sfx) G.sfx.play('hurt');
+    // 은빛 기사 각성: 맞으면 주변을 반격해 벤다
+    if (p.stats.retaliate && p.retaliateCd <= 0) {
+      p.retaliateCd = 0.6;
+      game.retaliateFx = 0.25;
+      G.hitCircle(game, p.x, p.y, G.area(game, 115), 45, { knock: 320 });
+    }
+    if (p.hp <= 0 && p.revivesUsed < p.stats.revive) {
+      // 불멸의 심장: 한 번 되살아난다
+      p.revivesUsed++;
+      p.hp = p.maxHp * 0.5;
+      p.invuln = 2.5;
+      G.burst(game, p.x, p.y, 'rgba(255, 120, 140, 0.9)', 40, 280, true);
+      G.hitCircle(game, p.x, p.y, 260, 200, { knock: 600 });
+      G.announce(game, '불멸의 심장이 다시 뜁니다!');
+      if (G.sfx) G.sfx.play('evolve');
+    }
   };
 
   G.healPlayer = function (game, amount) {
@@ -54,14 +106,14 @@
     p.hp = Math.min(p.maxHp, p.hp + amount);
     const healed = Math.round(p.hp - before);
     if (healed > 0) {
-      game.numbers.push({ x: p.x, y: p.y - 34, n: '+' + healed, big: true, heal: true, life: 0.9, max: 0.9 });
+      G.addDamageNumber(game, p.x, p.y - 34, '+' + healed, 'heal');
       G.burst(game, p.x, p.y - 8, 'rgba(120, 255, 170, 0.8)', 10, 90, true);
     }
   };
 
   G.gainXp = function (game, value) {
     const p = game.player;
-    p.xp += value * game.xpMul;
+    p.xp += value * game.xpMul * p.stats.xpMul;
     while (p.xp >= p.xpNext) {
       p.xp -= p.xpNext;
       p.level++;
@@ -70,14 +122,13 @@
     }
   };
 
-  // 등불이 있는 위치 (빛의 중심)
+  // 등불(빛의 중심) 위치
   G.lanternPos = function (p) {
     return { x: p.x + (p.flip ? -15 : 15), y: p.y - 1 };
   };
 
   G.drawPlayer = function (ctx, game) {
     const p = game.player;
-    // 발밑 그림자
     ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
     ctx.beginPath();
     ctx.ellipse(p.x, p.y + 14, 15, 5, 0, 0, Math.PI * 2);
@@ -86,7 +137,8 @@
     const blink = p.invuln > 0 && Math.floor(game.clock * 22) % 2 === 0;
     ctx.globalAlpha = blink ? 0.5 : 1;
     const frame = p.moving ? Math.floor(p.walk) % 4 : 0;
-    const spr = G.art.get('player', frame);
+    const sprite = G.CHAMPIONS[p.champion].sprite;
+    const spr = G.art.get(sprite, frame) || G.art.get('player', frame);
     const breathe = p.moving ? 0 : Math.sin(game.clock * 2.6) * 0.02;
     if (spr) {
       ctx.save();
@@ -101,19 +153,25 @@
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+
+    // 반격 베기 효과
+    if (game.retaliateFx > 0) {
+      G.drawSlash(ctx, p.x, p.y - 4, game.clock * 9, G.area(game, 115), 1 - game.retaliateFx / 0.25);
+    }
   };
 
   // 발밑 체력 막대 (어둠 위에 그려서 항상 보이게)
   G.drawPlayerBar = function (ctx, game) {
     const p = game.player;
     const w = 40, h = 5, x = p.x - w / 2, y = p.y + 22;
+    const ratio = Math.max(0, p.hp / p.maxHp);
     ctx.fillStyle = 'rgba(8, 12, 11, 0.85)';
     ctx.fillRect(x - 1.5, y - 1.5, w + 3, h + 3);
     ctx.fillStyle = '#4a1822';
     ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = p.hp / p.maxHp < 0.3 ? '#ff5a5a' : '#e0445a';
-    ctx.fillRect(x, y, w * (p.hp / p.maxHp), h);
+    ctx.fillStyle = ratio < 0.3 ? '#ff5a5a' : '#e0445a';
+    ctx.fillRect(x, y, w * ratio, h);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.fillRect(x, y, w * (p.hp / p.maxHp), 1.5);
+    ctx.fillRect(x, y, w * ratio, 1.5);
   };
 })(window.G);

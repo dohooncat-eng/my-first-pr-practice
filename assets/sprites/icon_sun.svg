@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="isun-back" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffb547" stop-opacity="0.5"/>
+    <stop offset="0.55" stop-color="#ffb547" stop-opacity="0.225"/>
+    <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="isun-ring" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff4cc"/>
+    <stop offset="0.35" stop-color="#f6cf72"/>
+    <stop offset="0.7" stop-color="#c98b2e"/>
+    <stop offset="1" stop-color="#7a4c18"/>
+  </linearGradient>
+    <radialGradient id="isun-rays" cx="32" cy="32" r="31" gradientUnits="userSpaceOnUse">
+      <stop offset="0.3" stop-color="#ffe2a0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="isun-rimglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
+    
+    <radialGradient id="isun-flare" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.5" stop-color="#ffb547"/>
+      <stop offset="1" stop-color="#ff6b3d"/>
+    </radialGradient>
+    <radialGradient id="isun-sun" cx="0.4" cy="0.38" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#ffe2a0"/>
+      <stop offset="0.75" stop-color="#ffb547"/>
+      <stop offset="1" stop-color="#e0782e"/>
+    </radialGradient>
+    <radialGradient id="isun-ball" cx="0.38" cy="0.36" r="0.72">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#f4ffa8"/>
+      <stop offset="0.75" stop-color="#c2ec4e"/>
+      <stop offset="1" stop-color="#6f9e26"/>
+    </radialGradient></defs>
+  <circle cx="32" cy="32" r="31" fill="url(#isun-back)"/>
+  <path d="M32 32 L62.43 37.91 L61.31 42.1 Z M32 32 L55.4 52.33 L52.33 55.4 Z M32 32 L42.1 61.31 L37.91 62.43 Z M32 32 L26.09 62.43 L21.9 61.31 Z M32 32 L11.67 55.4 L8.6 52.33 Z M32 32 L2.69 42.1 L1.57 37.91 Z M32 32 L1.57 26.09 L2.69 21.9 Z M32 32 L8.6 11.67 L11.67 8.6 Z M32 32 L21.9 2.69 L26.09 1.57 Z M32 32 L37.91 1.57 L42.1 2.69 Z M32 32 L52.33 8.6 L55.4 11.67 Z M32 32 L61.31 21.9 L62.43 26.09 Z" fill="url(#isun-rays)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="#ffd27a" stroke-width="3" opacity="0.55" filter="url(#isun-rimglow)"/>
+  <circle cx="32" cy="32" r="29.4" fill="none" stroke="url(#isun-ring)" stroke-width="1.7"/>
+  
+    <path d="M32 13 L35 18.84 L40.24 14.88 L40.42 21.45 L46.85 20.15 L44.16 26.14 L50.52 27.77 L45.5 32 L50.52 36.23 L44.16 37.86 L46.85 43.85 L40.42 42.55 L40.24 49.12 L35 45.16 L32 51 L29 45.16 L23.76 49.12 L23.58 42.55 L17.15 43.85 L19.84 37.86 L13.48 36.23 L18.5 32 L13.48 27.77 L19.84 26.14 L17.15 20.15 L23.58 21.45 L23.76 14.88 L29 18.84 L32 13 Z" fill="url(#isun-flare)" stroke="#0a1110" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="32" cy="32" r="12.4" fill="url(#isun-sun)" stroke="#0a1110" stroke-width="2.6"/>
+    <path d="M24.4 28.4 A9 9 0 0 1 30.4 22.6" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="36" cy="35" r="2.2" fill="#ffb547" opacity="0.7"/>
+    <path d="M32 7 A25 25 0 0 1 48.73 13.42" fill="none" stroke="#e6ff94" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+      <circle cx="51.15" cy="15.93" r="4.6" fill="url(#isun-ball)" stroke="#0a1110" stroke-width="1.8"/>
+      <circle cx="49.75" cy="14.53" r="1.3" fill="#ffffff"/><path d="M32 57 A25 25 0 0 1 15.27 50.58" fill="none" stroke="#e6ff94" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+      <circle cx="12.85" cy="48.07" r="4.6" fill="url(#isun-ball)" stroke="#0a1110" stroke-width="1.8"/>
+      <circle cx="11.45" cy="46.67" r="1.3" fill="#ffffff"/>
+  <path d="M11 7 L12.04 9.96 L15 11 L12.04 12.04 L11 15 L9.96 12.04 L7 11 L9.96 9.96 Z" fill="#fff6da" opacity="1"/>
+  <path d="M53 50.6 L53.88 53.12 L56.4 54 L53.88 54.88 L53 57.4 L52.12 54.88 L49.6 54 L52.12 53.12 Z" fill="#fff6da" opacity="1"/>
+</svg>

@@ -83,5 +83,8 @@ window.G = window.G || {};
     set(key, value) {
       try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* 저장 못 해도 게임은 계속 */ }
     },
+    remove(key) {
+      try { localStorage.removeItem(key); } catch (e) { /* 무시 */ }
+    },
   };
 })(window.G);

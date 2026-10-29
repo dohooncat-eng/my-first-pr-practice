@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="iarea-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#ffb547" stop-opacity="0.24"/>
+    <stop offset="0.55" stop-color="#ffb547" stop-opacity="0.108"/>
+    <stop offset="1" stop-color="#ffb547" stop-opacity="0"/>
+  </radialGradient>
+    <radialGradient id="iarea-core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.35" stop-color="#ffe2a0"/>
+      <stop offset="0.75" stop-color="#ffb547"/>
+      <stop offset="1" stop-color="#e0782e"/>
+    </radialGradient>
+    <radialGradient id="iarea-fill" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe2a0" stop-opacity="0.75"/>
+      <stop offset="0.7" stop-color="#ffb547" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffb547" stop-opacity="0.32"/>
+    </radialGradient></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#iarea-back)"/>
+  
+    <circle cx="32" cy="32" r="20.5" fill="url(#iarea-fill)"/>
+    <circle cx="32" cy="32" r="20.5" fill="none" stroke="#0a1110" stroke-width="4.6"/>
+    <circle cx="32" cy="32" r="20.5" fill="none" stroke="#ffb547" stroke-width="2.2" stroke-dasharray="5.4 3.2"/>
+    <path d="M40.31 35.44 L46.32 37.93" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M35.44 40.31 L37.93 46.32" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M28.56 40.31 L26.07 46.32" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M23.69 35.44 L17.68 37.93" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M23.69 28.56 L17.68 26.07" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M28.56 23.69 L26.07 17.68" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M35.44 23.69 L37.93 17.68" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/><path d="M40.31 28.56 L46.32 26.07" stroke="#ffe2a0" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <circle cx="32" cy="32" r="7.4" fill="url(#iarea-core)" stroke="#0a1110" stroke-width="2.4"/>
+    <circle cx="30" cy="30" r="2.1" fill="#ffffff"/>
+    <g transform="rotate(0 32 32)">
+      <path d="M26.5 9.5 L32 3.5 L37.5 9.5 L34.4 9.5 L32 7.2 L29.6 9.5 Z" fill="#ffe2a0" stroke="#0a1110" stroke-width="1.8" stroke-linejoin="round"/>
+    </g><g transform="rotate(90 32 32)">
+      <path d="M26.5 9.5 L32 3.5 L37.5 9.5 L34.4 9.5 L32 7.2 L29.6 9.5 Z" fill="#ffe2a0" stroke="#0a1110" stroke-width="1.8" stroke-linejoin="round"/>
+    </g><g transform="rotate(180 32 32)">
+      <path d="M26.5 9.5 L32 3.5 L37.5 9.5 L34.4 9.5 L32 7.2 L29.6 9.5 Z" fill="#ffe2a0" stroke="#0a1110" stroke-width="1.8" stroke-linejoin="round"/>
+    </g><g transform="rotate(270 32 32)">
+      <path d="M26.5 9.5 L32 3.5 L37.5 9.5 L34.4 9.5 L32 7.2 L29.6 9.5 Z" fill="#ffe2a0" stroke="#0a1110" stroke-width="1.8" stroke-linejoin="round"/>
+    </g>
+</svg>

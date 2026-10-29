@@ -1,27 +1,31 @@
-// 게임 상태와 메인 루프: 업데이트 순서, 그리기 순서(땅 → 캐릭터 → 어둠 → 빛 → HUD)
+// 게임 상태와 메인 루프: 판 시작·이어하기·일시정지·레벨업·상자·정산, 그리기 순서(땅 → 캐릭터 → 어둠 → 빛 → HUD)
 (function (G) {
   'use strict';
 
-  G.BEST_KEY = 'deungbul.best';
-
   const game = G.game = {
-    state: 'loading', // loading | title | playing | levelup | paused | dying | end
+    state: 'loading', // loading | menu | playing | levelup | chest | paused | dying | end
     canvas: null, ctx: null,
     w: 0, h: 0, dpr: 1, zoom: 1,
     viewW: 0, viewH: 0, viewRadius: 0, despawnDist: 0,
     safe: { t: 0, r: 0, b: 0, l: 0 },
     cam: { x: 0, y: 0 },
-    clock: 0, time: 0, kills: 0,
-    player: null,
+    clock: 0, time: 0, kills: 0, runGold: 0, fps: 60,
+    player: null, stage: null, boss: null,
     debug: false, xpMul: 1, reducedMotion: false,
-    shake: 0,
+    shake: 0, settings: { sfx: 0.7, shake: true, numbers: true, fps: false },
+    lastRun: { stageId: 'forest', championId: 'keeper' },
   };
 
-  G.resetRun = function () {
-    game.player = G.createPlayer();
-    G.addWeapon(game.player, 'bolt');
+  const AUTOSAVE_EVERY = 10;
+  const SAVE_STATES = ['playing', 'paused', 'levelup', 'chest'];
+
+  function resetWorld(stageId, championId) {
+    game.stage = G.stageById(stageId);
+    game.player = G.createPlayer(championId);
     game.enemies = [];
     game.projectiles = [];
+    game.enemyBullets = [];
+    game.telegraphs = [];
     game.gems = [];
     game.items = [];
     game.particles = [];
@@ -31,68 +35,128 @@
     game.director = G.createDirector();
     game.time = 0;
     game.kills = 0;
+    game.runGold = 0;
     game.pendingLevelUps = 0;
+    game.pendingChests = 0;
     game.shake = 0;
     game.banner = null;
+    game.boss = null;
+    game.retaliateFx = 0;
+    game.autosave = AUTOSAVE_EVERY;
     game.cam.x = 0;
     game.cam.y = 0;
-  };
+    game.lastRun = { stageId: game.stage.id, championId: game.player.champion };
+    G.recalcStats(game);
+    game.player.hp = game.player.maxHp;
+  }
 
-  game.start = function () {
+  game.newRun = function (stageId, championId) {
     if (game.state === 'loading') return;
-    G.resetRun();
+    resetWorld(stageId, championId);
+    const p = game.player;
+    G.addWeapon(p, G.CHAMPIONS[p.champion].weapon, 1);
+    // 반딧불 마녀 각성: 무기 하나를 더 들고 시작
+    if (p.stats.extraWeapon) {
+      const options = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k) && !p.weapons.some((w) => w.key === k));
+      G.addWeapon(p, G.pick(options), 1);
+    }
+    G.clearRun();
     G.input.clear();
     game.state = 'playing';
-    G.ui.show(null);
-    G.announce(game, '어둠이 몰려옵니다. 10분을 버티세요');
+    G.ui.hideAll();
+    G.announce(game, game.stage.name + ' · 20분을 버티세요');
+    G.saveRun(game);
   };
+
+  game.continueRun = function () {
+    const d = G.loadRunData();
+    if (!d || game.state === 'loading') return false;
+    resetWorld(d.stageId, d.player.champion);
+    G.restoreRun(game, d);
+    G.input.clear();
+    game.state = 'paused';
+    G.ui.showPause(game);
+    return true;
+  };
+
+  game.retry = function () { game.newRun(game.lastRun.stageId, game.lastRun.championId); };
 
   game.pause = function () {
     if (game.state !== 'playing') return;
     game.state = 'paused';
     G.input.clear();
+    G.saveRun(game);
     G.ui.showPause(game);
   };
 
   game.resume = function () {
     if (game.state !== 'paused') return;
-    game.state = 'playing';
-    G.ui.show(null);
+    continueAfterModal();
+  };
+
+  game.saveAndQuit = function () {
+    if (game.player && SAVE_STATES.indexOf(game.state) !== -1) G.saveRun(game);
+    game.toTitle();
+  };
+
+  game.giveUp = function () {
+    if (game.state === 'paused' || game.state === 'playing') endRun(false);
   };
 
   game.toTitle = function () {
-    game.state = 'title';
-    G.ui.show('title');
-    G.ui.setLoading(1, true);
+    game.state = 'menu';
+    G.input.clear();
+    G.ui.showTitle();
   };
+
+  // 레벨업·상자 창이 닫힌 뒤: 남은 상자 → 남은 레벨업 → 플레이 순서
+  function continueAfterModal() {
+    if (game.pendingChests > 0) openChest();
+    else if (game.pendingLevelUps > 0) openLevelUp();
+    else {
+      game.state = 'playing';
+      G.ui.hideAll();
+    }
+  }
 
   function openLevelUp() {
     game.state = 'levelup';
     G.input.clear();
-    const choices = G.buildChoices(game.player, 3);
+    if (G.sfx) G.sfx.play('levelup');
+    const choices = G.buildChoices(game, game.player.stats.choices);
     G.ui.showLevelUp(game, choices, (c) => {
       G.applyChoice(game, c);
       game.pendingLevelUps--;
-      if (game.pendingLevelUps > 0) openLevelUp();
-      else {
-        game.state = 'playing';
-        G.ui.show(null);
-      }
+      if (G.sfx) G.sfx.play('select');
+      continueAfterModal();
     });
+  }
+
+  function openChest() {
+    game.state = 'chest';
+    G.input.clear();
+    game.pendingChests--;
+    if (G.sfx) G.sfx.play('chest');
+    const result = G.openChest(game);
+    G.ui.showChest(game, result, continueAfterModal);
   }
 
   function endRun(win) {
     game.state = 'end';
+    const settle = G.settleRun(game, win);
+    G.clearRun();
     const p = game.player;
-    const result = { win, time: Math.floor(game.time), level: p.level, kills: game.kills };
-    const best = G.storage.get(G.BEST_KEY);
-    const isBest = !best || result.time > best.time || (result.time === best.time && result.kills > best.kills);
-    if (isBest) G.storage.set(G.BEST_KEY, result);
-    G.ui.showEnd(game, result, isBest);
+    G.ui.showEnd(game, {
+      win, time: Math.floor(game.time), level: p.level, kills: game.kills,
+      gold: settle.gold, isBest: settle.isBest,
+      stageId: game.stage.id, championId: p.champion, newlyUnlocked: settle.newlyUnlocked,
+    });
+    if (G.sfx) G.sfx.play(win ? 'evolve' : 'hurt');
   }
 
   function update(dt) {
     game.time += dt;
+    const p = game.player;
     G.updatePlayer(game, dt);
     game.grid.clear();
     for (const e of game.enemies) game.grid.insert(e);
@@ -100,17 +164,25 @@
     G.updateEnemies(game, dt);
     G.updateWeapons(game, dt);
     G.updateProjectiles(game, dt);
+    G.updateBossFx(game, dt);
     G.compact(game.enemies);
     G.updatePickups(game, dt);
     G.updateEffects(game, dt);
+    game.retaliateFx = Math.max(0, game.retaliateFx - dt);
 
-    const p = game.player;
     const k = Math.min(1, dt * 8);
     game.cam.x += (p.x - game.cam.x) * k;
     game.cam.y += (p.y - game.cam.y) * k;
 
+    game.autosave -= dt;
+    if (game.autosave <= 0) {
+      game.autosave = AUTOSAVE_EVERY;
+      G.saveRun(game);
+    }
+
     if (p.hp <= 0) {
       game.state = 'dying';
+      G.clearRun(); // 쓰러진 판은 이어할 수 없다
       game.dieTimer = 1.3;
       G.burst(game, p.x, p.y, 'rgba(255, 181, 71, 0.9)', 40, 260, true);
       G.addShake(game, 12);
@@ -121,43 +193,46 @@
       endRun(true);
       return;
     }
-    if (game.pendingLevelUps > 0) openLevelUp();
+    if (game.pendingChests > 0) openChest();
+    else if (game.pendingLevelUps > 0) openLevelUp();
   }
 
   // ---------- 그리기 ----------
 
   const DECAL_CELL = 110;
-  let groundPattern = null;
+  const patterns = {};
 
   function drawGround(ctx) {
+    const st = game.stage;
     const x0 = game.cam.x - game.viewW / 2 - 40, y0 = game.cam.y - game.viewH / 2 - 40;
     const x1 = x0 + game.viewW + 80, y1 = y0 + game.viewH + 80;
-    const tile = G.art.get('ground_tile');
+    const tile = G.art.get(st.ground);
     if (tile) {
-      if (!groundPattern) {
-        groundPattern = ctx.createPattern(tile.img, 'repeat');
+      if (!patterns[st.ground]) {
+        const pat = ctx.createPattern(tile.img, 'repeat');
         const s = tile.w / tile.img.width;
-        if (groundPattern.setTransform) groundPattern.setTransform(new DOMMatrix().scaleSelf(s, s));
+        if (pat.setTransform) pat.setTransform(new DOMMatrix().scaleSelf(s, s));
+        patterns[st.ground] = pat;
       }
-      ctx.fillStyle = groundPattern;
+      ctx.fillStyle = patterns[st.ground];
     } else {
-      ctx.fillStyle = '#111a17';
+      ctx.fillStyle = st.groundColor;
     }
     ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
 
-    // 고정 난수로 흩뿌린 장식 (같은 자리엔 항상 같은 풀)
+    // 고정 난수로 흩뿌린 장식 (같은 자리엔 항상 같은 장식)
+    const decals = st.decals;
     const cx0 = Math.floor(x0 / DECAL_CELL), cx1 = Math.floor(x1 / DECAL_CELL);
     const cy0 = Math.floor(y0 / DECAL_CELL), cy1 = Math.floor(y1 / DECAL_CELL);
     for (let cx = cx0; cx <= cx1; cx++) {
       for (let cy = cy0; cy <= cy1; cy++) {
         const h = G.hash2(cx, cy);
         if (h > 0.42) continue;
-        const name = G.DECALS[Math.floor(G.hash2(cy + 7, cx - 3) * G.DECALS.length)];
-        const spr = G.art.get(name);
+        const spr = G.art.get(decals[Math.floor(G.hash2(cy + 7, cx - 3) * decals.length)]);
         if (!spr) continue;
         const ox = G.hash2(cx * 3 + 1, cy) * DECAL_CELL, oy = G.hash2(cx, cy * 3 + 2) * DECAL_CELL;
         const sc = 0.8 + G.hash2(cx + 11, cy + 5) * 0.5;
-        G.drawSprite(ctx, spr, cx * DECAL_CELL + ox, cy * DECAL_CELL + oy, sc, h < 0.2, false);
+        G.drawSprite(ctx, spr, cx * DECAL_CELL + ox, cy * DECAL_CELL + oy, sc, h < 0.2, 0);
       }
     }
   }
@@ -169,6 +244,8 @@
     };
   }
 
+  const HUD_STATES = ['playing', 'levelup', 'chest', 'paused', 'dying'];
+
   function render() {
     const ctx = game.ctx;
     const { w, h, dpr, zoom } = game;
@@ -176,7 +253,7 @@
     ctx.fillStyle = '#0d1513';
     ctx.fillRect(0, 0, w, h);
     const p = game.player;
-    if (!p) return;
+    if (!p || game.state === 'menu' || game.state === 'loading') return;
 
     const sx = game.shake ? G.rand(-game.shake, game.shake) : 0;
     const sy = game.shake ? G.rand(-game.shake, game.shake) : 0;
@@ -189,24 +266,28 @@
     world();
     drawGround(ctx);
     G.drawPickups(ctx, game);
+    G.drawTelegraphs(ctx, game);
     G.drawWeaponsUnder(ctx, game);
     G.drawEnemies(ctx, game);
-    if (game.state !== 'dying' && game.state !== 'end') G.drawPlayer(ctx, game);
+    const dying = game.state === 'dying' || game.state === 'end';
+    if (!dying) G.drawPlayer(ctx, game);
+    G.drawProjectiles(ctx, game);
     G.drawWeaponsOver(ctx, game);
+    G.drawEnemyBullets(ctx, game);
     G.drawParticles(ctx, game, false);
 
-    // 어둠: 등불에서 멀어질수록 짙어진다
+    // 어둠: 등불에서 멀어질수록 짙어진다 (스테이지마다 어둠의 색이 다르다)
     const lp = G.lanternPos(p);
     const ls = toScreen(lp.x, lp.y, sx, sy);
     const flicker = 1 + Math.sin(game.clock * 11) * 0.015 + Math.sin(game.clock * 23.7) * 0.01;
-    const dying = game.state === 'dying' || game.state === 'end';
     const inner = (dying ? 30 : 80) * zoom * flicker;
     const outer = Math.max(w, h) * (dying ? 0.45 : 0.62);
+    const c = game.stage.dark.join(', ');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const dark = ctx.createRadialGradient(ls.x, ls.y, inner, ls.x, ls.y, outer);
-    dark.addColorStop(0, 'rgba(3, 7, 10, 0)');
-    dark.addColorStop(0.4, 'rgba(3, 7, 10, 0.32)');
-    dark.addColorStop(1, 'rgba(2, 5, 8, 0.84)');
+    dark.addColorStop(0, 'rgba(' + c + ', 0)');
+    dark.addColorStop(0.4, 'rgba(' + c + ', 0.32)');
+    dark.addColorStop(1, 'rgba(' + c + ', 0.84)');
     ctx.fillStyle = dark;
     ctx.fillRect(0, 0, w, h);
 
@@ -218,8 +299,10 @@
       G.drawGlow(ctx, 'rgba(255, 226, 160, 0.9)', lp.x, lp.y, 18 * flicker, 0.9);
     }
     G.drawPickupGlow(ctx, game);
+    G.drawProjectileGlow(ctx, game);
     G.drawWeaponGlow(ctx, game);
     G.drawEnemyGlow(ctx, game);
+    G.drawEnemyBulletGlow(ctx, game);
     G.drawParticles(ctx, game, true);
     ctx.globalCompositeOperation = 'source-over';
 
@@ -239,7 +322,7 @@
       ctx.fillRect(0, 0, w, h);
     }
 
-    if (game.state !== 'title' && game.state !== 'end') G.drawHUD(ctx, game);
+    if (HUD_STATES.indexOf(game.state) !== -1) G.drawHUD(ctx, game);
   }
 
   // ---------- 화면 크기와 루프 ----------
@@ -270,8 +353,10 @@
 
   let last = 0;
   function frame(ts) {
-    const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0;
+    const raw = last ? (ts - last) / 1000 : 0;
+    const dt = Math.min(0.05, raw);
     last = ts;
+    if (raw > 0) game.fps = game.fps * 0.93 + (1 / raw) * 0.07;
     game.clock += dt;
     if (game.state === 'playing') update(dt);
     else if (game.state === 'dying') {
@@ -283,27 +368,37 @@
     requestAnimationFrame(frame);
   }
 
+  // 플레이 중 단축키. 메뉴 화면의 키는 UI가 처리한다.
   game.onKey = function (e) {
-    if (game.debug) {
-      if (e.code === 'KeyL' && game.state === 'playing') game.pendingLevelUps++;
-      if (e.code === 'KeyK' && game.state === 'playing') game.time += 60;
-      if (e.code === 'KeyH' && game.player) game.player.hp = game.player.maxHp;
+    if (game.debug && game.player && (game.state === 'playing' || game.state === 'paused')) debugKey(e);
+    if (game.state === 'playing' && (e.key === 'Escape' || e.code === 'KeyP')) game.pause();
+  };
+
+  // ?debug: L 레벨업 · K 60초 넘기기 · H 회복 · B 보스 · C 상자 · M 가진 것 모두 만렙 · G 금화 1000
+  function debugKey(e) {
+    const p = game.player;
+    switch (e.code) {
+      case 'KeyL': game.pendingLevelUps++; break;
+      case 'KeyK': game.time += 60; break;
+      case 'KeyH': p.hp = p.maxHp; break;
+      case 'KeyB': G.spawnBoss(game, Math.min(2, game.director.bossIndex)); break;
+      case 'KeyC': G.dropItem(game, p.x + 40, p.y, 'chest'); break;
+      case 'KeyM':
+        p.weapons.forEach((w) => { if (G.isBaseWeapon(w.key)) w.level = G.WEAPON_MAX; });
+        Object.keys(p.passives).forEach((k) => { p.passives[k] = G.PASSIVE_MAX; });
+        G.recalcStats(game);
+        break;
+      case 'KeyG': G.meta.gold += 1000; G.saveMeta(); break;
+      default: break;
     }
-    const st = game.state;
-    if (st === 'title' && (e.key === 'Enter' || e.code === 'Space')) game.start();
-    else if (st === 'playing' && (e.key === 'Escape' || e.code === 'KeyP')) game.pause();
-    else if (st === 'paused' && (e.key === 'Escape' || e.code === 'KeyP')) game.resume();
-    else if (st === 'levelup' && /^Digit[1-3]$/.test(e.code)) G.ui.pickCard(Number(e.code.slice(5)) - 1);
-    else if (st === 'end' && e.key === 'Enter') game.start();
-    else if (st === 'end' && e.key === 'Escape') game.toTitle();
-  };
+  }
 
-  game.run = function () {
-    requestAnimationFrame(frame);
-  };
+  game.run = function () { requestAnimationFrame(frame); };
 
-  // 테스트·디버그용: 고정 시간 간격으로 직접 진행
+  // 테스트용: 고정 시간 간격으로 직접 진행
   game.step = function (dt, n) {
     for (let i = 0; i < (n || 1); i++) if (game.state === 'playing') update(dt);
   };
+
+  game.canSave = function () { return !!game.player && SAVE_STATES.indexOf(game.state) !== -1; };
 })(window.G);

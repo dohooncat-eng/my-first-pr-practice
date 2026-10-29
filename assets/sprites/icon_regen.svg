@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+  <radialGradient id="iregen-back" cx="32" cy="32" r="30" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#6fbf73" stop-opacity="0.28"/>
+    <stop offset="0.55" stop-color="#6fbf73" stop-opacity="0.12600000000000003"/>
+    <stop offset="1" stop-color="#6fbf73" stop-opacity="0"/>
+  </radialGradient>
+    <radialGradient id="iregen-fill" cx="24" cy="20" r="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffb0ba"/>
+      <stop offset="0.35" stop-color="#ff6476"/>
+      <stop offset="0.7" stop-color="#e0445a"/>
+      <stop offset="1" stop-color="#8a1f33"/>
+    </radialGradient>
+    <linearGradient id="iregen-moss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b9ec8e"/>
+      <stop offset="0.5" stop-color="#6cbc5e"/>
+      <stop offset="1" stop-color="#2f6b45"/>
+    </linearGradient>
+    <clipPath id="iregen-clip"><path d="M32 54 C18 44 8.5 35 8.5 24 C8.5 15.5 14.6 10 22 10 C27 10 30.4 13 32 17 C33.6 13 37 10 42 10 C49.4 10 55.5 15.5 55.5 24 C55.5 35 46 44 32 54 Z"/></clipPath></defs>
+  <circle cx="32" cy="32" r="30" fill="url(#iregen-back)"/>
+  
+    <g transform="translate(32 33) scale(0.9) translate(-32 -32)">
+      <path d="M32 54 C18 44 8.5 35 8.5 24 C8.5 15.5 14.6 10 22 10 C27 10 30.4 13 32 17 C33.6 13 37 10 42 10 C49.4 10 55.5 15.5 55.5 24 C55.5 35 46 44 32 54 Z" fill="url(#iregen-fill)"/>
+      <g clip-path="url(#iregen-clip)">
+        <ellipse cx="46" cy="40" rx="20" ry="22" fill="#7a1a2e" opacity="0.4"/>
+        <path d="M4 34 C10 31 14 36 19 33 C23 30.4 26 34 30 32.6 C34 31 36 35.6 41 34 C46 32.4 50 35 60 33 L60 64 L4 64 Z" fill="url(#iregen-moss)"/>
+        <path d="M4 34 C10 31 14 36 19 33 C23 30.4 26 34 30 32.6 C34 31 36 35.6 41 34 C46 32.4 50 35 60 33" fill="none" stroke="#1f4f35" stroke-width="2"/>
+        <circle cx="18" cy="40" r="2.4" fill="#d4f7a4" opacity="0.8"/>
+        <circle cx="26" cy="45" r="1.6" fill="#d4f7a4" opacity="0.7"/>
+        <circle cx="38" cy="41" r="2" fill="#d4f7a4" opacity="0.7"/>
+        <circle cx="32" cy="50" r="1.4" fill="#d4f7a4" opacity="0.6"/>
+        <path d="M8 22 C10 18 13 18 14.4 20.6 C12.6 22.4 10 23 8 22 Z" fill="#9ad86a"/>
+      </g>
+      <path d="M32 54 C18 44 8.5 35 8.5 24 C8.5 15.5 14.6 10 22 10 C27 10 30.4 13 32 17 C33.6 13 37 10 42 10 C49.4 10 55.5 15.5 55.5 24 C55.5 35 46 44 32 54 Z" fill="none" stroke="#0a1110" stroke-width="3.333333333333333" stroke-linejoin="round"/>
+      <ellipse cx="19.5" cy="20.5" rx="5" ry="3.2" transform="rotate(-38 19.5 20.5)" fill="#ffffff" opacity="0.9"/>
+    </g>
+    <g transform="translate(43 15.5) scale(0.82)">
+      <path d="M0 0 C0 -4 0 -7 0 -9" stroke="#0a1110" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M0 0 C0 -4 0 -7 0 -9" stroke="#7fb04a" stroke-width="2" stroke-linecap="round"/>
+      <path d="M0 -8 C-3 -14 -10 -14 -12 -10 C-8 -7 -3 -7 0 -8 Z" fill="#9ad86a" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M0 -9 C3 -16 11 -17 13 -12 C9 -8.5 4 -8 0 -9 Z" fill="#b9ec8e" stroke="#0a1110" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+    <path d="M52 44 L52 52 M48 48 L56 48" stroke="#d4f7a4" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M9 47 L9 52 M6.5 49.5 L11.5 49.5" stroke="#9ad86a" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+</svg>

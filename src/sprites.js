@@ -6,31 +6,49 @@
   const BASE = 'assets/sprites/';
   const RES = 3; // 게임 크기의 몇 배 해상도로 굽는지 (확대·고해상도 화면 대비)
 
-  // 이름: { frames, w, h (월드 단위), ax, ay (기준점 비율) }
+  // 이름: { frames, w, h (월드 단위), ax, ay (기준점 비율), res(굽기 배율) }
   const LIST = {
-    player: { frames: 4, w: 60, h: 60, ax: 0.5, ay: 116 / 128 },
-    slime: { frames: 4, w: 42, h: 42, ax: 0.5, ay: 86 / 96 },
-    bat: { frames: 4, w: 50, h: 43, ax: 0.5, ay: 0.5 },
-    golem: { frames: 4, w: 66, h: 66, ax: 0.5, ay: 118 / 128 },
     bolt: { w: 34, h: 17, ax: 48 / 64, ay: 0.5 },
     orb: { w: 26, h: 26 },
     slash: { w: 128, h: 128 },
+    scythe: { w: 34, h: 34 },
+    meteor: { w: 30, h: 45, ay: 72 / 96 },
+    poison_pool: { w: 128, h: 128, res: 2 },
+    spark: { w: 24, h: 24 },
+    sun: { w: 48, h: 48 },
     gem_0: { w: 13, h: 16 },
     gem_1: { w: 15, h: 19 },
     gem_2: { w: 18, h: 22 },
     item_heal: { w: 28, h: 28 },
     item_magnet: { w: 28, h: 28 },
-    ground_tile: { w: 256, h: 256, res: 2 },
-    decal_grass_0: { w: 40, h: 40 },
-    decal_grass_1: { w: 40, h: 40 },
-    decal_stone: { w: 40, h: 40 },
-    decal_mushroom: { w: 40, h: 40 },
-    decal_flowers: { w: 40, h: 40 },
-    decal_roots: { w: 40, h: 40 },
+    chest: { w: 44, h: 44, ay: 86 / 96 },
+    coin: { w: 14, h: 14 },
   };
-  G.ICONS = ['bolt', 'sword', 'orb', 'aura', 'vitality', 'swift', 'might', 'haste', 'magnet', 'heal'];
-  G.ICONS.forEach((k) => { LIST['icon_' + k] = { w: 32, h: 32, res: 2 }; });
-  G.DECALS = ['decal_grass_0', 'decal_grass_1', 'decal_stone', 'decal_mushroom', 'decal_flowers', 'decal_roots'];
+  // 데이터 파일(적·스테이지·무기)은 이 파일보다 늦게 불러오므로, 목록은 불러오기 직전에 채운다
+  function addDataSprites() {
+    // 챔피언 (오른쪽을 보는 걷기 4프레임)
+    ['player', 'knight', 'witch', 'hunter'].forEach((k) => {
+      LIST[k] = { frames: 4, w: 60, h: 60, ax: 0.5, ay: 116 / 128 };
+    });
+    // 적: 역할별 규격
+    const ROLE_SPEC = {
+      basic: { frames: 4, w: 42, h: 42, ax: 0.5, ay: 86 / 96 },
+      fast: { frames: 4, w: 50, h: 43, ax: 0.5, ay: 0.5 },
+      tank: { frames: 4, w: 66, h: 66, ax: 0.5, ay: 118 / 128 },
+    };
+    Object.keys(G.ENEMY_TYPES || {}).forEach((k) => { LIST[k] = ROLE_SPEC[G.ENEMY_TYPES[k].role]; });
+    Object.keys(G.BOSS_TYPES || {}).forEach((k) => {
+      LIST['boss_' + k] = { frames: 4, w: 120, h: 120, ax: 0.5, ay: 180 / 192, res: 2.5 };
+    });
+    // 바닥 타일과 장식
+    (G.STAGES || []).forEach((st) => {
+      LIST[st.ground] = { w: 256, h: 256, res: 2 };
+      st.decals.forEach((d) => { LIST[d] = { w: 40, h: 40 }; });
+    });
+    // 아이콘: 무기·패시브·조합·회복
+    G.ICONS = Object.keys(G.WEAPONS || {}).concat(Object.keys(G.PASSIVES || {}), Object.keys(G.FUSIONS || {}), ['heal']);
+    G.ICONS.forEach((k) => { LIST['icon_' + k] = { w: 32, h: 32, res: 2 }; });
+  }
 
   const store = {};
 
@@ -71,6 +89,7 @@
 
   // 모든 그림을 불러온다. 없는 그림은 건너뛰고 게임은 대체 도형으로 그린다.
   G.loadSprites = function (onProgress) {
+    addDataSprites();
     const jobs = [];
     Object.keys(LIST).forEach((name) => {
       const def = LIST[name];
