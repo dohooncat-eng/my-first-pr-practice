@@ -1,4 +1,5 @@
-// 무기 데이터: 기본 무기 9개(레벨 1~5) + 진화 무기 9개 + 무기 조합 3개(레벨 1개)
+// 무기 데이터: 기본 무기 14개(레벨 1~5) + 진화 무기 14개 + 무기 조합 3개(레벨 1개)
+// 새 무기 5개(덫·빛의 창·달나방·회오리·불꽃 채찍)의 동작은 src/systems/weapons/new2.js
 // 동작은 src/systems/weapons/에 있다. 수치 이름은 무기마다 그 동작이 읽는 필드다.
 (function (G) {
   'use strict';
@@ -116,6 +117,66 @@
       ],
       notes: ['', '피해 +30%, 범위 증가', '범위 증가, 더 자주 울립니다', '피해 +33%, 범위 증가', '피해 +33%, 범위·속도 증가'],
     },
+    trap: {
+      kind: 'base', name: '그림자 덫',
+      desc: '주변 땅에 덫을 깔고, 적이 밟으면 폭발합니다.',
+      levels: [
+        { dmg: 26, cd: 2.2, count: 1, radius: 55, life: 8, spread: 140 },
+        { dmg: 26, cd: 2.2, count: 2, radius: 55, life: 8, spread: 150 },
+        { dmg: 36, cd: 2.0, count: 2, radius: 62, life: 9, spread: 160 },
+        { dmg: 36, cd: 1.8, count: 3, radius: 66, life: 9, spread: 170 },
+        { dmg: 52, cd: 1.6, count: 4, radius: 74, life: 10, spread: 180 },
+      ],
+      notes: ['', '덫 +1', '피해 +38%, 폭발 범위 증가', '덫 +1, 더 자주 깝니다', '피해 +44%, 덫 +1'],
+    },
+    lance: {
+      kind: 'base', name: '빛의 창',
+      desc: '가장 가까운 적 쪽으로 모든 적을 꿰뚫는 빛줄기를 쏩니다.',
+      levels: [
+        { dmg: 22, cd: 1.6, count: 1, length: 300, width: 16 },
+        { dmg: 28, cd: 1.6, count: 1, length: 330, width: 18 },
+        { dmg: 28, cd: 1.4, count: 2, length: 340, width: 18 },
+        { dmg: 36, cd: 1.3, count: 2, length: 360, width: 20 },
+        { dmg: 50, cd: 1.1, count: 3, length: 400, width: 22 },
+      ],
+      notes: ['', '피해 +27%, 길어집니다', '빛줄기 +1, 더 자주 쏩니다', '피해 +29%, 굵어집니다', '피해 +39%, 빛줄기 +1'],
+    },
+    moth: {
+      kind: 'base', name: '달나방 떼',
+      desc: '적을 쫓아 날아가는 달나방을 풀어놓습니다.',
+      levels: [
+        { dmg: 18, cd: 1.2, count: 2, speed: 260, life: 3 },
+        { dmg: 18, cd: 1.2, count: 3, speed: 270, life: 3 },
+        { dmg: 24, cd: 1.1, count: 3, speed: 290, life: 3.2 },
+        { dmg: 24, cd: 1.0, count: 4, speed: 300, life: 3.4, hits: 2 },
+        { dmg: 34, cd: 0.85, count: 5, speed: 320, life: 3.6, hits: 2 },
+      ],
+      notes: ['', '나방 +1', '피해 +33%, 더 빨라집니다', '나방 +1, 더 자주 풀고 적 2마리를 뚫습니다', '피해 +42%, 나방 +1'],
+    },
+    tornado: {
+      kind: 'base', name: '회오리',
+      desc: '떠돌아다니며 적을 끌어당기고 갈아 버리는 회오리를 일으킵니다.',
+      levels: [
+        { dmg: 6, cd: 4.5, count: 1, radius: 48, life: 4, tick: 0.3, pull: 90, speed: 90 },
+        { dmg: 8, cd: 4.5, count: 1, radius: 52, life: 4.5, tick: 0.3, pull: 100, speed: 95 },
+        { dmg: 8, cd: 4.0, count: 2, radius: 54, life: 4.5, tick: 0.3, pull: 100, speed: 100 },
+        { dmg: 11, cd: 3.6, count: 2, radius: 58, life: 5, tick: 0.28, pull: 115, speed: 105 },
+        { dmg: 15, cd: 3.2, count: 2, radius: 66, life: 5.5, tick: 0.25, pull: 130, speed: 110 },
+      ],
+      notes: ['', '피해 +33%, 오래갑니다', '회오리 +1, 더 자주 일으킵니다', '피해 +38%, 커집니다', '피해 +36%, 크고 오래갑니다'],
+    },
+    whip: {
+      kind: 'base', name: '불꽃 채찍',
+      desc: '좌우를 번갈아 길게 후려칩니다.',
+      levels: [
+        { dmg: 20, cd: 1.3, length: 130, width: 34, both: false },
+        { dmg: 26, cd: 1.3, length: 140, width: 36, both: false },
+        { dmg: 26, cd: 1.2, length: 150, width: 38, both: true },
+        { dmg: 34, cd: 1.1, length: 160, width: 40, both: true },
+        { dmg: 54, cd: 0.95, length: 180, width: 44, both: true },
+      ],
+      notes: ['', '피해 +30%, 길어집니다', '양쪽을 함께 후려칩니다', '피해 +31%, 길어집니다', '피해 +59%, 더 길고 빨라집니다'],
+    },
 
     // ---------- 진화 무기 (무기 Lv 5 + 패시브) ----------
     inferno: {
@@ -162,6 +223,32 @@
       kind: 'evolved', from: 'bell', name: '대지의 종',
       desc: '충격파가 두 번 울리고, 맞은 적을 잠시 기절시킵니다.',
       levels: [{ dmg: 22, cd: 2.0, radius: 260, knock: 420, width: 38, stun: 0.8, echo: true }],
+    },
+
+    helltrap: {
+      kind: 'evolved', from: 'trap', name: '지옥 덫',
+      desc: '덫이 터지면 주변 덫까지 연쇄로 터지고, 불길이 남습니다.',
+      levels: [{ dmg: 80, cd: 1.0, count: 5, radius: 95, life: 12, spread: 200, chain: true }],
+    },
+    judgment: {
+      kind: 'evolved', from: 'lance', name: '심판의 창',
+      desc: '사방으로 네 줄기 빛의 창이 쏟아집니다.',
+      levels: [{ dmg: 70, cd: 0.9, count: 4, length: 460, width: 28, around: true }],
+    },
+    mothswarm: {
+      kind: 'evolved', from: 'moth', name: '달나방 군단',
+      desc: '달나방 무리가 쉬지 않고 적을 쫓아 물어뜯습니다.',
+      levels: [{ dmg: 30, cd: 0.6, count: 6, speed: 360, life: 4, pierce: 2 }],
+    },
+    tempest: {
+      kind: 'evolved', from: 'tornado', name: '폭풍 회랑',
+      desc: '거대한 회오리 두 개가 주위를 돌며 적을 빨아들입니다.',
+      levels: [{ dmg: 24, cd: 2.6, count: 2, radius: 90, life: 6, tick: 0.22, pull: 180, speed: 120, orbit: true }],
+    },
+    dragonwhip: {
+      kind: 'evolved', from: 'whip', name: '용의 채찍',
+      desc: '양쪽을 한꺼번에 후려치고, 지나간 자리에 불길이 남습니다.',
+      levels: [{ dmg: 70, cd: 0.8, length: 230, width: 54, both: true, flame: true }],
     },
 
     // ---------- 무기 조합 (무기 Lv 5 + 무기 Lv 5) ----------

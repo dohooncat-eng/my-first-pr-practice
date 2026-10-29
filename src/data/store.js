@@ -36,5 +36,10 @@
     exchange: { crystals: 50, gold: 1000 }, // 별빛 결정 → 금화
   };
 
+  // 쿠폰 코드 (fill: 금화·별빛 결정을 한도까지)
+  G.COUPONS = {
+    SBR: { fill: true, desc: '금화·별빛 결정을 한도까지' },
+  };
+
   G.storeProduct = function (id) { return G.STORE.products.find((p) => p.id === id) || null; };
 })(window.G);

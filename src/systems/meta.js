@@ -21,8 +21,37 @@
       noAds: false,
       pass: { until: -1, lastClaim: -1 },
       runsSinceAd: 0,
+      coupons: {},
     };
   }
+
+  // 재화 한도
+  G.CURRENCY_MAX = { gold: 9999999, crystals: 99999 };
+
+  G.addCurrency = function (kind, n) {
+    G.meta[kind] = Math.min(G.CURRENCY_MAX[kind], Math.max(0, (G.meta[kind] || 0) + n));
+    return G.meta[kind];
+  };
+
+  // 쿠폰: 저장 데이터마다 코드 하나에 한 번 (대소문자·앞뒤 공백 무시)
+  G.redeemCoupon = function (code) {
+    const key = String(code || '').trim().toUpperCase();
+    const c = G.COUPONS[key];
+    if (!c) return { ok: false, reason: 'invalid' };
+    if (G.meta.coupons[key]) return { ok: false, reason: 'used' };
+    const granted = { gold: 0, crystals: 0 };
+    if (c.fill) {
+      granted.gold = G.CURRENCY_MAX.gold - G.meta.gold;
+      granted.crystals = G.CURRENCY_MAX.crystals - G.meta.crystals;
+    }
+    if (c.gold) granted.gold += c.gold;
+    if (c.crystals) granted.crystals += c.crystals;
+    G.addCurrency('gold', granted.gold);
+    G.addCurrency('crystals', granted.crystals);
+    G.meta.coupons[key] = true;
+    G.saveMeta();
+    return { ok: true, granted, gold: G.meta.gold, crystals: G.meta.crystals };
+  };
 
   const num = (v, d) => (typeof v === 'number' && isFinite(v) ? v : d);
 
@@ -42,14 +71,15 @@
     const saved = G.storage.get(KEY);
     const m = defaults();
     if (saved && typeof saved === 'object') {
-      m.gold = Math.max(0, Number(saved.gold) || 0);
+      m.gold = Math.min(G.CURRENCY_MAX.gold, Math.max(0, Number(saved.gold) || 0));
       Object.assign(m.unlocked, saved.unlocked);
       Object.assign(m.champLv, saved.champLv);
       Object.assign(m.cleared, saved.cleared);
       Object.assign(m.best, saved.best);
       Object.assign(m.settings, saved.settings);
       if (G.difficultyById && saved.lastDifficulty) m.lastDifficulty = G.difficultyById(saved.lastDifficulty).id;
-      m.crystals = Math.max(0, num(saved.crystals, 0));
+      m.crystals = Math.min(G.CURRENCY_MAX.crystals, Math.max(0, num(saved.crystals, 0)));
+      Object.assign(m.coupons, saved.coupons);
       loadGacha(m, saved.gacha);
       Object.assign(m.purchases, saved.purchases);
       m.noAds = !!saved.noAds;
@@ -80,6 +110,19 @@
     const i = G.STAGES.findIndex((s) => s.id === id);
     if (i <= 0) return i === 0;
     return !!G.meta.cleared[G.STAGES[i - 1].id];
+  };
+
+  // 무기·패시브는 그것을 여는 스테이지가 열려야 레벨업에 나온다 (kind: 'weapon' | 'passive')
+  G.isItemUnlocked = function (kind, key) {
+    const st = G.ITEM_UNLOCK_STAGE[kind + ':' + key];
+    return !st || G.isStageUnlocked(st);
+  };
+
+  G.stageUnlockNames = function (stageId) {
+    return (G.stageById(stageId).unlocks || []).map((k) => {
+      const [kind, key] = k.split(':');
+      return (kind === 'weapon' ? G.WEAPONS : G.PASSIVES)[key].name;
+    });
   };
 
   // 난이도는 스테이지마다 차례로 열린다: 보통 → 어려움 → MAX
@@ -137,7 +180,7 @@
     const goldMul = (game.player && game.player.stats.goldMul) || 1;
     const bonus = Math.round((minutes * 6 + (win ? 120 : 0)) * st.goldMul * diff.gold * goldMul);
     const gold = Math.round(game.runGold * diff.gold * goldMul) + bonus;
-    G.meta.gold += gold;
+    G.addCurrency('gold', gold);
     let crystals = 0;
     let unlockedDifficulty = null;
     if (win) {
@@ -145,7 +188,7 @@
       if (!G.meta.cleared[dKey]) {
         G.meta.cleared[dKey] = true;
         crystals = G.GACHA.firstClearCrystals[diff.id] || 0;
-        G.meta.crystals += crystals;
+        G.addCurrency('crystals', crystals);
         if (diff.id !== 'normal') newlyUnlocked.push(st.name + ' ' + diff.name + ' 클리어!');
         const next = G.DIFFICULTIES[G.DIFFICULTIES.indexOf(diff) + 1];
         if (next) {
@@ -156,7 +199,12 @@
       if (!G.meta.cleared[st.id]) {
         G.meta.cleared[st.id] = true;
         const i = G.STAGES.indexOf(st);
-        if (G.STAGES[i + 1]) newlyUnlocked.push('새 스테이지: ' + G.STAGES[i + 1].name);
+        const next = G.STAGES[i + 1];
+        if (next) {
+          newlyUnlocked.push('새 스테이지: ' + next.name);
+          const names = G.stageUnlockNames(next.id);
+          if (names.length) newlyUnlocked.push('새 무기·패시브: ' + names.join(', '));
+        }
       }
     }
     const rec = { time: Math.floor(game.time), kills: game.kills, level: game.player.level, champion: game.player.champion, difficulty: diff.id };

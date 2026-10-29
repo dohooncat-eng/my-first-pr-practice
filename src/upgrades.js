@@ -23,11 +23,11 @@
     const passiveSlotFree = G.passiveSlotsUsed(p) < G.PASSIVE_SLOTS;
 
     Object.keys(G.WEAPONS).forEach((key) => {
-      if (!G.isBaseWeapon(key)) return;
+      if (!G.isBaseWeapon(key) || !G.WEAPON_BEHAVIORS[key]) return; // 동작이 없는 무기는 내보내지 않는다
       const owned = p.weapons.find((w) => w.key === key);
       if (owned) {
         if (owned.level < G.WEAPON_MAX) pool.push({ kind: 'weapon', key, level: owned.level + 1, weight: 1.5 });
-      } else if (weaponSlotFree && !consumed(p, key)) {
+      } else if (weaponSlotFree && !consumed(p, key) && G.isItemUnlocked('weapon', key)) {
         pool.push({ kind: 'weapon', key, level: 1, weight: 1 });
       }
     });
@@ -35,7 +35,7 @@
       if (passiveInFusion(p, key)) return;
       const lv = p.passives[key] || 0;
       if (lv > 0 && lv < G.PASSIVE_MAX) pool.push({ kind: 'passive', key, level: lv + 1, weight: 1.1 });
-      else if (lv === 0 && passiveSlotFree) pool.push({ kind: 'passive', key, level: 1, weight: 0.9 });
+      else if (lv === 0 && passiveSlotFree && G.isItemUnlocked('passive', key)) pool.push({ kind: 'passive', key, level: 1, weight: 0.9 });
     });
 
     // 가중치로 하나 뽑아 목록에서 뺀다

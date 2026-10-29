@@ -28,6 +28,8 @@
   G.WEAPON_SIZE = 0.8;
   G.areaMul = function (game) { return game.player.stats.area * G.WEAPON_SIZE; };
   G.area = function (game, r) { return r * G.areaMul(game); };
+  // 지속 시간(덫·웅덩이·회오리 등)에 오래 타는 심지를 반영
+  G.dur = function (game, t) { return t * (game.player.stats.duration || 1); };
   G.amount = function (game, n) { return n + game.player.stats.amount; };
 
   G.inView = function (game, x, y, margin) {

@@ -44,7 +44,7 @@
 
   G.fireEnemyBullet = function (game, x, y, angle, speed, dmg, color) {
     if (game.enemyBullets.length > 300) return;
-    game.enemyBullets.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 8, dmg, life: 5, color: color || 'rgba(255, 90, 90, 0.9)' });
+    game.enemyBullets.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 6, dmg, life: 5, color: color || 'rgba(255, 90, 90, 0.9)' });
   };
 
   function ring(game, e, n, speed, dmg, color, offset) {
@@ -70,7 +70,7 @@
       if (ai.timerB <= 0) {
         ai.timerB = 8;
         const tx = p.x, ty = p.y;
-        telegraphCircle(game, tx, ty, 120, 1.1, e.damage * 1.3, () => {
+        telegraphCircle(game, tx, ty, 85, 1.2, e.damage * 1.3, () => {
           G.burst(game, tx, ty, 'rgba(160, 200, 110, 0.9)', 24, 260);
           G.addShake(game, 7);
         });
@@ -82,14 +82,14 @@
       const ai = e.ai;
       if (ai.mode === 'leap') {
         ai.t += dt;
-        const k = Math.min(1, ai.t / 0.9);
+        const k = Math.min(1, ai.t / 1.0);
         e.x = ai.sx + (ai.tx - ai.sx) * k;
         e.y = ai.sy + (ai.ty - ai.sy) * k;
         e.lift = Math.sin(k * Math.PI) * 90;
         if (k >= 1) {
           ai.mode = 'walk';
           e.lift = 0;
-          ring(game, e, 10 + e.index * 4, 150, e.damage * 0.5, 'rgba(182, 227, 90, 0.95)');
+          ring(game, e, 8 + e.index * 3, 150, e.damage * 0.5, 'rgba(182, 227, 90, 0.95)');
           G.burst(game, e.x, e.y, 'rgba(182, 227, 90, 0.9)', 26, 260);
           G.addShake(game, 9);
         }
@@ -102,7 +102,7 @@
         ai.t = 0;
         ai.sx = e.x; ai.sy = e.y;
         ai.tx = p.x; ai.ty = p.y;
-        telegraphCircle(game, p.x, p.y, 110, 0.9, e.damage * 1.2);
+        telegraphCircle(game, p.x, p.y, 80, 1.0, e.damage * 1.2);
       }
       return 1;
     },
@@ -119,6 +119,12 @@
         e.x += Math.cos(ai.angle) * 620 * dt;
         e.y += Math.sin(ai.angle) * 620 * dt;
         if (game.time % 0.1 < dt) G.burst(game, e.x, e.y, 'rgba(255, 120, 60, 0.8)', 2, 60, true);
+        if (ai.t <= 0) { ai.mode = 'recover'; ai.t = 0.9; }
+        return 0;
+      }
+      // 돌진 뒤 잠깐 멈춰 숨을 고른다 (그 사이 거리를 벌릴 수 있게)
+      if (ai.mode === 'recover') {
+        ai.t -= dt;
         if (ai.t <= 0) ai.mode = 'walk';
         return 0;
       }
@@ -133,7 +139,7 @@
       }
       if (ai.timerB <= 0) {
         ai.timerB = 7;
-        ring(game, e, 16 + e.index * 4, 190, e.damage * 0.55, 'rgba(255, 120, 60, 0.95)');
+        ring(game, e, 12 + e.index * 3, 190, e.damage * 0.55, 'rgba(255, 120, 60, 0.95)');
       }
       return 1;
     },
@@ -147,8 +153,8 @@
         ai.spin = (ai.spin || 0) + dt * 2.4;
         ai.shot = (ai.shot || 0) - dt;
         if (ai.shot <= 0) {
-          ai.shot = 0.16;
-          const arms = 3 + e.index;
+          ai.shot = 0.2;
+          const arms = 2 + e.index;
           for (let i = 0; i < arms; i++) G.fireEnemyBullet(game, e.x, e.y - 20, ai.spin + (i / arms) * Math.PI * 2, 150, e.damage * 0.5, 'rgba(190, 170, 255, 0.95)');
         }
         if (ai.t <= 0) ai.mode = 'walk';
@@ -192,7 +198,8 @@
     e.y += e.ky * dt;
     e.kx -= e.kx * Math.min(1, dt * 9);
     e.ky -= e.ky * Math.min(1, dt * 9);
-    if (!e.lift && d < e.r + p.r) G.damagePlayer(game, e.damage, e);
+    // 몸통 판정은 그림보다 조금 작게 (스치기만 해도 맞지 않게)
+    if (!e.lift && d < e.r * 0.75 + p.r) G.damagePlayer(game, e.damage, e);
   };
 
   G.updateBossFx = function (game, dt) {

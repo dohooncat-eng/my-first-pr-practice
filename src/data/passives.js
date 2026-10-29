@@ -1,4 +1,4 @@
-// 패시브 데이터: 기본 패시브 10개(레벨 1~5) + 패시브 조합 3개
+// 패시브 데이터: 기본 패시브 15개(레벨 1~5) + 패시브 조합 3개
 // apply(s, lv)는 스탯 묶음 s에 그 레벨만큼의 효과를 더한다 (G.recalcStats가 매번 처음부터 계산).
 (function (G) {
   'use strict';
@@ -19,6 +19,11 @@
     area: { name: '넓은 빛', desc: '공격 범위 +10%', apply(s, lv) { s.area += 0.1 * lv; } },
     amount: { name: '쌍둥이 심지', desc: 'Lv 1·3·5에 투사체 +1', apply(s, lv) { s.amount += AMOUNT_BY_LEVEL[lv]; } },
     luck: { name: '별의 가호', desc: '치명타 확률 +4%, 상자에서 더 많이 강화', apply(s, lv) { s.crit += 0.04 * lv; s.luck += 0.12 * lv; } },
+    wick: { name: '오래 타는 심지', desc: '덫·웅덩이·회오리 같은 효과가 12% 더 오래갑니다', apply(s, lv) { s.duration += 0.12 * lv; } },
+    keeneye: { name: '날카로운 눈', desc: '치명타 피해 +15%', apply(s, lv) { s.critMult += 0.15 * lv; } },
+    lore: { name: '배움의 등불', desc: '경험치 +8%', apply(s, lv) { s.xpMul += 0.08 * lv; } },
+    cloak: { name: '그림자 망토', desc: '공격을 피할 확률 +4%', apply(s, lv) { s.dodge += 0.04 * lv; } },
+    rage: { name: '분노의 불씨', desc: '체력이 절반 아래일 때 모든 피해 +8%', apply(s, lv) { s.rage += 0.08 * lv; } },
   };
 
   // 패시브 조합: 재료 두 개(둘 다 Lv 5)를 합친 것. 재료의 Lv 5 효과 + 추가 효과를 모두 담는다.

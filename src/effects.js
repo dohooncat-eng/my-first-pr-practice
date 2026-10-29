@@ -158,7 +158,7 @@
   };
 
   // 데미지 숫자: 글자를 스타일마다 한 번 그려 둔 판에서 잘라 찍는다 (매 프레임 글자를 그리면 느리다)
-  const GLYPHS = '0123456789+G';
+  const GLYPHS = '0123456789+GMIS';
   const NUM_STYLES = ['', 'big', 'soft', 'crit', 'heal'];
   const NUM_COLORS = ['#fff6e4', '#ffd27a', '#ffcf8a', '#ff8a5c', '#8affb0'];
   const BAKE = 40, PAD = 6;

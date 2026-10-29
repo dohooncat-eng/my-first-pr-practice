@@ -14,7 +14,7 @@
       maxHp: 100, speed: 1, damage: 1, cooldown: 1, magnet: 85, area: 1, amount: 0,
       armor: 0, regen: 0, luck: 1, crit: 0.05, critMult: 1.5, xpMul: 1, revive: 0,
       choices: 3, retaliate: 0, extraWeapon: 0,
-      goldMul: 1, startLevel: 0, rerolls: 0, chestBonus: 0,
+      goldMul: 1, startLevel: 0, rerolls: 0, chestBonus: 0, duration: 1, dodge: 0, rage: 0,
     };
   };
 
@@ -48,6 +48,7 @@
     p.fusions.forEach((k) => G.FUSIONS[k].apply(s));
     s.armor = Math.min(0.75, s.armor);
     s.crit = Math.min(0.9, s.crit);
+    s.dodge = Math.min(0.4, s.dodge);
     const oldMax = p.maxHp;
     p.stats = s;
     p.baseSpeed = champ.base.speed;
@@ -80,6 +81,12 @@
   G.damagePlayer = function (game, amount, source) {
     const p = game.player;
     if (p.invuln > 0 || p.hp <= 0) return;
+    // 그림자 망토: 확률로 피한다 (잠깐 무적)
+    if (p.stats.dodge > 0 && Math.random() < p.stats.dodge) {
+      p.invuln = 0.3;
+      G.addDamageNumber(game, p.x, p.y - 34, 'MISS', 'soft');
+      return;
+    }
     const dmg = amount * (1 - p.stats.armor);
     p.hp = Math.max(0, p.hp - dmg);
     p.invuln = 0.45;

@@ -76,7 +76,7 @@
     G.addWeapon(p, champ.weapon, champ.weaponLevel || 1);
     // 반딧불 마녀 각성: 무기 하나를 더 들고 시작
     if (p.stats.extraWeapon) {
-      const options = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k) && !p.weapons.some((w) => w.key === k));
+      const options = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k) && G.isItemUnlocked('weapon', k) && !p.weapons.some((w) => w.key === k));
       G.addWeapon(p, G.pick(options), 1);
     }
     // 가챠 첫걸음: 높은 레벨로 시작하고, 그만큼 카드를 먼저 고른다
@@ -127,7 +127,7 @@
     s.doubled = true;
     return G.ads.rewarded('double_gold').then((ok) => {
       if (!ok) { s.doubled = false; return 0; }
-      G.meta.gold += s.gold;
+      G.addCurrency('gold', s.gold);
       G.saveMeta();
       return s.gold;
     });
@@ -493,7 +493,7 @@
         Object.keys(p.passives).forEach((k) => { p.passives[k] = G.PASSIVE_MAX; });
         G.recalcStats(game);
         break;
-      case 'KeyG': G.meta.gold += 1000; G.saveMeta(); break;
+      case 'KeyG': G.addCurrency('gold', 1000); G.saveMeta(); break;
       default: break;
     }
   }

@@ -756,7 +756,7 @@
     w.timer -= dt;
     if (w.timer > 0) return;
     G.spawnPools(game, fx, G.amount(game, s.count), {
-      radius: G.area(game, s.radius), dmg: s.dmg, duration: s.duration, tick: s.tick, slow: s.slow, look,
+      radius: G.area(game, s.radius), dmg: s.dmg, duration: G.dur(game, s.duration), tick: s.tick, slow: s.slow, look,
     });
     G.sfx && G.sfx.play('bubble');
     w.timer = G.cd(game, s.cd);

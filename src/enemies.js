@@ -49,6 +49,8 @@
     if (e.dead) return false;
     const s = game.player.stats;
     let dmg = base * s.damage * G.rand(0.9, 1.1);
+    // 분노의 불씨: 체력이 절반 아래면 피해 증가
+    if (s.rage > 0 && game.player.hp < game.player.maxHp * 0.5) dmg *= 1 + s.rage;
     const crit = !soft && Math.random() < s.crit;
     if (crit) dmg *= s.critMult;
     dmg = Math.max(1, Math.round(dmg));

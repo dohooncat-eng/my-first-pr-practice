@@ -43,7 +43,7 @@
     if (!keys.length) {
       // 3성을 모두 모았다: 별빛 결정으로
       const c = G.GACHA.refund[3].crystals;
-      G.meta.crystals += c;
+      G.addCurrency('crystals', c);
       return { key: null, star: 3, name: '별빛 결정 ' + c, icon: 'crystal', from: 0, to: 0, isNew: false, refund: { crystals: c } };
     }
     const key = G.pick(keys);
@@ -51,7 +51,7 @@
     const from = g.items[key] || 0;
     if (from >= it.max) {
       const gold = G.GACHA.refund[star].gold;
-      G.meta.gold += gold;
+      G.addCurrency('gold', gold);
       return { key, star, name: it.name, icon: it.icon, from, to: from, isNew: false, refund: { gold } };
     }
     g.items[key] = from + 1;

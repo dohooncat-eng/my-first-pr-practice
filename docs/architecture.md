@@ -129,3 +129,12 @@ src/ui/hud.js  src/ui/screens.js  src/game.js  src/main.js
 - 데미지 숫자는 글자판을 미리 구워 `drawImage`로 찍는다(최대 60개). 파티클 최대 300, 결정 빛 번짐 최대 120.
 - 적끼리 밀어내기는 화면 근처 적만, 한 마리당 2프레임에 한 번 계산한다.
 - `game.render()`는 테스트·성능 측정용으로 열어 둔 그리기 함수다.
+
+# 4차 업데이트: 무기·패시브 5+5, 스테이지 해금, 쿠폰, 재화 한도
+
+- 새 무기(기본, Lv 1~5): `trap` 그림자 덫 · `lance` 빛의 창 · `moth` 달나방 떼 · `tornado` 회오리 · `whip` 불꽃 채찍. 진화: `helltrap`(덫+`wick`) · `judgment`(창+`keeneye`) · `mothswarm`(나방+`lore`) · `tempest`(회오리+`cloak`) · `dragonwhip`(채찍+`rage`). 수치는 `src/data/weapons.js`, 동작은 `src/systems/weapons/new2.js`.
+- 새 패시브: `wick`(지속 시간 `stats.duration`) · `keeneye`(치명타 피해) · `lore`(경험치) · `cloak`(피하기 `stats.dodge`, 최대 40%) · `rage`(체력 50% 미만일 때 피해 `stats.rage`).
+- 지속 시간은 `G.dur(game, t)`로 반영한다(덫 수명, 웅덩이, 회오리, 불길).
+- 스테이지 해금: `stage.unlocks = ['weapon:키' | 'passive:키']`, `G.isItemUnlocked(kind, key)`, `G.stageUnlockNames(stageId)` → 이름 목록. 처음부터 쓸 수 있는 것은 무기 6·패시브 6, 늪 6개·폐허 6개·심연 5개.
+- 재화: `G.CURRENCY_MAX = { gold: 9999999, crystals: 99999 }`, 늘릴 때는 항상 `G.addCurrency(kind, n)`.
+- 쿠폰: `G.COUPONS`(`src/data/store.js`), `G.redeemCoupon(code)` → `{ ok, reason: 'invalid' | 'used', granted: { gold, crystals }, gold, crystals }`. 저장 데이터마다 코드당 1번(`G.meta.coupons`).

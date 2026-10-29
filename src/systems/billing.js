@@ -23,9 +23,9 @@
     const out = { crystals: 0, gold: 0, tickets2: 0, noAds: false, passDays: 0 };
     if (g.crystals) {
       out.crystals = g.crystals * (product.firstBonus && bought === 0 ? 2 : 1);
-      m.crystals += out.crystals;
+      G.addCurrency('crystals', out.crystals);
     }
-    if (g.gold) { out.gold = g.gold; m.gold += g.gold; }
+    if (g.gold) { out.gold = g.gold; G.addCurrency('gold', g.gold); }
     if (g.tickets2) { out.tickets2 = g.tickets2; m.gacha.tickets2 += g.tickets2; }
     if (g.noAds) { out.noAds = true; m.noAds = true; }
     if (g.passDays) {
@@ -83,7 +83,7 @@
       const ex = G.STORE.exchange;
       if (G.meta.crystals < ex.crystals) return false;
       G.meta.crystals -= ex.crystals;
-      G.meta.gold += ex.gold;
+      G.addCurrency('gold', ex.gold);
       G.saveMeta();
       return true;
     },
@@ -99,7 +99,7 @@
       const s = G.store.passStatus();
       if (!s.active || s.claimedToday) return 0;
       G.meta.pass.lastClaim = G.dayNumber();
-      G.meta.crystals += G.STORE.passDaily;
+      G.addCurrency('crystals', G.STORE.passDaily);
       G.saveMeta();
       return G.STORE.passDaily;
     },

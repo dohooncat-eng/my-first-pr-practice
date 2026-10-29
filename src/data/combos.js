@@ -12,6 +12,11 @@
     { type: 'evolve', result: 'garden', weapon: 'poison', passive: 'regen' },
     { type: 'evolve', result: 'starfall', weapon: 'meteor', passive: 'luck' },
     { type: 'evolve', result: 'earthbell', weapon: 'bell', passive: 'armor' },
+    { type: 'evolve', result: 'helltrap', weapon: 'trap', passive: 'wick' },
+    { type: 'evolve', result: 'judgment', weapon: 'lance', passive: 'keeneye' },
+    { type: 'evolve', result: 'mothswarm', weapon: 'moth', passive: 'lore' },
+    { type: 'evolve', result: 'tempest', weapon: 'tornado', passive: 'cloak' },
+    { type: 'evolve', result: 'dragonwhip', weapon: 'whip', passive: 'rage' },
 
     { type: 'union', result: 'thunderbolt', weapons: ['bolt', 'chain'] },
     { type: 'union', result: 'twinmoon', weapons: ['sword', 'scythe'] },
