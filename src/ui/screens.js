@@ -346,6 +346,7 @@
     m.settings = m.settings || {};
     const s = m.settings;
     if (typeof s.sfx !== 'number') s.sfx = 0.7;
+    if (typeof s.music !== 'number') s.music = 0.5;
     if (typeof s.shake !== 'boolean') s.shake = true;
     if (typeof s.numbers !== 'boolean') s.numbers = true;
     if (typeof s.fps !== 'boolean') s.fps = false;
@@ -359,6 +360,9 @@
     const v = Math.round(s.sfx * 100);
     $('set-sfx').value = v;
     $('set-sfx-out').textContent = v;
+    const mv = Math.round(s.music * 100);
+    $('set-music').value = mv;
+    $('set-music-out').textContent = mv;
     $('set-shake').checked = s.shake;
     $('set-numbers').checked = s.numbers;
     $('set-fps').checked = s.fps;
@@ -391,6 +395,13 @@
       $('set-sfx-out').textContent = e.target.value;
     });
     $('set-sfx').addEventListener('change', () => { saveSettings(); sfx('gem'); });
+    // 배경 음악은 끌어도 바로 들리게 input에서 반영하고, 놓았을 때 저장
+    $('set-music').addEventListener('input', (e) => {
+      s().music = Number(e.target.value) / 100;
+      $('set-music-out').textContent = e.target.value;
+      if (G.music) G.music.refreshVolume();
+    });
+    $('set-music').addEventListener('change', () => { saveSettings(); });
     $('set-shake').addEventListener('change', (e) => { s().shake = e.target.checked; saveSettings(); sfx('click'); });
     $('set-numbers').addEventListener('change', (e) => { s().numbers = e.target.checked; saveSettings(); sfx('click'); });
     $('set-fps').addEventListener('change', (e) => { s().fps = e.target.checked; saveSettings(); sfx('click'); });

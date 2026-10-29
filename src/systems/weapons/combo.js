@@ -229,7 +229,7 @@
       }
       st.flash = 0.14;
       G.addShake(game, 1.8);
-      G.sfx && G.sfx.play('shoot');
+      G.sfx && G.sfx.play('zap');
       w.timer = G.cd(game, s.cd);
     },
     over(ctx, game, w) { G.drawBolts(ctx, w.state.bolts || []); },

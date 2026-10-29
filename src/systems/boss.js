@@ -25,6 +25,8 @@
     const hasBatchim = (bt.name.charCodeAt(bt.name.length - 1) - 0xac00) % 28 !== 0;
     G.announce(game, bt.name + (hasBatchim ? '이' : '가') + ' 나타났습니다!');
     G.addShake(game, 10);
+    G.screenFlash(game, '200, 40, 50', 0.28, 0.9);
+    G.ring(game, e.x, e.y, 20, 260, 0.9, 'rgba(255, 80, 80, 0.9)', 6);
     if (G.sfx) G.sfx.play('boss');
     return e;
   };
@@ -32,9 +34,11 @@
   // ---------- 경고 표시와 보스 탄 ----------
   function telegraphCircle(game, x, y, r, delay, dmg, onEnd) {
     game.telegraphs.push({ kind: 'circle', x, y, r, life: delay, max: delay, dmg, onEnd });
+    if (G.sfx) G.sfx.play('warn');
   }
   function telegraphLine(game, x, y, angle, len, width, delay) {
     game.telegraphs.push({ kind: 'line', x, y, angle, len, width, life: delay, max: delay });
+    if (G.sfx) G.sfx.play('warn');
   }
 
   G.fireEnemyBullet = function (game, x, y, angle, speed, dmg, color) {
@@ -44,6 +48,7 @@
 
   function ring(game, e, n, speed, dmg, color, offset) {
     for (let i = 0; i < n; i++) G.fireEnemyBullet(game, e.x, e.y - 10, (offset || 0) + (i / n) * Math.PI * 2, speed, dmg, color);
+    if (G.sfx) G.sfx.play('bossShot');
   }
 
   // ---------- 패턴 ----------
@@ -195,6 +200,7 @@
       t.life -= dt;
       if (t.life <= 0) {
         t.dead = true;
+        if (t.kind === 'circle') G.ring(game, t.x, t.y, t.r * 0.3, t.r * 1.15, 0.35, 'rgba(255, 120, 90, 0.85)', 5);
         if (t.kind === 'circle' && t.dmg) {
           const dx = p.x - t.x, dy = p.y - t.y;
           if (dx * dx + dy * dy < (t.r + p.r) * (t.r + p.r)) G.damagePlayer(game, t.dmg);
@@ -227,8 +233,11 @@
     G.burst(game, e.x, e.y, G.BOSS_TYPES[e.type].color, 50, 340);
     G.burst(game, e.x, e.y, 'rgba(255, 210, 120, 0.95)', 40, 300, true);
     G.addShake(game, 14);
+    G.screenFlash(game, '255, 240, 210', 0.45, 0.6);
+    G.ring(game, e.x, e.y, 20, 340, 0.8, 'rgba(255, 220, 150, 0.95)', 8);
+    G.ring(game, e.x, e.y, 10, 200, 0.6, 'rgba(255, 255, 240, 0.9)', 4);
     G.announce(game, e.name + ' 처치! 상자를 떨어뜨렸습니다');
-    if (G.sfx) G.sfx.play('kill');
+    if (G.sfx) G.sfx.play('bossDie');
   };
 
   // ---------- 그리기 ----------

@@ -425,6 +425,7 @@
           m.done = true;
           m.boom = BOOM;
           G.hitCircle(game, m.x, m.y, m.r, m.dmg, { knock: 260 });
+          if (G.sfx) G.sfx.play('impact');
           G.burst(game, m.x, m.y, m.blue ? 'rgba(170, 210, 255, 0.95)' : 'rgba(255, 170, 80, 0.95)', 10, 260, true);
           G.burst(game, m.x, m.y, 'rgba(70, 58, 46, 0.85)', 6, 120, false);
           G.addShake(game, m.look === 'star' ? 2.2 : 3);
@@ -680,7 +681,7 @@
     if (look === 'earth') G.burst(game, p.x, p.y + 10, 'rgba(120, 90, 60, 0.85)', 10, 180, false);
     st.ring = 0.5;
     G.addShake(game, look === 'earth' ? 3 : 1.5);
-    G.sfx && G.sfx.play('select');
+    G.sfx && G.sfx.play('gong');
     w.timer = G.cd(game, s.cd);
   };
 
@@ -709,7 +710,7 @@
         G.burst(game, t.x, t.y - 6, 'rgba(160, 210, 255, 0.9)', 4, 140, true);
       }
       G.addShake(game, 1);
-      G.sfx && G.sfx.play('shoot');
+      G.sfx && G.sfx.play('zap');
       w.timer = G.cd(game, s.cd);
     },
     over(ctx, game, w) { G.drawBolts(ctx, w.state.bolts || []); },
@@ -734,7 +735,7 @@
       const a = around ? base + (i / count) * TAU : base + (i - (count - 1) / 2) * spread;
       G.throwBlade(game, fx, { angle: a, dmg: s.dmg, range: G.area(game, s.range), speed: s.speed, scale, look });
     }
-    G.sfx && G.sfx.play('slash');
+    G.sfx && G.sfx.play('whoosh');
   };
 
   G.defineWeapon('scythe', {
@@ -757,6 +758,7 @@
     G.spawnPools(game, fx, G.amount(game, s.count), {
       radius: G.area(game, s.radius), dmg: s.dmg, duration: s.duration, tick: s.tick, slow: s.slow, look,
     });
+    G.sfx && G.sfx.play('bubble');
     w.timer = G.cd(game, s.cd);
   };
 
@@ -772,7 +774,6 @@
     w.timer -= dt;
     if (w.timer > 0) return;
     G.dropMeteors(game, fx, G.amount(game, s.count), { radius: G.area(game, s.radius), dmg: s.dmg, delay: s.delay, look });
-    G.sfx && G.sfx.play('shoot');
     w.timer = G.cd(game, s.cd);
   };
 

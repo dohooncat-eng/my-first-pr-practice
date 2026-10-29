@@ -43,6 +43,7 @@
       if (G.sfx) G.sfx.play('coin');
     } else if (it.kind === 'chest') {
       game.pendingChests++;
+      if (G.sfx) G.sfx.play('pickupChest');
     } else {
       for (const g of game.gems) g.pull = true;
       G.announce(game, '끌림의 부적! 결정이 모여듭니다');
@@ -59,6 +60,7 @@
         g.dead = true;
         G.gainXp(game, g.value);
         game.gemSparkle = 0.12;
+        if (game.particles.length < 380) G.burst(game, p.x, p.y - 6, ['rgba(127, 212, 255, 0.9)', 'rgba(94, 240, 180, 0.9)', 'rgba(199, 139, 255, 0.9)'][g.tier], 1, 70, true);
         if (G.sfx) G.sfx.play('gem');
       }
     }

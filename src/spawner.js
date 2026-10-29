@@ -45,6 +45,7 @@
         const name = G.ENEMY_TYPES[roster[role]].name;
         const hasBatchim = (name.charCodeAt(name.length - 1) - 0xac00) % 28 !== 0;
         G.announce(game, '강한 ' + name + (hasBatchim ? '이' : '가') + ' 다가옵니다');
+        if (G.sfx) G.sfx.play('elite');
       }
     }
 
@@ -58,6 +59,7 @@
         G.spawnEnemy(game, roster.fast, game.player.x + Math.cos(a) * r, game.player.y + Math.sin(a) * r, false);
       }
       G.announce(game, G.ENEMY_TYPES[roster.fast].name + ' 떼가 몰려옵니다!');
+      if (G.sfx) G.sfx.play('swarm');
     }
 
     if (d.bossIndex < G.BOSS_TIMES.length && t >= G.BOSS_TIMES[d.bossIndex]) {

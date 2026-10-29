@@ -55,7 +55,15 @@
     e.kx += (kx || 0) * resist;
     e.ky += (ky || 0) * resist;
     G.addDamageNumber(game, e.x, e.y - e.r - 4, dmg, crit ? 'crit' : soft ? 'soft' : dmg >= 30 ? 'big' : '');
-    if (!soft && G.sfx) G.sfx.play('hit');
+    if (!soft) {
+      if (crit) {
+        G.burst(game, e.x, e.y - e.r * 0.4, 'rgba(255, 170, 110, 0.95)', 5, 200, true);
+        if (G.sfx) G.sfx.play('crit');
+      } else if (Math.random() < 0.35) {
+        G.burst(game, e.x, e.y - e.r * 0.4, 'rgba(255, 240, 210, 0.9)', 2, 140, true);
+      }
+      if (G.sfx) G.sfx.play('hit');
+    }
     if (e.hp <= 0) {
       G.killEnemy(game, e);
       return true;
@@ -71,6 +79,7 @@
     const gemScale = 1 + Math.floor(game.time / 180) * 0.25;
     G.dropGem(game, e.x, e.y, e.xp * gemScale);
     G.burst(game, e.x, e.y, t.color, e.elite ? 26 : 7, e.elite ? 260 : 150);
+    if (game.rings.length < 30) G.ring(game, e.x, e.y, e.r * 0.4, e.r * (e.elite ? 3.2 : 1.9), e.elite ? 0.45 : 0.28, 'rgba(255, 236, 200, 0.7)', e.elite ? 5 : 2.5);
     if (G.sfx) G.sfx.play('kill');
     if (e.elite) {
       G.burst(game, e.x, e.y, 'rgba(255, 150, 70, 0.9)', 16, 220, true);

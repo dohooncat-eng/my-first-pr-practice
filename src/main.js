@@ -35,6 +35,7 @@
     game.state = 'menu';
     G.ui.setLoading(1, true);
     G.ui.showTitle();
+    if (G.music) G.music.play('title');
   });
 
   game.run();

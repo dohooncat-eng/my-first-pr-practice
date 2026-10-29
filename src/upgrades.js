@@ -38,14 +38,23 @@
       else if (lv === 0 && passiveSlotFree) pool.push({ kind: 'passive', key, level: 1, weight: 0.9 });
     });
 
-    const choices = [];
-    while (choices.length < n && pool.length) {
-      const total = pool.reduce((s, c) => s + c.weight, 0);
+    // 가중치로 하나 뽑아 목록에서 뺀다
+    function draw(list) {
+      const total = list.reduce((s, c) => s + c.weight, 0);
       let r = Math.random() * total;
       let i = 0;
-      while (i < pool.length - 1 && r > pool[i].weight) { r -= pool[i].weight; i++; }
-      choices.push(pool.splice(i, 1)[0]);
+      while (i < list.length - 1 && r > list[i].weight) { r -= list[i].weight; i++; }
+      const c = list.splice(i, 1)[0];
+      pool.splice(pool.indexOf(c), 1);
+      return c;
     }
+
+    const choices = [];
+    // 가진 무기·패시브 중 올릴 수 있는 게 있으면 하나는 반드시 들어간다
+    const owned = pool.filter((c) => c.level > 1);
+    if (owned.length) choices.push(draw(owned));
+    while (choices.length < n && pool.length) choices.push(draw(pool.slice()));
+    G.shuffle(choices);
     // 더 올릴 게 없으면 회복·금화
     if (choices.length < n) choices.push({ kind: 'heal', key: 'heal', level: 0 });
     if (choices.length < n) choices.push({ kind: 'gold', key: 'gold', level: 0 });

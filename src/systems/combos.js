@@ -47,6 +47,8 @@
     const info = G.comboResultInfo(c);
     G.announce(game, info.typeLabel + '! ' + info.name);
     G.burst(game, p.x, p.y, 'rgba(255, 210, 120, 0.95)', 46, 320, true);
+    G.ring(game, p.x, p.y, 10, 300, 0.8, 'rgba(255, 214, 130, 0.95)', 8);
+    G.screenFlash(game, '255, 220, 150', 0.35, 0.6);
     G.addShake(game, 6);
     return info;
   };

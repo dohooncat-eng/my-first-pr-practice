@@ -34,6 +34,34 @@
     game.shake = Math.min(14, game.shake + amount);
   };
 
+  // 퍼져 나가는 빛 고리 (가산 합성으로 그린다)
+  const MAX_RINGS = 40;
+  G.ring = function (game, x, y, r0, r1, life, color, width) {
+    if (game.rings.length >= MAX_RINGS) game.rings.shift();
+    game.rings.push({ x, y, r0, r1, life, max: life, color, width: width || 4 });
+  };
+
+  // 화면 전체가 잠깐 물드는 효과 (rgb는 '255, 210, 120' 형식)
+  G.screenFlash = function (game, rgb, alpha, life) {
+    if (game.reducedMotion) alpha *= 0.4;
+    game.flash = { rgb, alpha, life, max: life };
+  };
+
+  // 레벨업 선택 직후: 금빛 충격파가 주변 적을 밀어낸다
+  G.levelUpBlast = function (game) {
+    const p = game.player;
+    G.ring(game, p.x, p.y, 10, 240, 0.55, 'rgba(255, 214, 130, 0.95)', 7);
+    G.ring(game, p.x, p.y, 10, 150, 0.4, 'rgba(255, 245, 210, 0.9)', 3);
+    G.burst(game, p.x, p.y - 10, 'rgba(255, 210, 120, 0.95)', 24, 260, true);
+    G.screenFlash(game, '255, 214, 140', 0.18, 0.35);
+    for (const e of G.enemiesInCircle(game, p.x, p.y, 200, [])) {
+      const dx = e.x - p.x, dy = e.y - p.y;
+      const k = (e.boss ? 60 : 520) / (Math.hypot(dx, dy) || 1);
+      e.kx += dx * k;
+      e.ky += dy * k;
+    }
+  };
+
   G.announce = function (game, text) {
     game.banner = { text, life: 2.8, max: 2.8 };
   };
@@ -56,11 +84,58 @@
     }
     G.compact(game.particles);
 
+    for (const r of game.rings) {
+      r.life -= dt;
+      if (r.life <= 0) r.dead = true;
+    }
+    G.compact(game.rings);
+    if (game.flash) {
+      game.flash.life -= dt;
+      if (game.flash.life <= 0) game.flash = null;
+    }
+
+    // 발걸음 먼지
+    const p = game.player;
+    if (p && p.moving) {
+      game.dustTimer = (game.dustTimer || 0) - dt;
+      if (game.dustTimer <= 0 && game.particles.length < MAX_PARTICLES - 40) {
+        game.dustTimer = 0.16;
+        const dust = game.stage && game.stage.dust || 'rgba(120, 110, 90, 0.5)';
+        for (let i = 0; i < 2; i++) {
+          game.particles.push({
+            x: p.x + G.rand(-6, 6), y: p.y + 13, vx: -p.face.x * G.rand(10, 40) + G.rand(-15, 15), vy: G.rand(-18, -4),
+            life: 0.45, max: 0.45, size: G.rand(2, 3.5), color: dust, glow: false,
+          });
+        }
+      }
+    }
+
     game.shake = Math.max(0, game.shake - dt * 30);
     if (game.banner) {
       game.banner.life -= dt;
       if (game.banner.life <= 0) game.banner = null;
     }
+  };
+
+  G.drawRings = function (ctx, game) {
+    for (const r of game.rings) {
+      const t = 1 - r.life / r.max;
+      const ease = 1 - (1 - t) * (1 - t);
+      ctx.globalAlpha = (1 - t) * 0.9;
+      ctx.strokeStyle = r.color;
+      ctx.lineWidth = r.width * (1 - t * 0.6);
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.r0 + (r.r1 - r.r0) * ease, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  };
+
+  G.drawScreenFlash = function (ctx, game) {
+    const f = game.flash;
+    if (!f) return;
+    ctx.fillStyle = 'rgba(' + f.rgb + ', ' + (f.alpha * f.life / f.max) + ')';
+    ctx.fillRect(0, 0, game.w, game.h);
   };
 
   G.drawParticles = function (ctx, game, glowPass) {

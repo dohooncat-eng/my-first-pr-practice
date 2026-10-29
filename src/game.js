@@ -17,6 +17,13 @@
   };
 
   const AUTOSAVE_EVERY = 10;
+
+  // 배경 음악 (오디오가 없거나 막혀 있어도 게임은 그대로)
+  function music(fn, arg) {
+    if (G.music && typeof G.music[fn] === 'function') {
+      try { G.music[fn](arg); } catch (e) { /* 소리 실패는 무시 */ }
+    }
+  }
   const SAVE_STATES = ['playing', 'paused', 'levelup', 'chest'];
 
   function resetWorld(stageId, championId) {
@@ -30,6 +37,9 @@
     game.items = [];
     game.particles = [];
     game.numbers = [];
+    game.rings = [];
+    game.flash = null;
+    game.heartbeat = 0;
     game._visEnemies = [];
     game.grid = new G.SpatialGrid(64);
     game.director = G.createDirector();
@@ -41,6 +51,7 @@
     game.shake = 0;
     game.banner = null;
     game.boss = null;
+    game.bossMusic = false;
     game.retaliateFx = 0;
     game.autosave = AUTOSAVE_EVERY;
     game.cam.x = 0;
@@ -65,6 +76,9 @@
     G.input.clear();
     game.state = 'playing';
     G.ui.hideAll();
+    music('play', game.stage.id);
+    music('setBoss', false);
+    music('duck', false);
     G.announce(game, game.stage.name + ' · 20분을 버티세요');
     G.saveRun(game);
   };
@@ -76,6 +90,8 @@
     G.restoreRun(game, d);
     G.input.clear();
     game.state = 'paused';
+    music('play', game.stage.id);
+    music('duck', true);
     G.ui.showPause(game);
     return true;
   };
@@ -87,6 +103,7 @@
     game.state = 'paused';
     G.input.clear();
     G.saveRun(game);
+    music('duck', true);
     G.ui.showPause(game);
   };
 
@@ -107,6 +124,9 @@
   game.toTitle = function () {
     game.state = 'menu';
     G.input.clear();
+    music('setBoss', false);
+    music('duck', false);
+    music('play', 'title');
     G.ui.showTitle();
   };
 
@@ -116,6 +136,7 @@
     else if (game.pendingLevelUps > 0) openLevelUp();
     else {
       game.state = 'playing';
+      music('duck', false);
       G.ui.hideAll();
     }
   }
@@ -123,10 +144,13 @@
   function openLevelUp() {
     game.state = 'levelup';
     G.input.clear();
+    music('duck', true);
     const choices = G.buildChoices(game, game.player.stats.choices);
     G.ui.showLevelUp(game, choices, (c) => {
       G.applyChoice(game, c);
       game.pendingLevelUps--;
+      // 선택하고 돌아오면 금빛 충격파가 주변 적을 밀어낸다
+      if (game.pendingLevelUps === 0) G.levelUpBlast(game);
       continueAfterModal();
     });
   }
@@ -134,6 +158,7 @@
   function openChest() {
     game.state = 'chest';
     G.input.clear();
+    music('duck', true);
     game.pendingChests--;
     const result = G.openChest(game);
     G.ui.showChest(game, result, continueAfterModal);
@@ -141,6 +166,9 @@
 
   function endRun(win) {
     game.state = 'end';
+    music('setBoss', false);
+    music('stinger', win ? 'victory' : 'defeat');
+    music('play', 'title');
     const settle = G.settleRun(game, win);
     G.clearRun();
     const p = game.player;
@@ -166,6 +194,14 @@
     G.updatePickups(game, dt);
     G.updateEffects(game, dt);
     game.retaliateFx = Math.max(0, game.retaliateFx - dt);
+
+    music('setIntensity', game.time / G.WIN_TIME);
+    const bossNow = !!game.boss;
+    if (bossNow !== game.bossMusic) { game.bossMusic = bossNow; music('setBoss', bossNow); }
+    if (p.hp > 0 && p.hp / p.maxHp < 0.3) {
+      game.heartbeat -= dt;
+      if (game.heartbeat <= 0) { game.heartbeat = 0.85; if (G.sfx) G.sfx.play('lowhp'); }
+    }
 
     const k = Math.min(1, dt * 8);
     game.cam.x += (p.x - game.cam.x) * k;
@@ -301,6 +337,7 @@
     G.drawWeaponGlow(ctx, game);
     G.drawEnemyGlow(ctx, game);
     G.drawEnemyBulletGlow(ctx, game);
+    G.drawRings(ctx, game);
     G.drawParticles(ctx, game, true);
     ctx.globalCompositeOperation = 'source-over';
 
@@ -320,6 +357,7 @@
       ctx.fillRect(0, 0, w, h);
     }
 
+    G.drawScreenFlash(ctx, game);
     if (HUD_STATES.indexOf(game.state) !== -1) G.drawHUD(ctx, game);
   }
 
