@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+<defs>
+<linearGradient id="stage_mine-cave" x1="0.1" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#101b20"/><stop offset="0.3333333333333333" stop-color="#292421"/><stop offset="0.6666666666666666" stop-color="#3b281e"/><stop offset="1" stop-color="#111715"/></linearGradient>
+<linearGradient id="stage_mine-rock" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#344047"/><stop offset="0.5" stop-color="#272a2b"/><stop offset="1" stop-color="#171b1c"/></linearGradient>
+<linearGradient id="stage_mine-timber" x1="1" y1="0" x2="0" y2="0.2"><stop offset="0" stop-color="#6e4e32"/><stop offset="0.5" stop-color="#3d3026"/><stop offset="1" stop-color="#1d2221"/></linearGradient>
+<linearGradient id="stage_mine-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#372b21"/><stop offset="0.5" stop-color="#1b201e"/><stop offset="1" stop-color="#0c1414"/></linearGradient>
+<linearGradient id="stage_mine-molten" x1="0" y1="0" x2="0.1" y2="1"><stop offset="0" stop-color="#fff0ad"/><stop offset="0.3333333333333333" stop-color="#ffcf6a"/><stop offset="0.6666666666666666" stop-color="#f28739"/><stop offset="1" stop-color="#833a24"/></linearGradient>
+<radialGradient id="stage_mine-heat"><stop offset="0" stop-color="#ffb45f" stop-opacity="0.28"/><stop offset="0.55" stop-color="#ef733b" stop-opacity="0.11"/><stop offset="1" stop-color="#c65b34" stop-opacity="0"/></radialGradient>
+<radialGradient id="stage_mine-cool"><stop offset="0" stop-color="#8baac0" stop-opacity="0.14"/><stop offset="1" stop-color="#67909c" stop-opacity="0"/></radialGradient>
+<linearGradient id="stage_mine-bottom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#080f10" stop-opacity="0"/><stop offset="0.48" stop-color="#080f10" stop-opacity="0"/><stop offset="0.6" stop-color="#080f10" stop-opacity="0.44"/><stop offset="0.76" stop-color="#080f10" stop-opacity="0.87"/><stop offset="1" stop-color="#080f10"/></linearGradient>
+<radialGradient id="stage_mine-vignette" cx="57%" cy="45%" r="72%"><stop offset="0.38" stop-color="#050d0e" stop-opacity="0"/><stop offset="1" stop-color="#050d0e" stop-opacity="0.83"/></radialGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M0 0H640V360H0Z" fill="url(#stage_mine-cave)" />
+<ellipse cx="438" cy="156" rx="216" ry="142" fill="url(#stage_mine-heat)"/>
+<ellipse cx="172" cy="71" rx="190" ry="154" fill="url(#stage_mine-cool)"/>
+<path d="M0 0H640V69L604 66 577 83 547 72 523 87 496 55 472 64 447 43 414 48 396 33 360 51 334 41 300 64 266 51 236 73 211 56 184 79 152 70 119 90 80 77 47 108 0 114Z" fill="#151e21" />
+<path d="M0 0H640V22L584 38 568 29 537 38 516 24 481 33 450 18 421 26 390 16 362 35 331 28 298 41 270 31 242 45 209 35 187 48 159 37 126 57 89 47 62 68 24 62 0 80Z" fill="#283236" />
+<path d="M56 51L85 45 104 67 94 103 80 78 67 82Z" fill="#1a2428" />
+<path d="M222 40L243 44 239 81 232 68Z" fill="#1d282b" />
+<path d="M515 24L536 38 528 73 521 55Z" fill="#242b2b" />
+<path d="M98 38L127 27 149 35M264 20L289 27 303 20M361 20L376 11 393 18" fill="none" stroke="#536364" stroke-width="1.5" opacity="0.34"/>
+<path d="M267 165L275 81 298 67 316 77 325 162Z" fill="#302a24" />
+<path d="M279 84L297 72 307 80 305 162 280 161Z" fill="#222625" />
+<path d="M320 158L329 69 359 55 400 61 432 91 435 169Z" fill="#4e3524" />
+<path d="M340 149L345 83Q369 61 396 83L410 109 408 160Z" fill="#1b1d1b" />
+<path d="M357 139L359 101Q375 79 391 99L396 141Z" fill="#743c24" />
+<path d="M365 139L365 109Q376 91 385 107L389 141Z" fill="url(#stage_mine-molten)" />
+<path d="M355 77L366 72 387 75M330 108L341 106M408 97L418 103" fill="none" stroke="#ad6f3a" stroke-width="2" opacity="0.45"/>
+<path d="M451 71L480 65 496 85 494 155 461 164 442 144Z" fill="#443226" />
+<path d="M460 78L477 72 484 90 480 149 460 151Z" fill="#543926" />
+<path d="M460 79L477 74 481 85" fill="none" stroke="#ab6c37" stroke-width="1.9" opacity="0.6"/>
+<path d="M382 133L397 135 403 150 432 153 449 167 432 183 396 184 386 170 405 161 388 151Z" fill="#853d24" />
+<path d="M385 136L393 137 398 153 422 157 437 167 426 175 403 177 397 171 416 164 390 157Z" fill="url(#stage_mine-molten)" />
+<path d="M387 139L391 151 398 157 421 162" fill="none" stroke="#fff2b5" stroke-width="2" opacity="0.85"/>
+<path d="M406 174L426 171 432 166" fill="none" stroke="#ffd47c" stroke-width="1.6" />
+<ellipse cx="407" cy="165" rx="112" ry="67" fill="url(#stage_mine-heat)"/>
+<path d="M0 203L104 175 178 185 257 167 316 171 367 161 397 182 453 173 498 186 564 174 640 192V360H0Z" fill="url(#stage_mine-floor)" />
+<path d="M212 209L285 182 318 184 357 173 385 187 352 201 322 198 291 214 250 221Z" fill="#373329" />
+<path d="M453 194L482 183 521 194 510 208 473 213 443 206Z" fill="#30312b" />
+<path d="M91 202L132 194 166 209 149 220 104 219 78 213Z" fill="#252b28" />
+<path d="M374 189L396 184 429 185 453 177 468 187 453 202 419 210 397 222 365 231 346 222 387 204Z" fill="#0e191a" />
+<path d="M377 191L395 187 428 189 450 181" fill="none" stroke="#89522d" stroke-width="2" />
+<path d="M396 194L429 193 452 185 449 193 426 201 412 201 389 214 377 213Z" fill="#b45b2e" />
+<path d="M398 195L429 196 447 189 426 199 413 199 392 209Z" fill="#e18d43" />
+<g transform="translate(270 88) scale(0.5)" >
+<path d="M0 0L20 -2 26 174 4 175Z" fill="#3b3227" stroke="#172022" stroke-width="4" />
+<path d="M13 3L18 2 23 166 17 167Z" fill="#855831" />
+<path d="M-5 21L26 19 28 31 -4 34Z" fill="#38403c" stroke="#152022" stroke-width="2" />
+<path d="M-4 126L26 124 28 136 -3 140Z" fill="#353d38" stroke="#152022" stroke-width="2" />
+</g>
+<g transform="translate(322 108) scale(0.32)" >
+<path d="M0 0L20 -2 26 174 4 175Z" fill="#3b3227" stroke="#172022" stroke-width="4" />
+<path d="M13 3L18 2 23 166 17 167Z" fill="#855831" />
+<path d="M-5 21L26 19 28 31 -4 34Z" fill="#38403c" stroke="#152022" stroke-width="2" />
+<path d="M-4 126L26 124 28 136 -3 140Z" fill="#353d38" stroke="#152022" stroke-width="2" />
+</g>
+<g transform="translate(480 86) scale(0.53)" >
+<path d="M0 0L20 -2 26 174 4 175Z" fill="#3b3227" stroke="#172022" stroke-width="4" />
+<path d="M13 3L18 2 23 166 17 167Z" fill="#855831" />
+<path d="M-5 21L26 19 28 31 -4 34Z" fill="#38403c" stroke="#152022" stroke-width="2" />
+<path d="M-4 126L26 124 28 136 -3 140Z" fill="#353d38" stroke="#152022" stroke-width="2" />
+</g>
+<path d="M236 87L494 75 496 91 239 103Z" fill="#43362a" stroke="#1a2221" stroke-width="3" />
+<path d="M242 91L487 80" fill="none" stroke="#8d643e" stroke-width="2" opacity="0.55"/>
+<path d="M192 40L191 103" fill="none" stroke="#101b1d" stroke-width="3.4" />
+<path d="M193 42L192 97" fill="none" stroke="#65716a" stroke-width="0.9" />
+<ellipse cx="191" cy="121" rx="61" ry="58" fill="url(#stage_mine-heat)"/>
+<path d="M183 105L198 105 203 122 199 133 184 133 179 122Z" fill="#37413e" stroke="#0a1110" stroke-width="2" />
+<path d="M185 111L197 111 198 124 185 125Z" fill="#ffba56" stroke="#8e6033" stroke-width="1.2" />
+<path d="M188 113L194 113 195 121 189 122Z" fill="#ffe4a1" />
+<path d="M191 109L191 126" fill="none" stroke="#525340" stroke-width="1.6" />
+<path d="M182 128L200 128 198 134 185 134Z" fill="#454b40" stroke="#0a1110" stroke-width="1.6" />
+<path d="M101 31L124 28 135 225 109 233 99 212Z" fill="url(#stage_mine-timber)" stroke="#0a1110" stroke-width="4.5" />
+<path d="M116 36L121 34 130 218 123 221Z" fill="#8b623a" />
+<path d="M106 51L108 99 104 122 110 188" fill="none" stroke="#1d2423" stroke-width="2.3" />
+<path d="M113 83L119 153 116 179" fill="none" stroke="#6b5135" stroke-width="1.5" />
+<path d="M511 27L537 33 527 224 504 232 501 204Z" fill="url(#stage_mine-timber)" stroke="#0a1110" stroke-width="4.5" />
+<path d="M512 38L519 38 512 218 507 221Z" fill="#a46a38" />
+<path d="M527 61L523 111 526 130 519 195" fill="none" stroke="#1a2220" stroke-width="2.5" />
+<path d="M86 23L539 19 547 42 92 53Z" fill="url(#stage_mine-timber)" stroke="#0a1110" stroke-width="5" />
+<path d="M96 29L533 25 538 31 97 41Z" fill="#6b563d" />
+<path d="M127 45L245 36 293 39 399 31" fill="none" stroke="#272822" stroke-width="2" />
+<path d="M98 32L191 29" fill="none" stroke="#9ba795" stroke-width="1.8" opacity="0.4"/>
+<path d="M128 93L174 47 190 47 130 120Z" fill="#4a3b2c" stroke="#0a1110" stroke-width="3" />
+<path d="M134 94L174 53 179 53 132 105Z" fill="#80603c" />
+<path d="M449 43L466 43 509 91 508 112Z" fill="#513e2c" stroke="#0a1110" stroke-width="3" />
+<path d="M460 48L467 48 507 94 507 101Z" fill="#a06b3a" />
+<path d="M99 65l29 -2 1 12 -29 3Z" fill="#38403b" stroke="#0a1110" stroke-width="1.5" />
+<path d="M102 67l24 -1" fill="none" stroke="#8a8462" stroke-width="1" opacity="0.6"/>
+<circle cx="106" cy="71" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<circle cx="123" cy="70" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<path d="M106 177l29 -2 1 12 -29 3Z" fill="#38403b" stroke="#0a1110" stroke-width="1.5" />
+<path d="M109 179l24 -1" fill="none" stroke="#8a8462" stroke-width="1" opacity="0.6"/>
+<circle cx="113" cy="183" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<circle cx="130" cy="182" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<path d="M506 66l30 -2 1 12 -30 3Z" fill="#38403b" stroke="#0a1110" stroke-width="1.5" />
+<path d="M509 68l25 -1" fill="none" stroke="#8a8462" stroke-width="1" opacity="0.6"/>
+<circle cx="513" cy="72" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<circle cx="531" cy="71" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<path d="M503 172l28 -2 1 12 -28 3Z" fill="#38403b" stroke="#0a1110" stroke-width="1.5" />
+<path d="M506 174l23 -1" fill="none" stroke="#8a8462" stroke-width="1" opacity="0.6"/>
+<circle cx="510" cy="178" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<circle cx="526" cy="177" r="2" fill="#9c8b60" stroke="#0a1110" stroke-width="1"/>
+<path d="M157 173L203 169 220 186 215 209 169 212 157 192Z" fill="#1a2525" stroke="#0a1110" stroke-width="3" />
+<path d="M161 177L201 173 214 186 170 190Z" fill="#41433a" />
+<path d="M161 177L166 166 178 164 185 156 198 164 202 171 210 177 185 182Z" fill="#1b2426" />
+<path d="M166 176L170 169 177 169" fill="none" stroke="#56605a" stroke-width="1.3" />
+<path d="M174 188L214 185 211 203 176 205Z" fill="#29312c" />
+<path d="M173 192L211 189" fill="none" stroke="#5c5740" stroke-width="1.2" />
+<circle cx="177" cy="211" r="7" fill="#151f20" stroke="#0a1110" stroke-width="2"/>
+<circle cx="208" cy="208" r="7" fill="#151f20" stroke="#0a1110" stroke-width="2"/>
+<circle cx="177" cy="211" r="2" fill="#5c5740"/>
+<circle cx="208" cy="208" r="2" fill="#5c5740"/>
+<path d="M227 203Q224 187 233 183L237 177 243 180 251 182Q262 188 261 201L256 207 235 208Z" fill="#101c1e" />
+<path d="M231 189L239 184" fill="none" stroke="#48514b" stroke-width="1.5" />
+<path d="M232 192L239 194 238 197 233 196Z" fill="#ffbd5e" />
+<path d="M246 193L253 190 252 195 246 197Z" fill="#ed9643" />
+<g transform="translate(423 115) scale(.58)" >
+<path d="M14 85L30 86 28 125 13 128 7 122Z" fill="#182323" stroke="#0a1110" stroke-width="3" />
+<path d="M45 85L61 84 67 120 63 127 47 127Z" fill="#182323" stroke="#0a1110" stroke-width="3" />
+<path d="M13 44L10 1 18 -2 23 3 25 45Z" fill="#1e292a" stroke="#0a1110" stroke-width="3" />
+<path d="M17 5L20 33" fill="none" stroke="#736b4d" stroke-width="1.4" />
+<path d="M47 44L48 -7 57 -11 63 -6 61 47Z" fill="#202a28" stroke="#0a1110" stroke-width="3" />
+<path d="M53 -4L53 28" fill="none" stroke="#a47742" stroke-width="1.8" />
+<path d="M5 37L22 30 51 29 69 41 67 77 56 94 25 96 10 82Z" fill="#1d2827" stroke="#0a1110" stroke-width="4" />
+<path d="M12 41L23 36 34 39 28 47 13 49Z" fill="#586050" />
+<ellipse cx="39" cy="65" rx="16" ry="22" fill="#b77231" stroke="#0a1110" stroke-width="3"/>
+<ellipse cx="39" cy="65" rx="11" ry="17" fill="#edb15b"/>
+<path d="M33 49L35 81M41 46L43 83M49 52L50 76" fill="none" stroke="#26302b" stroke-width="4" />
+<path d="M24 64L54 64" fill="none" stroke="#26302b" stroke-width="4" />
+<path d="M22 15L34 8 48 12 54 25 48 35 29 34 22 27Z" fill="#28322d" stroke="#0a1110" stroke-width="3" />
+<path d="M28 23L36 25 35 28 29 27Z" fill="#ffc16b" />
+<path d="M41 24L49 21 48 26 42 28Z" fill="#ffc16b" />
+<path d="M5 43L-6 51 -10 78 4 82 16 58Z" fill="#25302a" stroke="#0a1110" stroke-width="3" />
+<path d="M-18 76L-2 71 16 80 13 96 -2 100 -19 91Z" fill="#29342d" stroke="#0a1110" stroke-width="3" />
+<path d="M-13 79L-3 76 8 81" fill="none" stroke="#687359" stroke-width="2" />
+<path d="M63 43L77 48 83 79 75 87 65 77Z" fill="#202b26" stroke="#0a1110" stroke-width="3" />
+<path d="M73 52L78 74" fill="none" stroke="#956a3a" stroke-width="2" />
+</g>
+<path d="M303 185Q283 224 196 360M326 185Q324 224 344 360" fill="none" stroke="#0f1919" stroke-width="8" />
+<path d="M303 185Q283 224 196 360M326 185Q324 224 344 360" fill="none" stroke="#58604c" stroke-width="2.4" />
+<path d="M302 187Q282 226 201 358M325 187Q323 224 340 358" fill="none" stroke="#a57a42" stroke-width="0.8" opacity="0.5"/>
+<path d="M298 193L328 192" fill="none" stroke="#372d21" stroke-width="5" />
+<path d="M290 207L329 204" fill="none" stroke="#372d21" stroke-width="5" />
+<path d="M278 226L331 220" fill="none" stroke="#372d21" stroke-width="5" />
+<path d="M258 252L334 244" fill="none" stroke="#372d21" stroke-width="5" />
+<path d="M236 283L340 272" fill="none" stroke="#372d21" stroke-width="5" />
+<path d="M204 326L349 310" fill="none" stroke="#372d21" stroke-width="5" />
+<circle cx="394" cy="111" r="1.3" fill="#ffbf65"/>
+<circle cx="407" cy="123" r="0.8" fill="#ffbf65"/>
+<circle cx="421" cy="135" r="1" fill="#ffbf65"/>
+<circle cx="373" cy="154" r="0.9" fill="#ffbf65"/>
+<circle cx="456" cy="152" r="0.8" fill="#ffbf65"/>
+<circle cx="394" cy="78" r="0.8" fill="#ffbf65"/>
+<circle cx="366" cy="123" r="0.7" fill="#ffbf65"/>
+<circle cx="211" cy="113" r="0.7" fill="#ffbf65"/>
+<circle cx="438" cy="100" r="0.9" fill="#ffbf65"/>
+<circle cx="405" cy="155" r="1.1" fill="#ffbf65"/>
+<circle cx="351" cy="187" r="0.8" fill="#ffbf65"/>
+<circle cx="473" cy="173" r="0.7" fill="#ffbf65"/>
+<path d="M0 0L40 0 26 30 39 57 28 96 46 125 34 171 53 201 39 260 0 278Z" fill="url(#stage_mine-rock)" />
+<path d="M0 0L26 0 15 36 23 63 9 95 20 135 10 186 28 225 0 248Z" fill="#101b1f" />
+<path d="M31 58L19 88 29 116M35 148L26 171 38 202" fill="none" stroke="#5e7476" stroke-width="2" opacity="0.35"/>
+<path d="M640 0H603L610 34 594 63 606 98 590 125 603 166 582 201 596 254 640 277Z" fill="url(#stage_mine-rock)" />
+<path d="M640 0H623L630 49 615 85 624 123 610 168 625 209 611 246 640 264Z" fill="#111d20" />
+<path d="M598 121L609 151 600 181" fill="none" stroke="#b9824b" stroke-width="2" opacity="0.34"/>
+<ellipse cx="354" cy="202" rx="204" ry="22" fill="url(#stage_mine-heat)"/>
+<path d="M0 0H640V360H0Z" fill="url(#stage_mine-vignette)" />
+<path d="M0 0H640V360H0Z" fill="url(#stage_mine-bottom)" />
+</g>
+</svg>

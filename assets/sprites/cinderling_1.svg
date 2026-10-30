@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+<defs>
+<linearGradient id="cinderling_1-coal" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#66737a"/><stop offset="0.3333333333333333" stop-color="#3d4147"/><stop offset="0.6666666666666666" stop-color="#22262c"/><stop offset="1" stop-color="#161d22"/></linearGradient>
+<linearGradient id="cinderling_1-iron" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#8c9797"/><stop offset="0.3333333333333333" stop-color="#596269"/><stop offset="0.6666666666666666" stop-color="#353b42"/><stop offset="1" stop-color="#20272c"/></linearGradient>
+<linearGradient id="cinderling_1-dark" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#414b51"/><stop offset="0.5" stop-color="#283036"/><stop offset="1" stop-color="#151d22"/></linearGradient>
+<linearGradient id="cinderling_1-rust" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#b98659"/><stop offset="0.5" stop-color="#78553d"/><stop offset="1" stop-color="#382b27"/></linearGradient>
+<radialGradient id="cinderling_1-heat" cx="36%" cy="27%" r="78%"><stop offset="0" stop-color="#fff1be"/><stop offset="0.3333333333333333" stop-color="#ffcf6a"/><stop offset="0.6666666666666666" stop-color="#ff8a3d"/><stop offset="1" stop-color="#b93e2e"/></radialGradient>
+<linearGradient id="cinderling_1-flame" x1="0" y1="1" x2="0.3" y2="0"><stop offset="0" stop-color="#ffcf6a"/><stop offset="0.5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#db4d2c"/></linearGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(0 0)" >
+<path d="M27 73L42 75 41 84Q32 88 23 84L24 79Z" fill="url(#cinderling_1-dark)" stroke="#0a1110" stroke-width="3.1" />
+<path d="M26 79L39 80 38 84 25 83Z" fill="#9a5639" />
+</g>
+<g transform="translate(0 0)" >
+<path d="M54 75L69 72 73 82Q72 87 57 86L53 82Z" fill="url(#cinderling_1-dark)" stroke="#0a1110" stroke-width="3.1" />
+<path d="M58 81L70 79 70 83 58 85Z" fill="#d57e43" />
+</g>
+<g transform="translate(0 1) rotate(0 48 76)" >
+<g transform="rotate(2 24 54)" >
+<path d="M24 53Q13 53 11 65L14 72 22 69 29 60Z" fill="url(#cinderling_1-coal)" stroke="#0a1110" stroke-width="3.1" />
+<path d="M15 60L13 66" fill="none" stroke="#6c8a94" stroke-width="1.7" />
+</g>
+<g transform="rotate(-2 73 54)" >
+<path d="M73 54Q82 56 85 67L81 73 73 69 67 61Z" fill="url(#cinderling_1-dark)" stroke="#0a1110" stroke-width="3.1" />
+<path d="M80 62L82 67" fill="none" stroke="#d4874e" stroke-width="2" />
+</g>
+<path d="M35 34Q29 26 35 20L43 25 47 15 55 23 63 21 65 35Z" fill="url(#cinderling_1-coal)" stroke="#0a1110" stroke-width="3.1" />
+<path d="M35 26L42 29 47 21 52 28 61 25 58 36Z" fill="#a2462c" />
+<path d="M46 27L50 33" fill="none" stroke="#ffb547" stroke-width="2" />
+<path d="M23 42L34 33 51 31 67 37Q78 45 79 62L74 75Q64 83 48 83L28 79Q18 71 18 57Z" fill="url(#cinderling_1-coal)" stroke="#0a1110" stroke-width="3.1" />
+<path d="M23 43L35 36 51 35 41 48 25 53Z" fill="#68767b" />
+<path d="M59 36L68 40 75 52 73 65 66 57 59 54Z" fill="#4e5359" />
+<path d="M22 64L36 69 53 68 68 62 76 58 73 75 60 80 32 77Z" fill="#1c252a" />
+<path d="M25 73L35 78 52 80 69 75 73 68 67 73 52 76 36 75Z" fill="#a35736" />
+<path d="M26 45L34 38 44 36" fill="none" stroke="#9bbfc9" stroke-width="2.2" />
+<path d="M53 34L49 43 54 48" fill="none" stroke="#191f24" stroke-width="3.8" />
+<path d="M53 35L51 43 54 47" fill="none" stroke="#ff8a3d" stroke-width="1.7" />
+<path d="M28 61L31 67 27 72M65 63L61 70 64 76" fill="none" stroke="#a23e2c" stroke-width="3" />
+<path d="M29 62L32 67M65 64L62 70 64 74" fill="none" stroke="#ffb547" stroke-width="1.5" />
+<path d="M27 52Q33 47 41 52L40 59Q32 62 27 57Z" fill="url(#cinderling_1-heat)" stroke="#0a1110" stroke-width="1.9" />
+<path d="M54 52Q61 48 68 51L67 57Q61 61 55 58Z" fill="url(#cinderling_1-heat)" stroke="#0a1110" stroke-width="1.9" />
+<path d="M26 49L42 53M54 52L69 48" fill="none" stroke="#0a1110" stroke-width="3.7" />
+<path d="M30 54L36 55M58 54L64 53" fill="none" stroke="#fff4c9" stroke-width="2.4" />
+<path d="M40 65L47 67 55 64 52 71 45 72Z" fill="#9a3b27" stroke="#0a1110" stroke-width="1.5" />
+<path d="M43 66L47 68 50 67 49 70 45 69Z" fill="#ffcf6a" />
+</g>
+</g>
+</svg>

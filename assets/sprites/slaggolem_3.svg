@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<defs>
+<linearGradient id="slaggolem_3-coal" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#66737a"/><stop offset="0.3333333333333333" stop-color="#3d4147"/><stop offset="0.6666666666666666" stop-color="#22262c"/><stop offset="1" stop-color="#161d22"/></linearGradient>
+<linearGradient id="slaggolem_3-iron" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#8c9797"/><stop offset="0.3333333333333333" stop-color="#596269"/><stop offset="0.6666666666666666" stop-color="#353b42"/><stop offset="1" stop-color="#20272c"/></linearGradient>
+<linearGradient id="slaggolem_3-dark" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#414b51"/><stop offset="0.5" stop-color="#283036"/><stop offset="1" stop-color="#151d22"/></linearGradient>
+<linearGradient id="slaggolem_3-rust" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#b98659"/><stop offset="0.5" stop-color="#78553d"/><stop offset="1" stop-color="#382b27"/></linearGradient>
+<radialGradient id="slaggolem_3-heat" cx="36%" cy="27%" r="78%"><stop offset="0" stop-color="#fff1be"/><stop offset="0.3333333333333333" stop-color="#ffcf6a"/><stop offset="0.6666666666666666" stop-color="#ff8a3d"/><stop offset="1" stop-color="#b93e2e"/></radialGradient>
+<linearGradient id="slaggolem_3-flame" x1="0" y1="1" x2="0.3" y2="0"><stop offset="0" stop-color="#ffcf6a"/><stop offset="0.5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#db4d2c"/></linearGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(0 0)" >
+<path d="M34 88L55 90 56 112 51 118 27 118 24 111 29 100Z" fill="url(#slaggolem_3-dark)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M31 105L49 102 50 112 29 114Z" fill="#54565b" />
+<path d="M31 98L39 103 38 112" fill="none" stroke="#c65b31" stroke-width="3.2" />
+<path d="M31 98L39 103" fill="none" stroke="#ffbf61" stroke-width="1.5" />
+</g>
+<g transform="translate(0 0)" >
+<path d="M72 90L94 87 101 102 104 114 99 118 74 118 69 111Z" fill="url(#slaggolem_3-dark)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M78 101L94 100 100 112 77 112Z" fill="#55565a" />
+<path d="M92 98L88 106 92 114" fill="none" stroke="#ee7c3c" stroke-width="2.8" />
+</g>
+<g transform="translate(0 1) rotate(0 64 94)" >
+<g transform="rotate(0 29 52)" >
+<path d="M21 49L38 53 36 73 31 91 15 93 10 85 14 65Z" fill="url(#slaggolem_3-dark)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M17 66L28 70 24 78 14 77Z" fill="url(#slaggolem_3-heat)" />
+<path d="M10 78L23 75 35 81 36 97 26 104 10 101 6 91Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M12 80L23 79 30 84 26 89 10 91Z" fill="#586873" />
+<path d="M10 84L14 80 21 80" fill="none" stroke="#8aaeb9" stroke-width="2" />
+<path d="M29 87L32 97 25 101" fill="none" stroke="#d4864a" stroke-width="2" />
+</g>
+<g transform="rotate(0 100 54)" >
+<path d="M89 50L109 51 116 70 113 88 95 92 91 76Z" fill="url(#slaggolem_3-dark)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M100 69L113 65 114 74 101 79Z" fill="url(#slaggolem_3-heat)" />
+<path d="M97 79L111 77 122 85 120 102 111 109 94 104 91 93Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M98 82L109 81 116 87 109 93 97 91Z" fill="#5b5c60" />
+<path d="M116 89L117 99 111 104" fill="none" stroke="#dc8e4b" stroke-width="2.5" />
+</g>
+<path d="M33 40L48 32 69 34 87 30 100 43 98 68 92 91 78 101 53 101 33 90 27 66Z" fill="url(#slaggolem_3-heat)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M33 42L48 36 59 42 57 57 43 64 30 59Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="2.5" />
+<path d="M35 43L47 40 54 44 42 51 31 54Z" fill="#6e7c82" />
+<path d="M65 40L83 34 96 44 92 60 77 64 65 55Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="2.5" />
+<path d="M70 41L82 38 91 45 80 50 68 49Z" fill="#676b72" />
+<path d="M32 66L45 68 56 63 65 69 60 87 51 95 36 87Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="2.5" />
+<path d="M35 68L45 72 55 68 51 83 39 86Z" fill="#3e4d56" />
+<path d="M71 70L80 69 94 65 89 85 77 96 64 96 67 85Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="2.5" />
+<path d="M75 75L88 72 83 85 72 90Z" fill="#4a494d" />
+<path d="M57 59L63 55 69 60 66 68 61 72 57 65Z" fill="#fff2b8" />
+<path d="M63 72L64 81 59 89" fill="none" stroke="#ffe2a0" stroke-width="1.8" />
+<path d="M11 45L16 31 28 32 32 23 45 32 47 45 38 57 22 56Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M18 34L27 36 33 29 41 34 35 42 15 46Z" fill="#7b8588" />
+<path d="M17 38L20 34 27 36M33 29L39 33" fill="none" stroke="#a7c9ce" stroke-width="2" />
+<path d="M19 50L28 52 38 48" fill="none" stroke="#a95b3f" stroke-width="2" />
+<path d="M84 35L94 24 102 32 112 31 120 45 113 58 96 59 84 51Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M92 36L96 30 102 36 111 35 115 44 104 47Z" fill="#677075" />
+<path d="M114 47L110 53 98 55" fill="none" stroke="#f0a05b" stroke-width="2.5" />
+<path d="M46 21L57 14 74 16 83 25 81 43 71 51 53 47 44 36Z" fill="url(#slaggolem_3-coal)" stroke="#0a1110" stroke-width="3.7" />
+<path d="M49 24L58 18 72 19 76 25 65 30 48 30Z" fill="#8c9699" />
+<path d="M72 29L79 26 77 40 70 46 64 41Z" fill="#2a313a" />
+<path d="M49 25L58 19 68 20" fill="none" stroke="#b8d7d5" stroke-width="2.1" />
+<path d="M49 33L60 35 59 40 52 39Z" fill="url(#slaggolem_3-heat)" stroke="#0a1110" stroke-width="1.4" />
+<path d="M66 35L78 31 75 38 67 40Z" fill="url(#slaggolem_3-heat)" stroke="#0a1110" stroke-width="1.4" />
+<path d="M50 33L60 35M66 35L78 31" fill="none" stroke="#0a1110" stroke-width="2.5" />
+<path d="M57 45L62 43 66 46 72 44" fill="none" stroke="#ff8a3d" stroke-width="1.8" />
+</g>
+</g>
+</svg>

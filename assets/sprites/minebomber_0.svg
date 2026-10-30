@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 96" width="88" height="96">
+<defs>
+<linearGradient id="minebomber_0-coal" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#66737a"/><stop offset="0.3333333333333333" stop-color="#3d4147"/><stop offset="0.6666666666666666" stop-color="#22262c"/><stop offset="1" stop-color="#161d22"/></linearGradient>
+<linearGradient id="minebomber_0-iron" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#8c9797"/><stop offset="0.3333333333333333" stop-color="#596269"/><stop offset="0.6666666666666666" stop-color="#353b42"/><stop offset="1" stop-color="#20272c"/></linearGradient>
+<linearGradient id="minebomber_0-dark" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#414b51"/><stop offset="0.5" stop-color="#283036"/><stop offset="1" stop-color="#151d22"/></linearGradient>
+<linearGradient id="minebomber_0-rust" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#b98659"/><stop offset="0.5" stop-color="#78553d"/><stop offset="1" stop-color="#382b27"/></linearGradient>
+<radialGradient id="minebomber_0-heat" cx="36%" cy="27%" r="78%"><stop offset="0" stop-color="#fff1be"/><stop offset="0.3333333333333333" stop-color="#ffcf6a"/><stop offset="0.6666666666666666" stop-color="#ff8a3d"/><stop offset="1" stop-color="#b93e2e"/></radialGradient>
+<linearGradient id="minebomber_0-flame" x1="0" y1="1" x2="0.3" y2="0"><stop offset="0" stop-color="#ffcf6a"/><stop offset="0.5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#db4d2c"/></linearGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M27 70L38 72 37 84 23 86 19 83 22 78Z" fill="url(#minebomber_0-dark)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M44 72L55 70 60 81 57 86 43 86 40 82Z" fill="url(#minebomber_0-dark)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M24 82L33 82M46 82L55 82" fill="none" stroke="#9e805a" stroke-width="1.6" />
+<g transform="translate(0 0)" >
+<path d="M18 43Q11 45 13 63L18 70 27 65 28 49Z" fill="url(#minebomber_0-rust)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M16 49L17 59" fill="none" stroke="#9b9582" stroke-width="1.4" />
+<path d="M26 42L45 40 54 50 57 70 51 77 26 77 19 69 21 52Z" fill="url(#minebomber_0-rust)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M39 44L49 47 53 69 48 74 40 72Z" fill="#453b35" />
+<path d="M28 47L34 48 34 60 44 60 43 48 49 47 52 74 27 74Z" fill="url(#minebomber_0-dark)" stroke="#0a1110" stroke-width="1.6" />
+<path d="M30 52L30 60M46 51L47 59" fill="none" stroke="#92a4a3" stroke-width="1.5" />
+<path d="M32 64L45 64 44 71 34 72Z" fill="#48535a" stroke="#0a1110" stroke-width="1.2" />
+<circle cx="31" cy="61" r="1.4" fill="#c6975d"/>
+<circle cx="47" cy="61" r="1.4" fill="#c6975d"/>
+<path d="M22 50L16 55 18 67 26 70 31 64 27 60 24 62Z" fill="url(#minebomber_0-coal)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M20 58L21 64 26 66" fill="none" stroke="#7f9295" stroke-width="1.6" />
+<path d="M21 27Q20 17 36 16Q51 16 54 30L52 44 45 51 30 49 22 41Z" fill="url(#minebomber_0-coal)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M25 32L34 30 48 31 49 42 41 47 31 44Z" fill="#1a2227" />
+<path d="M24 35L34 35 34 41 26 40Z" fill="#ffc46a" stroke="#0a1110" stroke-width="1.2" />
+<path d="M40 35L49 33 48 39 41 41Z" fill="#ffcf6a" stroke="#0a1110" stroke-width="1.2" />
+<path d="M24 34L34 36M40 36L50 33" fill="none" stroke="#0a1110" stroke-width="2.5" />
+<path d="M31 43L44 42 46 47 40 51 32 48Z" fill="#53616a" stroke="#0a1110" stroke-width="1.5" />
+<path d="M35 45L36 48M40 45L40 48" fill="none" stroke="#1d272c" stroke-width="1.1" />
+<path d="M19 27Q16 11 33 9Q50 8 54 26L59 29 57 34 45 36 21 33 16 30Z" fill="url(#minebomber_0-rust)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M21 23Q22 13 32 12L42 13 40 23Z" fill="#aa926b" />
+<path d="M42 13Q49 15 51 25L44 27Z" fill="#714e3b" />
+<path d="M22 23Q23 15 30 14" fill="none" stroke="#c6d2bf" stroke-width="1.8" />
+<path d="M20 29L34 31 54 29" fill="none" stroke="#d9ac68" stroke-width="2" />
+<path d="M34 10L42 10 45 29 34 29Z" fill="#424b4d" stroke="#0a1110" stroke-width="1.5" />
+<ellipse cx="39" cy="21" rx="7.5" ry="8.5" fill="#a98757" stroke="#0a1110" stroke-width="1.8"/>
+<ellipse cx="39" cy="21" rx="5" ry="5.8" fill="url(#minebomber_0-heat)"/>
+<ellipse cx="38" cy="19" rx="2.5" ry="3" fill="#fff3bc"/>
+<g transform="rotate(8 52 52)" >
+<path d="M49 47Q57 45 61 53L68 53 71 61 65 66 58 64 51 59Z" fill="url(#minebomber_0-rust)" stroke="#0a1110" stroke-width="2.6" />
+<path d="M54 51L58 53 59 59 65 61 65 63 57 61Z" fill="#a78760" />
+<g transform="rotate(-12 69 50)" >
+<path d="M59 44L75 43 79 60 62 62Z" fill="#812e2a" stroke="#0a1110" stroke-width="2" />
+<path d="M57 42L62 41 66 59 61 61Z" fill="#b94e32" stroke="#0a1110" stroke-width="1.5" />
+<path d="M64 40L70 39 74 59 67 60Z" fill="#db6840" stroke="#0a1110" stroke-width="1.5" />
+<path d="M72 42L77 42 81 59 75 60Z" fill="#a13d2e" stroke="#0a1110" stroke-width="1.5" />
+<path d="M59 49L78 47 79 51 60 53Z" fill="#d1b37b" />
+<path d="M61 56L80 54 81 57 62 59Z" fill="#726c52" />
+<path d="M68 40Q66 33 72 31" fill="none" stroke="#3a2820" stroke-width="3.3" />
+<path d="M68 39Q66 33 72 31" fill="none" stroke="#dca868" stroke-width="1.5" />
+<path d="M72 34Q65 31 69 25L72 21 72 27 76 24Q80 32 72 34Z" fill="url(#minebomber_0-flame)" stroke="#0a1110" stroke-width="1.3" />
+<path d="M72 32Q69 29 72 26L74 28 75 27Q77 31 72 32Z" fill="#ffe2a0" />
+</g>
+<path d="M63 58Q67 55 71 58L72 63 67 67 62 64Z" fill="url(#minebomber_0-coal)" stroke="#0a1110" stroke-width="2" />
+<path d="M65 60L69 60" fill="none" stroke="#a6a495" stroke-width="1.4" />
+</g>
+</g>
+</g>
+</svg>

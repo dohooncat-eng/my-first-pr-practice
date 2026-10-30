@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+<linearGradient id="decal_mine_0-stone" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#4b4840"/><stop offset="0.5" stop-color="#343332"/><stop offset="1" stop-color="#202426"/></linearGradient>
+<linearGradient id="decal_mine_0-iron" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#536166"/><stop offset="0.5" stop-color="#343c40"/><stop offset="1" stop-color="#222b2e"/></linearGradient>
+<linearGradient id="decal_mine_0-wood" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#594331"/><stop offset="0.5" stop-color="#3c2c23"/><stop offset="1" stop-color="#241f1c"/></linearGradient>
+<radialGradient id="decal_mine_0-ember" cx="36%" cy="27%" r="78%"><stop offset="0" stop-color="#c28744"/><stop offset="0.5" stop-color="#8d4b2c"/><stop offset="1" stop-color="#44291e"/></radialGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M9 42L16 29 29 27 39 36 37 50 21 55 10 50Z" fill="url(#decal_mine_0-stone)" stroke="#0a1110" stroke-width="1.6" />
+<path d="M13 41L19 33 28 31 34 37 26 43Z" fill="#55524a" />
+<path d="M11 45L26 47 35 40 35 49 21 53 13 49Z" fill="#252d2f" />
+<path d="M14 38L19 33 26 32" fill="none" stroke="#727366" stroke-width="1.2" />
+<path d="M31 37L38 23 48 25 57 40 52 51 39 51 34 45Z" fill="url(#decal_mine_0-stone)" stroke="#0a1110" stroke-width="1.6" />
+<path d="M37 36L41 28 47 30 52 39 44 42Z" fill="#494742" />
+<path d="M48 37L44 43 47 49" fill="none" stroke="#995831" stroke-width="1.4" />
+<path d="M24 41L27 47 22 52" fill="none" stroke="#6e432c" stroke-width="1.1" />
+<path d="M6 53L11 49 16 53 12 57 6 56Z" fill="#343836" stroke="#0a1110" stroke-width="1" />
+<path d="M51 54L56 51 60 55 57 58 52 57Z" fill="#343836" stroke="#0a1110" stroke-width="1" />
+</g>
+</svg>

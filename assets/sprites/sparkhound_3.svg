@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 96" width="112" height="96">
+<defs>
+<linearGradient id="sparkhound_3-coal" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#66737a"/><stop offset="0.3333333333333333" stop-color="#3d4147"/><stop offset="0.6666666666666666" stop-color="#22262c"/><stop offset="1" stop-color="#161d22"/></linearGradient>
+<linearGradient id="sparkhound_3-iron" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#8c9797"/><stop offset="0.3333333333333333" stop-color="#596269"/><stop offset="0.6666666666666666" stop-color="#353b42"/><stop offset="1" stop-color="#20272c"/></linearGradient>
+<linearGradient id="sparkhound_3-dark" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#414b51"/><stop offset="0.5" stop-color="#283036"/><stop offset="1" stop-color="#151d22"/></linearGradient>
+<linearGradient id="sparkhound_3-rust" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#b98659"/><stop offset="0.5" stop-color="#78553d"/><stop offset="1" stop-color="#382b27"/></linearGradient>
+<radialGradient id="sparkhound_3-heat" cx="36%" cy="27%" r="78%"><stop offset="0" stop-color="#fff1be"/><stop offset="0.3333333333333333" stop-color="#ffcf6a"/><stop offset="0.6666666666666666" stop-color="#ff8a3d"/><stop offset="1" stop-color="#b93e2e"/></radialGradient>
+<linearGradient id="sparkhound_3-flame" x1="0" y1="1" x2="0.3" y2="0"><stop offset="0" stop-color="#ffcf6a"/><stop offset="0.5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#db4d2c"/></linearGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(0 1)" >
+<path d="M38 56L28 60 20 69 22 74 31 73 36 67 46 63Z" fill="url(#sparkhound_3-dark)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M67 53L80 56 90 68 97 69 98 64 91 59 81 49Z" fill="url(#sparkhound_3-dark)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M33 49Q17 48 13 31L7 25Q19 24 25 38L36 40Z" fill="url(#sparkhound_3-flame)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M31 45Q21 43 19 34L26 40 36 42Z" fill="#ffcf6a" />
+<path d="M29 42Q35 33 47 36L66 33 76 41 75 56Q64 65 51 60L41 63Q30 62 28 54Z" fill="url(#sparkhound_3-coal)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M31 43Q39 37 47 40L60 39 53 47 36 48Z" fill="#596e78" />
+<path d="M33 53L46 51 58 55 67 51 65 59 53 61 42 58Z" fill="#17232a" />
+<path d="M33 42L42 39 49 40" fill="none" stroke="#94bac8" stroke-width="2" />
+<path d="M46 57L44 69 50 82 59 84 63 80 57 75 57 59Z" fill="url(#sparkhound_3-coal)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M68 55L65 67 53 77 54 82 65 82 76 73 79 57Z" fill="url(#sparkhound_3-iron)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M49 69L54 78M71 68L60 79" fill="none" stroke="#a95c3d" stroke-width="2" />
+<path d="M47 50L38 40 46 41 40 29 49 32 48 17 60 26 69 15 75 29 85 26 80 43 71 58 60 64 60 55Z" fill="url(#sparkhound_3-flame)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M49 38L54 41 53 30 62 35 67 27 71 37 76 35 72 48 63 55 61 49 54 51Z" fill="#ffcf6a" />
+<path d="M59 34L57 18 68 25 72 25 85 17 83 37 87 46 80 58 66 60 57 49Z" fill="url(#sparkhound_3-coal)" stroke="#0a1110" stroke-width="2.9" />
+<path d="M60 23L63 34 67 29Z" fill="#a96146" />
+<path d="M77 29L82 23 79 36Z" fill="#c2794c" />
+<path d="M60 36L68 30 75 32 67 42 62 44Z" fill="#74858b" />
+<path d="M60 33L61 26M63 36L69 33" fill="none" stroke="#a5c7d1" stroke-width="1.5" />
+<path d="M67 45L80 44 90 49 87 56 75 60 64 55Z" fill="url(#sparkhound_3-dark)" stroke="#0a1110" stroke-width="2.2" />
+<path d="M70 46L80 46 86 50 75 51Z" fill="#7e7670" />
+<path d="M82 48L90 48 89 53 84 54 80 51Z" fill="#0a1110" stroke="#0a1110" stroke-width="1" />
+<path d="M66 54L77 56 86 54" fill="none" stroke="#0a1110" stroke-width="1.8" />
+<path d="M74 55L77 59 79 55Z" fill="#ffdfa1" />
+<path d="M59 40L69 42 65 46 60 45Z" fill="url(#sparkhound_3-heat)" stroke="#0a1110" stroke-width="1.4" />
+<path d="M76 39L82 36 82 41 77 43Z" fill="url(#sparkhound_3-heat)" stroke="#0a1110" stroke-width="1.4" />
+<path d="M60 41L65 43M78 39L80 38" fill="none" stroke="#fff1be" stroke-width="1.4" />
+</g>
+</g>
+</svg>
