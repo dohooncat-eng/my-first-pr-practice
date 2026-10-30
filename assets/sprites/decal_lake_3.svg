@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+<linearGradient id="decal_lake_3-stone" gradientUnits="userSpaceOnUse" x1="17" y1="25" x2="45" y2="54"><stop offset="0" stop-color="#52677c" stop-opacity="1"/><stop offset="0.5" stop-color="#2e4056" stop-opacity="1"/><stop offset="1" stop-color="#16263b" stop-opacity="1"/></linearGradient>
+<linearGradient id="decal_lake_3-silver" gradientUnits="userSpaceOnUse" x1="20" y1="20" x2="41" y2="48"><stop offset="0" stop-color="#879bac" stop-opacity="1"/><stop offset="0.4" stop-color="#5c7591" stop-opacity="1"/><stop offset="1" stop-color="#273b54" stop-opacity="1"/></linearGradient>
+<linearGradient id="decal_lake_3-reed" gradientUnits="userSpaceOnUse" x1="13" y1="14" x2="37" y2="55"><stop offset="0" stop-color="#4a6676" stop-opacity="1"/><stop offset="0.5" stop-color="#293f51" stop-opacity="1"/><stop offset="1" stop-color="#142638" stop-opacity="1"/></linearGradient>
+<clipPath id="decal_lake_3-cut0"><path d="M17 44 Q10 37 16 32 Q15 25 23 27 Q26 20 32 27 Q39 20 43 29 Q52 28 50 36 Q57 43 46 47 L32 53Z" fill="none"/></clipPath>
+<clipPath id="decal_lake_3-cut1"><path d="M15 47 Q30 42 49 47 Q45 56 32 56 Q21 55 15 47Z" fill="none"/></clipPath>
+</defs>
+<path d="M8 51 L19 46 L45 44 L57 51 L45 55 L16 55Z" fill="#142338" stroke="#0a1110" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17 44 Q10 37 16 32 Q15 25 23 27 Q26 20 32 27 Q39 20 43 29 Q52 28 50 36 Q57 43 46 47 L32 53Z" fill="url(#decal_lake_3-stone)" stroke="#0a1110" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><g clip-path="url(#decal_lake_3-cut0)"><path d="M17 31 Q24 27 28 29 L32 49Z" fill="#62768a" opacity="0.5"/><path d="M18 33 L32 49 M26 29 L32 49 M34 28 L32 49 M43 31 L32 49 M49 38 L32 49" fill="none" stroke="#182a3f" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/><path d="M18 30 L22 29 M28 26 L31 29 M36 26 L39 28" fill="none" stroke="#8ba1b4" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/></g><path d="M17 44 Q10 37 16 32 Q15 25 23 27 Q26 20 32 27 Q39 20 43 29 Q52 28 50 36 Q57 43 46 47 L32 53Z" fill="none" stroke="#0a1110" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15 47 Q30 42 49 47 Q45 56 32 56 Q21 55 15 47Z" fill="url(#decal_lake_3-stone)" stroke="#0a1110" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><g clip-path="url(#decal_lake_3-cut1)"><path d="M20 47 Q32 44 44 48" fill="none" stroke="#8094a9" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/><path d="M19 49 Q33 46 45 50 Q34 54 19 49Z" fill="#111e30"/></g><path d="M15 47 Q30 42 49 47 Q45 56 32 56 Q21 55 15 47Z" fill="none" stroke="#0a1110" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="34" cy="48" r="3" fill="#91a7b9" stroke="#21334b" stroke-width="1"/>
+<circle cx="33" cy="47" r="0.9" fill="#cfdee2" opacity="0.7"/>
+<path d="M6 52 L9 49 L14 53 L10 55Z" fill="#34485d" stroke="#0a1110" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48 54 L54 49 L59 53 L56 56Z" fill="#293e52" stroke="#0a1110" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

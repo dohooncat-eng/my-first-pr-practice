@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+<linearGradient id="decal_lake_0-stone" gradientUnits="userSpaceOnUse" x1="17" y1="25" x2="45" y2="54"><stop offset="0" stop-color="#52677c" stop-opacity="1"/><stop offset="0.5" stop-color="#2e4056" stop-opacity="1"/><stop offset="1" stop-color="#16263b" stop-opacity="1"/></linearGradient>
+<linearGradient id="decal_lake_0-silver" gradientUnits="userSpaceOnUse" x1="20" y1="20" x2="41" y2="48"><stop offset="0" stop-color="#879bac" stop-opacity="1"/><stop offset="0.4" stop-color="#5c7591" stop-opacity="1"/><stop offset="1" stop-color="#273b54" stop-opacity="1"/></linearGradient>
+<linearGradient id="decal_lake_0-reed" gradientUnits="userSpaceOnUse" x1="13" y1="14" x2="37" y2="55"><stop offset="0" stop-color="#4a6676" stop-opacity="1"/><stop offset="0.5" stop-color="#293f51" stop-opacity="1"/><stop offset="1" stop-color="#142638" stop-opacity="1"/></linearGradient>
+</defs>
+<path d="M10 54 Q28 48 53 54 Q43 60 17 58Z" fill="#0d1b2a" stroke="#0a1110" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M25 55 Q20 27 10 19 Q25 27 29 55Z" fill="url(#decal_lake_0-reed)" stroke="#0a1110" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35 55 Q36 25 48 13 Q40 29 39 55Z" fill="url(#decal_lake_0-reed)" stroke="#0a1110" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 55 Q47 35 57 33 Q48 43 43 56Z" fill="url(#decal_lake_0-reed)" stroke="#0a1110" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M29 55 Q32 30 28 12 M35 55 Q31 29 38 7" fill="none" stroke="#3c5365" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="1"/>
+<path d="M28 11 Q16 14 23 25 Q30 29 30 18Z" fill="url(#decal_lake_0-silver)" stroke="#0a1110" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M38 7 Q30 11 33 20 Q37 26 39 18Z" fill="url(#decal_lake_0-silver)" stroke="#0a1110" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M25 15 L26 22 M35 11 L35 18" fill="none" stroke="#afc5d3" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+<path d="M25 56 Q22 42 13 34 Q26 39 30 55Z" fill="url(#decal_lake_0-reed)" stroke="#0a1110" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31 56 Q34 37 30 25 Q38 38 35 56Z" fill="url(#decal_lake_0-reed)" stroke="#0a1110" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15 25 Q23 39 25 47 M44 22 Q39 34 38 44" fill="none" stroke="#728c9c" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+<path d="M13 56 Q24 59 34 58 M43 57 L51 55" fill="none" stroke="#405c74" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+</svg>
