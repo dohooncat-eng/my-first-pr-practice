@@ -12,8 +12,8 @@
     const st = stage(game);
     const minutes = G.curveTime(game) / 60;
     const scale = elite ? 1.8 : 1;
-    // 체력 배율: 5분 3.3배 · 10분 11배 · 15분 26배 · 20분 51배 (예전보다 약 40% 낮추고 수·속도로 대신 어렵게)
-    const growth = (0.06 * minutes + 0.065 * minutes * minutes + 0.003 * minutes * minutes * minutes) * st.growth;
+    // 체력 배율: 5분 4.9배 · 8분 11배 · 10분 18배 · 15분 44배 · 20분 87배 (예전 곡선으로 되돌림)
+    const growth = (0.1 * minutes + 0.11 * minutes * minutes + 0.005 * minutes * minutes * minutes) * st.growth;
     const diff = game.difficulty || G.DIFFICULTIES[0];
     // 난이도 체력 배율은 처음엔 1/4만 걸리고 8분에 걸쳐 끝까지 오른다 (첫 무기로도 시작할 수 있게)
     const diffHp = 1 + (diff.hp - 1) * (0.25 + 0.75 * Math.min(1, minutes / 8));
@@ -126,7 +126,7 @@
     if (!e.aiming && e.shot <= AIM) {
       e.aiming = true;
       e.aimA = Math.atan2(p.y - e.y, p.x - e.x);
-      if (game.telegraphs.length < 80) game.telegraphs.push({ kind: 'line', x: e.x, y: e.y, angle: e.aimA, len: Math.min(d + 60, t.range + 120), width: 5, life: AIM, max: AIM });
+      if (game.telegraphs.length < 80) game.telegraphs.push({ kind: 'line', x: e.x, y: e.y, angle: e.aimA, len: 64, width: 5, life: AIM, max: AIM });
     }
     if (e.aiming) {
       setMove(0);

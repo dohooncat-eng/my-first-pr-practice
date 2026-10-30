@@ -105,15 +105,18 @@
     const a = ctx.globalAlpha; ctx.globalAlpha *= alpha; ctx.drawImage(beamImages[i], 0, -width / 2, length, width); ctx.globalAlpha = a;
   };
   FX.enemyBullet = function (ctx, b) {
+    // 날아가는 방향으로 길쭉한 짧은 선분(머리는 밝게, 꼬리는 가늘게)
     let im = bulletImages[b.color];
     if (!im) {
-      im = bulletImages[b.color] = canvas(40, 40); const c = im.getContext('2d');
-      c.fillStyle = '#21040d'; c.beginPath(); c.arc(20, 20, 16, 0, TAU); c.fill();
-      c.fillStyle = b.color; c.beginPath(); c.arc(20, 20, 12, 0, TAU); c.fill();
-      c.strokeStyle = '#ffe6dc'; c.lineWidth = 1.2; c.beginPath(); c.arc(20, 20, 12, -2.8, -0.8); c.stroke();
-      c.fillStyle = '#fff8f0'; c.beginPath(); c.arc(20, 20, 5, 0, TAU); c.fill();
+      im = bulletImages[b.color] = canvas(72, 28); const c = im.getContext('2d');
+      const seg = (r, fill) => { c.fillStyle = fill; c.beginPath(); c.moveTo(6, 14); c.lineTo(56 - r, 14 - r); c.arc(56, 14, r, -Math.PI / 2, Math.PI / 2); c.lineTo(6, 14); c.fill(); };
+      seg(12, '#21040d'); seg(9, b.color);
+      c.fillStyle = '#fff8f0'; c.beginPath(); c.arc(57, 14, 4.5, 0, TAU); c.fill();
     }
-    const r = b.r * 1.6; ctx.drawImage(im, b.x - r, b.y - r, r * 2, r * 2);
+    const r = b.r * 1.6;
+    ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(Math.atan2(b.vy, b.vx));
+    ctx.drawImage(im, -r * 3.6, -r, r * 4.6, r * 2);
+    ctx.restore();
   };
   FX.shadow = function (ctx, x, y, r, alpha) {
     bake(); const a = ctx.globalAlpha; ctx.globalAlpha = alpha === undefined ? 1 : alpha;

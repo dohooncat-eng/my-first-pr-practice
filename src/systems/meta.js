@@ -61,6 +61,11 @@
     if (c.crystals) granted.crystals += c.crystals;
     G.addCurrency('gold', granted.gold);
     G.addCurrency('crystals', granted.crystals);
+    if (c.speedMode) {
+      granted.speedMode = true;
+      G.meta.speedMode = true;
+      if (!G.meta.settings.speed || G.meta.settings.speed === 1) G.meta.settings.speed = 2;
+    }
     G.meta.coupons[key] = true;
     G.saveMeta();
     return { ok: true, granted, gold: G.meta.gold, crystals: G.meta.crystals };

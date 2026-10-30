@@ -16,19 +16,20 @@
   }
 
   // 이름: { frames, w, h (월드 단위), ax, ay (기준점 비율), res(굽기 배율) }
+  // 무기 투사체는 폰에서 잘 보이게 판정보다 1.5배 크게 그린다
   const LIST = {
-    bolt: { w: 28, h: 14, ax: 48 / 64, ay: 0.5 },
-    orb: { w: 22, h: 22 },
+    bolt: { w: 42, h: 21, ax: 48 / 64, ay: 0.5 },
+    orb: { w: 33, h: 33 },
     slash: { w: 128, h: 128 },
-    scythe: { w: 28, h: 28 },
-    meteor: { w: 25, h: 38, ay: 72 / 96 },
+    scythe: { w: 42, h: 42 },
+    meteor: { w: 38, h: 57, ay: 72 / 96 },
     poison_pool: { w: 128, h: 128, res: 2 },
-    spark: { w: 20, h: 20 },
+    spark: { w: 30, h: 30 },
     sun: { w: 40, h: 40 },
-    trap: { w: 30, h: 30 },
-    moth: { w: 24, h: 24 },
-    frost: { w: 22, h: 22 },
-    shield: { w: 30, h: 30 },
+    trap: { w: 45, h: 45 },
+    moth: { w: 36, h: 36 },
+    frost: { w: 33, h: 33 },
+    shield: { w: 45, h: 45 },
     tornado: { w: 64, h: 80, ay: 0.85 },
     gem_0: { w: 13, h: 16 },
     gem_1: { w: 15, h: 19 },

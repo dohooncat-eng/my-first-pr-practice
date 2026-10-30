@@ -38,7 +38,7 @@
     // 짧은 판은 곡선을 빨리 지나가므로 1초에 그만큼 더 내보내, 한 판에 만나는 적 수를 20분 판과 맞춘다. 그 위에 1.4배.
     const diff = game.difficulty;
     // 최종 보스와 싸우는 동안은 절반만
-    const crowd = 1.8 * G.WIN_TIME / G.runTime(game) * (game.boss && game.boss.final ? 0.5 : 1);
+    const crowd = 2.6 * G.WIN_TIME / G.runTime(game) * (game.boss && game.boss.final ? 0.5 : 1);
     const rate = (0.5 + m * 0.3 + m * m * 0.2 - m * m * m * 0.0055 + (m >= 18 ? 3 : 0)) * diff.spawn * crowd;
     if (game.enemies.length < G.MAX_ENEMIES) d.acc += rate * dt;
     while (d.acc >= 1) {
@@ -65,7 +65,7 @@
     if (t >= d.nextSwarm) {
       d.nextSwarm += 90;
       // 빠른 적 떼가 사방에서 원을 그리며 조여 온다
-      const count = Math.max(0, Math.min(G.MAX_ENEMIES - game.enemies.length, Math.round(Math.min(160, (18 + Math.floor(m * 7)) * diff.spawn))));
+      const count = Math.max(0, Math.min(G.MAX_ENEMIES - game.enemies.length, Math.round(Math.min(160, (24 + Math.floor(m * 9)) * diff.spawn))));
       const r = game.viewRadius + 20;
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2;

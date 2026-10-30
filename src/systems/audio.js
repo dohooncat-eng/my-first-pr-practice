@@ -110,14 +110,18 @@
   }
 
   function unlock() {
-    if (unlocked) return;
+    // 안드로이드 크롬은 손을 뗄 때(touchend·click)만 재생을 허락한다. 실패했으면 다음 터치에서 다시 깨운다.
+    if (unlocked) {
+      if (ctx && ctx.state !== 'running' && !document.hidden) ctx.resume().catch(() => {});
+      return;
+    }
     if (!ensure()) return;
     unlocked = true;
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     startScheduler();
     if (music.desired) startTrack(music.desired);
   }
-  ['pointerdown', 'keydown', 'touchstart'].forEach((ev) => {
+  ['pointerdown', 'keydown', 'touchstart', 'touchend', 'pointerup', 'click'].forEach((ev) => {
     window.addEventListener(ev, unlock, { capture: true, passive: true });
   });
   // 탭이 가려지면 소리를 멈추고, 돌아오면 다시 켠다
