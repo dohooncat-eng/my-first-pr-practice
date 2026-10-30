@@ -4,7 +4,7 @@
 (function (G) {
   'use strict';
 
-  G.WEAPON_MAX = 5;
+  G.WEAPON_MAX = 10; // Lv 6~10 수치와 Lv 5·10 갈래는 src/systems/branches.js가 붙인다
   G.WEAPON_SLOTS = 6;
 
   G.WEAPONS = {

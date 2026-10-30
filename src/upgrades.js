@@ -4,7 +4,7 @@
 
   G.passiveSlotsUsed = function (p) { return Object.keys(p.passives).length + p.fusions.length; };
   // 무기+무기·패시브+패시브 조합 결과는 칸을 따로 받는다(조합할 때마다 새로 하나 더 고를 수 있게)
-  G.weaponSlots = function (p) { return G.WEAPON_SLOTS + p.weapons.filter((w) => G.WEAPONS[w.key].kind === 'union').length; };
+  G.weaponSlots = function (p) { return G.WEAPON_SLOTS + p.weapons.filter((w) => { const k = G.WEAPONS[w.key].kind; return k === 'union' || k === 'xcombo'; }).length; };
   G.passiveSlots = function (p) { return G.PASSIVE_SLOTS + p.fusions.length; };
 
   // 이 기본 무기가 이미 진화·조합 재료로 쓰였는지
@@ -118,10 +118,28 @@
 
   G.describeChoice = function (c) {
     const p = G.game.player;
+    if (c.kind === 'branch') {
+      const owned = p.weapons.find((w) => w.key === c.key);
+      const br = G.branchById(c.key, c.tier, c.id, owned && owned.b5);
+      const subs = c.tier === 5 && br.subs ? ' · 조합 상대: ' + br.subs.map((k) => G.WEAPONS[k].name).join(', ') : '';
+      return { title: br.name, tag: G.WEAPONS[c.key].name + ' Lv ' + c.tier + ' 갈래', isNew: false, text: br.desc + subs, icon: c.key, comboHint: br.fx ? G.fxText(br.fx) : '' };
+    }
+    if (c.kind === 'xcombo') {
+      const def = G.WEAPONS[c.key];
+      return { title: def.name, tag: '조합 · 메인 ' + G.WEAPONS[c.main].name, isNew: true, text: def.desc, icon: c.main, comboHint: '재료 두 무기가 하나가 되고 칸이 하나 비어요' };
+    }
+    if (c.kind === 'oldcombo') {
+      const info = G.comboResultInfo(c.combo);
+      return { title: info.name, tag: info.typeLabel, isNew: true, text: info.desc, icon: info.key, comboHint: '' };
+    }
+    if (c.kind === 'nocombo') {
+      return { title: '조합하지 않기', tag: '보류', isNew: false, text: '이번 상자는 강화만 받고, 조합은 다음 상자로 미룹니다.', icon: 'heal', comboHint: '' };
+    }
     if (c.kind === 'weapon') {
       const def = G.WEAPONS[c.key];
+      const branchAt = c.level === 5 || c.level === 10;
       return {
-        title: def.name, tag: c.level === 1 ? '새 무기' : 'Lv ' + c.level, isNew: c.level === 1,
+        title: def.name, tag: c.level === 1 ? '새 무기' : 'Lv ' + c.level + (branchAt ? ' · 갈래 선택' : ''), isNew: c.level === 1,
         text: c.level === 1 ? def.desc : def.notes[c.level - 1], icon: c.key, comboHint: comboHint(p, c),
         level: c.level, max: G.WEAPON_MAX,
       };

@@ -33,7 +33,8 @@
     return i;
   }
 
-  function iconUrl(key) { return G.spriteUrl('icon_' + key); }
+  // 조합 무기처럼 아이콘을 빌려 쓰는 것은 def.icon
+  function iconUrl(key) { const d = G.WEAPONS[key]; return G.spriteUrl('icon_' + ((d && d.icon) || key)); }
 
   // 한국어 조사: 마지막 글자의 받침으로 을/를, 으로/로를 고른다
   function batchim(word) {
@@ -1146,9 +1147,15 @@
     return iconUrl(d.icon);
   }
 
-  function showLevelUp(g, choices, onPick) {
+  // opts: { eyebrow, title, sub } 갈래·조합 선택 때 머리글을 바꾼다
+  function showLevelUp(g, choices, onPick, opts) {
     show('levelup');
-    $('lv-number').textContent = g.player.level;
+    const o = opts || {};
+    $('lv-eyebrow').textContent = o.eyebrow || '레벨 업';
+    $('lv-title').innerHTML = '';
+    if (o.title) $('lv-title').textContent = o.title;
+    else { $('lv-title').append('Lv '); const n = el('span', '', String(g.player.level)); n.id = 'lv-number'; $('lv-title').appendChild(n); }
+    $('lv-sub').textContent = o.sub || '하나를 골라 등불을 키우세요';
     lvOnPick = onPick;
     renderCards(choices, 350);
     sfx('levelup');
@@ -1200,7 +1207,7 @@
 
   function renderReroll() {
     const left = (game && game.rerollsLeft) || 0;
-    $('btn-reroll').hidden = !(left > 0);
+    $('btn-reroll').hidden = !(left > 0) || !!(game && game.noReroll);
     $('reroll-label').textContent = '다시 뽑기 (남은 ' + left + ')';
   }
 
@@ -1549,7 +1556,8 @@
     p.weapons.forEach((w) => {
       const def = G.WEAPONS[w.key];
       const combo = def.kind !== 'base';
-      wl.appendChild(buildItem(w.key, def.name, combo ? (def.kind === 'evolved' ? '진화' : '무기 조합') : 'Lv ' + w.level + (w.level >= G.WEAPON_MAX ? ' MAX' : ''), combo ? 'is-combo' : ''));
+      const brName = [w.b5 && G.branchById(w.key, 5, w.b5), w.b10 && G.branchById(w.key, 10, w.b10, w.b5)].filter(Boolean).map((x) => x.name).join(' → ');
+      wl.appendChild(buildItem(w.key, def.name, combo ? (def.kind === 'evolved' ? '진화' : '무기 조합') : 'Lv ' + w.level + (w.level >= G.WEAPON_MAX ? ' MAX' : '') + (brName ? ' · ' + brName : ''), combo ? 'is-combo' : ''));
     });
     for (let i = p.weapons.length; i < G.weaponSlots(p); i++) wl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
     (p.fusions || []).forEach((f) => pl.appendChild(buildItem(f, G.FUSIONS[f].name, '패시브 조합', 'is-combo')));

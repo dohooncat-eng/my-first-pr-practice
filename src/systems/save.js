@@ -30,7 +30,7 @@
         champion: p.champion, x: r1(p.x), y: r1(p.y), hp: p.hp,
         level: p.level, xp: p.xp, xpNext: p.xpNext, revivesUsed: p.revivesUsed,
         passives: Object.assign({}, p.passives), fusions: p.fusions.slice(),
-        weapons: p.weapons.map((w) => ({ key: w.key, level: w.level, timer: w.timer })),
+        weapons: p.weapons.map((w) => ({ key: w.key, level: w.level, timer: w.timer, b5: w.b5, b10: w.b10 })),
       },
       // 잘라낼 때 보스·엘리트가 빠지지 않게 앞으로 (sort는 같은 순위의 순서를 지킨다)
       enemies: game.enemies.filter((e) => !e.dead).sort((a, b) => rank(b) - rank(a)).slice(0, MAX_SAVED_ENEMIES).map((e) => ({
@@ -83,7 +83,14 @@
     });
     p.weapons = [];
     d.player.weapons.forEach((w) => {
-      if (G.WEAPONS[w.key]) G.addWeapon(p, w.key, w.level).timer = w.timer || 0.3;
+      if (!G.WEAPONS[w.key]) return;
+      const nw = G.addWeapon(p, w.key, w.level);
+      nw.timer = w.timer || 0.3;
+      nw.b5 = w.b5;
+      nw.b10 = w.b10;
+      // 갈래를 고르기 전에 저장됐으면 첫 갈래로
+      if (G.needsBranch(nw)) G.branchChoices(nw).slice(0, 1).forEach((bc) => G.applyBranch(nw, bc));
+      if (G.needsBranch(nw)) G.branchChoices(nw).slice(0, 1).forEach((bc) => G.applyBranch(nw, bc));
     });
     G.recalcStats(game);
     p.hp = Math.min(p.maxHp, d.player.hp);

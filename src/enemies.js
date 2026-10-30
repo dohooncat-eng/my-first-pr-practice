@@ -61,6 +61,11 @@
     e.kx += (kx || 0) * resist;
     e.ky += (ky || 0) * resist;
     G.addDamageNumber(game, e.x, e.y - e.r - 4, dmg, crit ? 'crit' : soft ? 'soft' : dmg >= 30 ? 'big' : '');
+    // 무기 갈래·조합의 맞힐 때 효과 (처형으로 이미 쓰러졌으면 끝)
+    if (G.curFx && G.applyHitFx) {
+      G.applyHitFx(game, e, dmg, G.curFx);
+      if (e.dead) return true;
+    }
     if (!soft) {
       if (crit) {
         G.burst(game, e.x, e.y - e.r * 0.4, 'rgba(255, 170, 110, 0.95)', 5, 200, true);

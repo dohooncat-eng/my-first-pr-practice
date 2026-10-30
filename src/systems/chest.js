@@ -1,4 +1,4 @@
-// 상자: 조합 조건이 맞으면 무조건 하나 조합하고, 나머지는 확률로 1~5개 강화
+// 상자: 조합 조건이 맞으면 열기 전에 어떤 조합(메인)을 할지 고르고, 나머지는 확률로 1~5개 강화
 // 엘리트 상자는 나무에서, 보스 상자는 은에서 시작하고 강화 개수가 많으면 등급이 오른다(3~4개 은, 5개 금).
 (function (G) {
   'use strict';
@@ -25,7 +25,8 @@
   function upgradeTargets(p) {
     const list = [];
     p.weapons.forEach((w) => {
-      if (G.isBaseWeapon(w.key) && w.level < G.WEAPON_MAX) list.push({ kind: 'weapon', key: w.key });
+      // Lv 5·10은 갈래를 골라야 하므로 상자로는 올리지 않는다
+      if (G.isBaseWeapon(w.key) && w.level < G.WEAPON_MAX && w.level !== 4 && w.level !== 9) list.push({ kind: 'weapon', key: w.key });
     });
     Object.keys(p.passives).forEach((k) => {
       if (p.passives[k] < G.PASSIVE_MAX) list.push({ kind: 'passive', key: k });
@@ -34,7 +35,13 @@
   }
 
   // 상자를 열고 결과를 바로 적용한 뒤, 화면에 보여 줄 내용을 돌려준다
-  G.openChest = function (game, source) {
+  // 상자를 열기 전에 고를 수 있는 조합들 (새 조합 + 예전 진화·조합)
+  G.comboChoiceOptions = function (p) {
+    return G.xcomboOptions(p).concat(G.findCombos(p).map((c) => ({ kind: 'oldcombo', combo: c })));
+  };
+
+  // choice: 사용자가 고른 조합(없으면 조합하지 않음)
+  G.openChest = function (game, source, choice) {
     const p = game.player;
     let count = G.rollChestCount(p.stats.luck);
     if (source === 'boss') count = Math.max(G.BOSS_CHEST_MIN, count);
@@ -44,11 +51,8 @@
     const result = { combo: null, upgrades: [], count, gold: 0, source: source || 'elite', startTier, tier };
     let left = count;
 
-    const combos = G.findCombos(p);
-    if (combos.length) {
-      result.combo = G.applyCombo(game, G.pick(combos));
-      left--;
-    }
+    if (choice && choice.kind === 'xcombo') { result.combo = G.applyXcombo(game, choice); left--; }
+    else if (choice && choice.kind === 'oldcombo') { result.combo = G.applyCombo(game, choice.combo); left--; }
     for (let i = 0; i < left; i++) {
       const targets = upgradeTargets(p);
       if (!targets.length) {

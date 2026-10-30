@@ -18,6 +18,8 @@
   // 아이콘: 미리 구워 둔 그림이 있으면 쓰고, 없으면 SVG를 직접 불러 둔다
   const iconCache = {};
   function icon(key) {
+    const d = G.WEAPONS[key];
+    if (d && d.icon) key = d.icon;
     const baked = G.art && G.art.get('icon_' + key);
     if (baked) return baked.img;
     let img = iconCache[key];

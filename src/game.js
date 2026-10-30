@@ -144,7 +144,7 @@
 
   // 레벨업 카드 다시 뽑기 (가챠 운명 바꾸기)
   game.rerollChoices = function () {
-    if (game.state !== 'levelup' || !(game.rerollsLeft > 0)) return null;
+    if (game.noReroll || game.state !== 'levelup' || !(game.rerollsLeft > 0)) return null;
     game.rerollsLeft--;
     game.currentChoices = G.buildChoices(game, game.player.stats.choices);
     return game.currentChoices;
@@ -200,14 +200,27 @@
     game.state = 'levelup';
     G.input.clear();
     music('duck', true);
+    game.noReroll = false;
     const choices = game.currentChoices = G.buildChoices(game, game.player.stats.choices);
     G.ui.showLevelUp(game, choices, (c) => {
       game.currentChoices = null;
       G.applyChoice(game, c);
-      game.pendingLevelUps--;
-      // 선택하고 돌아오면 금빛 충격파가 주변 적을 밀어낸다
-      if (game.pendingLevelUps === 0) G.levelUpBlast(game);
-      continueAfterModal();
+      const done = () => {
+        game.noReroll = false;
+        game.pendingLevelUps--;
+        // 선택하고 돌아오면 금빛 충격파가 주변 적을 밀어낸다
+        if (game.pendingLevelUps === 0) G.levelUpBlast(game);
+        continueAfterModal();
+      };
+      // Lv 5·10에 닿으면 갈래를 고른다
+      const w = c.kind === 'weapon' && game.player.weapons.find((x) => x.key === c.key);
+      if (w && G.needsBranch(w)) {
+        game.noReroll = true;
+        G.ui.showLevelUp(game, G.branchChoices(w), (bc) => { G.applyBranch(w, bc); done(); },
+          { eyebrow: G.WEAPONS[w.key].name + ' Lv ' + w.level, title: '갈래 선택', sub: '고른 갈래에 따라 강해지는 방식과 조합 상대가 달라집니다' });
+        return;
+      }
+      done();
     });
   }
 
@@ -215,8 +228,17 @@
     game.state = 'chest';
     G.input.clear();
     music('duck', true);
-    const result = G.openChest(game, game.chestQueue.shift());
-    G.ui.showChest(game, result, continueAfterModal);
+    const source = game.chestQueue.shift();
+    const run = (choice) => {
+      game.noReroll = false;
+      G.ui.showChest(game, G.openChest(game, source, choice), continueAfterModal);
+    };
+    // 조합할 수 있으면 먼저 무엇을(어느 쪽을 메인으로) 조합할지 고른다
+    const options = G.comboChoiceOptions(game.player);
+    if (!options.length) { run(null); return; }
+    game.noReroll = true;
+    G.ui.showLevelUp(game, options.concat([{ kind: 'nocombo' }]), (c) => run(c.kind === 'nocombo' ? null : c),
+      { eyebrow: '상자', title: '조합 선택', sub: '어느 무기를 메인으로 할지에 따라 다른 무기가 됩니다' });
   }
 
   function endRun(win) {
@@ -246,6 +268,7 @@
     for (const e of game.enemies) game.grid.insert(e);
     G.updateSpawner(game, tdt);
     G.updateEnemies(game, dt);
+    G.updateDots(game, dt);
     G.updateWeapons(game, dt);
     G.updateProjectiles(game, dt);
     G.updateBossFx(game, dt);
@@ -398,6 +421,7 @@
     G.drawProjectileGlow(ctx, game);
     G.drawWeaponGlow(ctx, game);
     G.drawEnemyGlow(ctx, game);
+    G.drawDotGlow(ctx, game);
     G.drawEnemyBulletGlow(ctx, game);
     G.drawRings(ctx, game);
     G.drawParticles(ctx, game, true);
