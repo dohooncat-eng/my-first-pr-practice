@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+<linearGradient id="decal_lighthouse_1-stone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#464255"/><stop offset="0.5" stop-color="#292b39"/><stop offset="1" stop-color="#171e29"/></linearGradient>
+<linearGradient id="decal_lighthouse_1-bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#756149"/><stop offset="0.5" stop-color="#493e36"/><stop offset="1" stop-color="#222531"/></linearGradient>
+<linearGradient id="decal_lighthouse_1-cloth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#484052"/><stop offset="0.5" stop-color="#282637"/><stop offset="1" stop-color="#131b26"/></linearGradient>
+<clipPath id="decal_lighthouse_1-c0"><path d="M 18 18 L 34 11 L 46 20 L 44 44 L 52 51 L 35 56 L 13 49 L 18 42 Z" fill="#fff"/></clipPath>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g>
+<path d="M 18 18 L 34 11 L 46 20 L 44 44 L 52 51 L 35 56 L 13 49 L 18 42 Z" fill="url(#decal_lighthouse_1-stone)" stroke="#0a1110" stroke-width="2"/>
+<g clip-path="url(#decal_lighthouse_1-c0)">
+<path d="M 34 12 L 36 43 L 44 48 L 48 50 L 35 53 L 27 45 L 27 18 Z" fill="#30303e"/>
+<path d="M 20 20 L 32 15" fill="none" stroke="#777088" stroke-width="1.4"/>
+<path d="M 16 47 L 28 51" fill="none" stroke="#57505c" stroke-width="1"/>
+</g>
+<path d="M 18 18 L 34 11 L 46 20 L 44 44 L 52 51 L 35 56 L 13 49 L 18 42 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<circle cx="30" cy="30" r="8" fill="none" stroke="#6b5b48" stroke-width="1.7"/>
+<circle cx="30" cy="30" r="5.4" fill="#34303b"/>
+<path d="M 30 19 L 30 21 M 19 30 L 21 30 M 40 30 L 41 30 M 30 40 L 30 42 M 22 22 L 24 24 M 37 37 L 39 39" fill="none" stroke="#6b5b48" stroke-width="1.4"/>
+<path d="M 35 13 L 31 24 L 34 31 L 29 37 L 31 46" fill="none" stroke="#101823" stroke-width="1.8"/>
+<path d="M 36 14 L 33 24" fill="none" stroke="#514857" stroke-width="0.9"/>
+<path d="M 9 47 L 16 45 L 20 51 L 15 54 L 8 52 Z" fill="#2b2d38" stroke="#0a1110" stroke-width="1.3"/>
+</g>
+</svg>

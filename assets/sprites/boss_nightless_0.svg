@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+<defs>
+<linearGradient id="boss_nightless_0-hide" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#716b92"/><stop offset="0.3333333333333333" stop-color="#38364e"/><stop offset="0.6666666666666666" stop-color="#161b2b"/><stop offset="1" stop-color="#0c111b"/></linearGradient>
+<linearGradient id="boss_nightless_0-facet" x1="0" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#a397c7"/><stop offset="0.5" stop-color="#5e547c"/><stop offset="1" stop-color="#242b40"/></linearGradient>
+<linearGradient id="boss_nightless_0-mantle" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#524762"/><stop offset="0.5" stop-color="#242235"/><stop offset="1" stop-color="#0b111b"/></linearGradient>
+<radialGradient id="boss_nightless_0-sun" cx="0.4" cy="0.36" r="0.68"><stop offset="0" stop-color="#fff7d0"/><stop offset="0.25" stop-color="#ffe8a3"/><stop offset="0.5" stop-color="#ffd27a"/><stop offset="0.75" stop-color="#d98a3f"/><stop offset="1" stop-color="#995737"/></radialGradient>
+<radialGradient id="boss_nightless_0-aureole" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffd27a" stop-opacity="0.75"/><stop offset="0.5" stop-color="#ecaa53" stop-opacity="0.3"/><stop offset="1" stop-color="#e29846" stop-opacity="0"/></radialGradient>
+<linearGradient id="boss_nightless_0-gold" x1="0" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#ffe6a8"/><stop offset="0.5" stop-color="#c59757"/><stop offset="1" stop-color="#76563f"/></linearGradient>
+<clipPath id="boss_nightless_0-c0"><path d="M 55 50 Q 36 53 27 87 L 14 127 L 31 118 L 25 150 L 42 136 Q 34 161 22 173 Q 45 177 58 162 L 55 178 L 73 171 Q 85 184 96 179 Q 113 184 124 171 L 140 179 L 138 161 Q 155 178 166 172 Q 155 158 153 140 L 168 149 L 160 120 L 174 128 Q 167 90 151 65 Q 140 52 125 50 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c1"><path d="M 51 59 Q 35 63 28 90 L 22 119 L 31 124 Q 41 96 58 83 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c2"><path d="M 139 60 Q 157 70 163 94 L 169 122 L 160 129 Q 150 103 135 85 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c3"><path d="M 24 116 Q 18 119 16 127 L 11 144 Q 12 149 16 145 L 23 132 L 20 151 Q 21 156 25 151 L 31 133 L 31 147 Q 34 150 36 144 L 39 128 L 33 119 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c4"><path d="M 158 120 Q 171 117 176 128 L 182 146 Q 181 151 177 147 L 168 134 L 173 153 Q 171 157 168 152 L 161 135 L 163 148 Q 160 153 157 146 L 152 130 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c5"><path d="M 58 56 Q 77 48 96 48 Q 117 47 135 57 L 143 86 Q 141 109 131 127 L 129 149 L 118 143 L 119 162 L 103 154 L 96 175 L 86 155 L 72 165 L 74 143 L 61 149 L 65 126 Q 51 109 49 87 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c6"><path d="M 72 53 Q 48 50 43 29 L 41 12 Q 51 27 63 29 L 58 13 Q 70 22 78 31 L 85 44 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c7"><path d="M 114 47 Q 133 38 133 19 L 139 29 Q 150 24 153 9 Q 159 33 141 48 L 120 57 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c8"><path d="M 57 52 L 71 48 L 81 63 L 68 81 L 48 77 L 39 63 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c9"><path d="M 116 54 L 131 49 L 152 64 L 146 80 L 126 80 L 113 67 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c10"><path d="M 97 67 C 118 66 133 80 131 99 C 128 121 110 135 94 134 C 73 133 60 116 61 96 C 62 78 77 67 97 67 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c11"><path d="M 68 77 Q 62 95 68 112 L 83 125 L 92 124 Q 76 114 74 98 L 78 84 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c12"><path d="M 126 81 Q 133 101 120 119 L 105 132 L 97 131 Q 118 114 117 100 L 113 84 Z" fill="#fff"/></clipPath>
+<clipPath id="boss_nightless_0-c13"><path d="M 78 37 L 92 25 L 108 29 L 117 42 L 113 63 L 98 77 L 83 66 L 75 53 Z" fill="#fff"/></clipPath>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(0 0)">
+<g>
+<path d="M 55 50 Q 36 53 27 87 L 14 127 L 31 118 L 25 150 L 42 136 Q 34 161 22 173 Q 45 177 58 162 L 55 178 L 73 171 Q 85 184 96 179 Q 113 184 124 171 L 140 179 L 138 161 Q 155 178 166 172 Q 155 158 153 140 L 168 149 L 160 120 L 174 128 Q 167 90 151 65 Q 140 52 125 50 Z" fill="url(#boss_nightless_0-mantle)" stroke="#0a1110" stroke-width="5"/>
+<g clip-path="url(#boss_nightless_0-c0)">
+<path d="M 44 68 Q 41 106 36 133 L 47 124 Q 46 151 32 167 Q 51 164 61 143 L 63 108 Z" fill="#3c3652"/>
+<path d="M 125 61 Q 151 85 151 115 L 142 110 Q 143 135 150 155 L 138 148 L 125 104 Z" fill="#26243c"/>
+<path d="M 39 95 L 29 130 M 42 146 Q 38 163 28 170" fill="none" stroke="#8c79b3" stroke-width="2.6" opacity="0.82"/>
+<path d="M 154 149 Q 156 164 162 171" fill="none" stroke="#b1956b" stroke-width="2.1" opacity="0.68"/>
+</g>
+<path d="M 55 50 Q 36 53 27 87 L 14 127 L 31 118 L 25 150 L 42 136 Q 34 161 22 173 Q 45 177 58 162 L 55 178 L 73 171 Q 85 184 96 179 Q 113 184 124 171 L 140 179 L 138 161 Q 155 178 166 172 Q 155 158 153 140 L 168 149 L 160 120 L 174 128 Q 167 90 151 65 Q 140 52 125 50 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 51 59 Q 35 63 28 90 L 22 119 L 31 124 Q 41 96 58 83 Z" fill="url(#boss_nightless_0-hide)" stroke="#0a1110" stroke-width="4.8"/>
+<g clip-path="url(#boss_nightless_0-c1)">
+<path d="M 46 67 Q 31 91 29 115 L 34 108 L 47 85 Z" fill="#655b7d"/>
+<path d="M 42 72 Q 32 87 29 102" fill="none" stroke="#b0a1d0" stroke-width="2.5"/>
+<path d="M 36 108 L 31 120" fill="none" stroke="#b39a72" stroke-width="2"/>
+</g>
+<path d="M 51 59 Q 35 63 28 90 L 22 119 L 31 124 Q 41 96 58 83 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 139 60 Q 157 70 163 94 L 169 122 L 160 129 Q 150 103 135 85 Z" fill="url(#boss_nightless_0-hide)" stroke="#0a1110" stroke-width="4.8"/>
+<g clip-path="url(#boss_nightless_0-c2)">
+<path d="M 143 72 Q 158 88 162 115 L 155 104 L 144 90 Z" fill="#3e3c56"/>
+<path d="M 155 91 L 163 116" fill="none" stroke="#b49a6d" stroke-width="2.5"/>
+</g>
+<path d="M 139 60 Q 157 70 163 94 L 169 122 L 160 129 Q 150 103 135 85 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g transform="rotate(4 28 121) translate(0 0)">
+<g>
+<path d="M 24 116 Q 18 119 16 127 L 11 144 Q 12 149 16 145 L 23 132 L 20 151 Q 21 156 25 151 L 31 133 L 31 147 Q 34 150 36 144 L 39 128 L 33 119 Z" fill="url(#boss_nightless_0-hide)" stroke="#0a1110" stroke-width="3.6"/>
+<g clip-path="url(#boss_nightless_0-c3)">
+<path d="M 22 123 L 18 135 M 29 127 L 25 143" fill="none" stroke="#9281b1" stroke-width="2.1"/>
+<path d="M 35 131 L 34 141" fill="none" stroke="#b9a078" stroke-width="1.6"/>
+</g>
+<path d="M 24 116 Q 18 119 16 127 L 11 144 Q 12 149 16 145 L 23 132 L 20 151 Q 21 156 25 151 L 31 133 L 31 147 Q 34 150 36 144 L 39 128 L 33 119 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+</g>
+<g transform="rotate(4 165 124) translate(0 0)">
+<g>
+<path d="M 158 120 Q 171 117 176 128 L 182 146 Q 181 151 177 147 L 168 134 L 173 153 Q 171 157 168 152 L 161 135 L 163 148 Q 160 153 157 146 L 152 130 Z" fill="url(#boss_nightless_0-hide)" stroke="#0a1110" stroke-width="3.6"/>
+<g clip-path="url(#boss_nightless_0-c4)">
+<path d="M 172 127 L 178 142 M 164 132 L 169 146" fill="none" stroke="#c0a174" stroke-width="2"/>
+<path d="M 156 131 L 159 143" fill="none" stroke="#7e6d9c" stroke-width="1.7"/>
+</g>
+<path d="M 158 120 Q 171 117 176 128 L 182 146 Q 181 151 177 147 L 168 134 L 173 153 Q 171 157 168 152 L 161 135 L 163 148 Q 160 153 157 146 L 152 130 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+</g>
+<g>
+<path d="M 58 56 Q 77 48 96 48 Q 117 47 135 57 L 143 86 Q 141 109 131 127 L 129 149 L 118 143 L 119 162 L 103 154 L 96 175 L 86 155 L 72 165 L 74 143 L 61 149 L 65 126 Q 51 109 49 87 Z" fill="url(#boss_nightless_0-hide)" stroke="#0a1110" stroke-width="5.4"/>
+<g clip-path="url(#boss_nightless_0-c5)">
+<path d="M 60 60 L 80 55 L 70 79 L 62 107 L 72 132 L 65 132 Q 53 109 53 86 Z" fill="#504964"/>
+<path d="M 119 56 L 135 61 L 140 83 L 130 111 L 119 124 L 126 143 L 115 138 L 106 151 L 96 165 L 94 129 Z" fill="#111825"/>
+<path d="M 59 71 L 54 87 L 58 103" fill="none" stroke="#a697cb" stroke-width="3"/>
+<path d="M 133 108 L 126 124 L 126 139" fill="none" stroke="#c5a270" stroke-width="2.5"/>
+</g>
+<path d="M 58 56 Q 77 48 96 48 Q 117 47 135 57 L 143 86 Q 141 109 131 127 L 129 149 L 118 143 L 119 162 L 103 154 L 96 175 L 86 155 L 72 165 L 74 143 L 61 149 L 65 126 Q 51 109 49 87 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 72 53 Q 48 50 43 29 L 41 12 Q 51 27 63 29 L 58 13 Q 70 22 78 31 L 85 44 Z" fill="url(#boss_nightless_0-facet)" stroke="#0a1110" stroke-width="4.2"/>
+<g clip-path="url(#boss_nightless_0-c6)">
+<path d="M 43 16 Q 49 37 71 41 L 76 49 Q 51 47 45 29 Z" fill="#333149"/>
+<path d="M 45 20 Q 50 32 63 34" fill="none" stroke="#b3a0ce" stroke-width="2.6"/>
+</g>
+<path d="M 72 53 Q 48 50 43 29 L 41 12 Q 51 27 63 29 L 58 13 Q 70 22 78 31 L 85 44 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 114 47 Q 133 38 133 19 L 139 29 Q 150 24 153 9 Q 159 33 141 48 L 120 57 Z" fill="url(#boss_nightless_0-facet)" stroke="#0a1110" stroke-width="4.2"/>
+<g clip-path="url(#boss_nightless_0-c7)">
+<path d="M 153 14 Q 154 34 134 47 L 121 52 L 117 47 Q 146 38 153 14 Z" fill="#37334f"/>
+<path d="M 149 23 Q 146 36 133 42" fill="none" stroke="#ac99d1" stroke-width="2.6"/>
+</g>
+<path d="M 114 47 Q 133 38 133 19 L 139 29 Q 150 24 153 9 Q 159 33 141 48 L 120 57 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 57 52 L 71 48 L 81 63 L 68 81 L 48 77 L 39 63 Z" fill="url(#boss_nightless_0-facet)" stroke="#0a1110" stroke-width="4.3"/>
+<g clip-path="url(#boss_nightless_0-c8)">
+<path d="M 42 63 L 62 58 L 71 65 L 62 76 L 48 74 Z" fill="#363a52"/>
+<path d="M 44 62 L 58 54 L 66 53" fill="none" stroke="#b9a7d1" stroke-width="2.8"/>
+</g>
+<path d="M 57 52 L 71 48 L 81 63 L 68 81 L 48 77 L 39 63 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 116 54 L 131 49 L 152 64 L 146 80 L 126 80 L 113 67 Z" fill="url(#boss_nightless_0-facet)" stroke="#0a1110" stroke-width="4.3"/>
+<g clip-path="url(#boss_nightless_0-c9)">
+<path d="M 123 62 L 136 57 L 150 65 L 143 76 L 128 76 Z" fill="#33364e"/>
+<path d="M 147 68 L 143 76 L 130 76" fill="none" stroke="#bea070" stroke-width="2.5"/>
+</g>
+<path d="M 116 54 L 131 49 L 152 64 L 146 80 L 126 80 L 113 67 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 97 67 C 118 66 133 80 131 99 C 128 121 110 135 94 134 C 73 133 60 116 61 96 C 62 78 77 67 97 67 Z" fill="#070c17" stroke="#0a1110" stroke-width="3.1"/>
+<g clip-path="url(#boss_nightless_0-c10)">
+<ellipse cx="97" cy="101" rx="34" ry="35" fill="url(#boss_nightless_0-aureole)" />
+</g>
+<path d="M 97 67 C 118 66 133 80 131 99 C 128 121 110 135 94 134 C 73 133 60 116 61 96 C 62 78 77 67 97 67 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g transform="translate(96 99) scale(1) translate(-96 -99)">
+<circle cx="96" cy="99" r="25" fill="url(#boss_nightless_0-aureole)"/>
+<g transform="rotate(-3 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(27 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(57 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(87 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(117 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(147 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(177 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(207 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(237 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(267 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(297 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<g transform="rotate(327 96 99)">
+<path d="M 94 76 L 96 69 L 98 76 L 96 79 Z" fill="url(#boss_nightless_0-gold)" stroke="#6f4a36" stroke-width="0.7"/>
+</g>
+<circle cx="96" cy="99" r="20.5" fill="url(#boss_nightless_0-sun)" stroke="#d9a45c" stroke-width="1.7"/>
+<path d="M 80 97 Q 82 85 93 82" fill="none" stroke="#fff7cd" stroke-width="2.3" opacity="0.88"/>
+<path d="M 100 82 Q 115 90 113 102 Q 110 114 98 117 Q 111 109 108 100 Q 104 89 100 82 Z" fill="#dc913c" stroke="#0a1110" stroke-width="0" opacity="0.42"/>
+<path d="M 88 106 Q 95 109 103 105" fill="none" stroke="#fff3b7" stroke-width="1.2" opacity="0.55"/>
+</g>
+<g>
+<path d="M 68 77 Q 62 95 68 112 L 83 125 L 92 124 Q 76 114 74 98 L 78 84 Z" fill="#24263b" stroke="#0a1110" stroke-width="2.3"/>
+<g clip-path="url(#boss_nightless_0-c11)">
+<path d="M 75 90 Q 71 108 87 121" fill="none" stroke="#d0a36a" stroke-width="2.1"/>
+</g>
+<path d="M 68 77 Q 62 95 68 112 L 83 125 L 92 124 Q 76 114 74 98 L 78 84 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 126 81 Q 133 101 120 119 L 105 132 L 97 131 Q 118 114 117 100 L 113 84 Z" fill="#1b2236" stroke="#0a1110" stroke-width="2.3"/>
+<g clip-path="url(#boss_nightless_0-c12)">
+<path d="M 117 91 Q 124 108 109 123" fill="none" stroke="#efc172" stroke-width="2.2"/>
+</g>
+<path d="M 126 81 Q 133 101 120 119 L 105 132 L 97 131 Q 118 114 117 100 L 113 84 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 66 97 L 81 103 L 82 109 L 67 106 Z" fill="#24273a" stroke="#0a1110" stroke-width="1.5"/>
+<path d="M 72 103 L 79 106" fill="none" stroke="#d3a163" stroke-width="1.6"/>
+<path d="M 127 98 L 112 103 L 110 109 L 125 108 Z" fill="#1a2131" stroke="#0a1110" stroke-width="1.5"/>
+<path d="M 118 104 L 113 106" fill="none" stroke="#e5b66e" stroke-width="1.6"/>
+<g>
+<path d="M 78 37 L 92 25 L 108 29 L 117 42 L 113 63 L 98 77 L 83 66 L 75 53 Z" fill="url(#boss_nightless_0-hide)" stroke="#0a1110" stroke-width="4.4"/>
+<g clip-path="url(#boss_nightless_0-c13)">
+<path d="M 92 27 L 95 49 L 83 59 L 77 49 L 81 39 Z" fill="#67607f"/>
+<path d="M 97 31 L 108 32 L 114 43 L 110 58 L 99 68 L 96 50 Z" fill="#252b40"/>
+<path d="M 81 41 L 91 31" fill="none" stroke="#c0abd5" stroke-width="2.7"/>
+<path d="M 110 59 L 99 71" fill="none" stroke="#d5b37e" stroke-width="2.1"/>
+</g>
+<path d="M 78 37 L 92 25 L 108 29 L 117 42 L 113 63 L 98 77 L 83 66 L 75 53 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 80 48 L 92 52 L 89 56 L 82 54 Z" fill="#b6a3eb" stroke="#0a1110" stroke-width="1.3"/>
+<path d="M 100 52 L 112 46 L 110 53 L 102 56 Z" fill="#d2bdf3" stroke="#0a1110" stroke-width="1.3"/>
+<path d="M 91 62 L 97 65 L 103 60 L 99 69 L 96 71 Z" fill="#080d18"/>
+<path d="M 77 126 L 82 142 M 112 135 L 107 146" fill="none" stroke="#867291" stroke-width="2.2" opacity="0.7"/>
+</g>
+</g>
+</svg>

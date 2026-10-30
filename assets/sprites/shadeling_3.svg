@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 96" width="112" height="96">
+<defs>
+<linearGradient id="shadeling_3-wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8980bd"/><stop offset="0.5" stop-color="#42435f"/><stop offset="1" stop-color="#1a2030"/></linearGradient>
+<linearGradient id="shadeling_3-core" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#807baf"/><stop offset="0.5" stop-color="#323a56"/><stop offset="1" stop-color="#111722"/></linearGradient>
+<clipPath id="shadeling_3-c0"><path d="M 0 1 L -14 -12 L -40 -25 Q -36 -10 -45 0 L -31 1 L -34 15 L -21 9 L -19 22 L -9 12 L 1 13 Z" fill="#fff"/></clipPath>
+<clipPath id="shadeling_3-c1"><path d="M 0 1 L -14 -12 L -40 -25 Q -36 -10 -45 0 L -31 1 L -34 15 L -21 9 L -19 22 L -9 12 L 1 13 Z" fill="#fff"/></clipPath>
+<clipPath id="shadeling_3-c2"><path d="M 50 59 L 45 78 L 55 72 L 58 83 L 64 62 L 56 54 Z" fill="#fff"/></clipPath>
+<clipPath id="shadeling_3-c3"><path d="M 56 29 L 66 41 L 69 54 L 56 67 L 43 54 L 46 41 Z" fill="#fff"/></clipPath>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g>
+<g transform="translate(49 46) scale(1 1) rotate(6) scale(0.93 0.96)">
+<g>
+<path d="M 0 1 L -14 -12 L -40 -25 Q -36 -10 -45 0 L -31 1 L -34 15 L -21 9 L -19 22 L -9 12 L 1 13 Z" fill="url(#shadeling_3-wing)" stroke="#0a1110" stroke-width="3.6"/>
+<g clip-path="url(#shadeling_3-c0)">
+<path d="M -40 -25 L -14 -12 L 0 4 L -30 -3 Z" fill="#66658f"/>
+<path d="M -30 -3 L -34 15 L -21 9 L -19 22 L -13 5 Z" fill="#252e44"/>
+<path d="M -38 -22 L -14 -10 L -2 2" fill="none" stroke="#b5adea" stroke-width="2.2"/>
+<path d="M -30 -2 L -22 7 L -19 18" fill="none" stroke="#7e75bd" stroke-width="1.6"/>
+<path d="M -11 12 L -2 12" fill="none" stroke="#b59871" stroke-width="1.6" opacity="0.8"/>
+</g>
+<path d="M 0 1 L -14 -12 L -40 -25 Q -36 -10 -45 0 L -31 1 L -34 15 L -21 9 L -19 22 L -9 12 L 1 13 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+</g>
+<g transform="translate(63 46) scale(-1 1) rotate(2) scale(0.93 0.96)">
+<g>
+<path d="M 0 1 L -14 -12 L -40 -25 Q -36 -10 -45 0 L -31 1 L -34 15 L -21 9 L -19 22 L -9 12 L 1 13 Z" fill="url(#shadeling_3-wing)" stroke="#0a1110" stroke-width="3.6"/>
+<g clip-path="url(#shadeling_3-c1)">
+<path d="M -40 -25 L -14 -12 L 0 4 L -30 -3 Z" fill="#66658f"/>
+<path d="M -30 -3 L -34 15 L -21 9 L -19 22 L -13 5 Z" fill="#252e44"/>
+<path d="M -38 -22 L -14 -10 L -2 2" fill="none" stroke="#b5adea" stroke-width="2.2"/>
+<path d="M -30 -2 L -22 7 L -19 18" fill="none" stroke="#7e75bd" stroke-width="1.6"/>
+<path d="M -11 12 L -2 12" fill="none" stroke="#b59871" stroke-width="1.6" opacity="0.8"/>
+</g>
+<path d="M 0 1 L -14 -12 L -40 -25 Q -36 -10 -45 0 L -31 1 L -34 15 L -21 9 L -19 22 L -9 12 L 1 13 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+</g>
+<g>
+<path d="M 50 59 L 45 78 L 55 72 L 58 83 L 64 62 L 56 54 Z" fill="#24293c" stroke="#0a1110" stroke-width="3"/>
+<g clip-path="url(#shadeling_3-c2)">
+<path d="M 53 65 L 49 75" fill="none" stroke="#9181cb" stroke-width="2"/>
+</g>
+<path d="M 50 59 L 45 78 L 55 72 L 58 83 L 64 62 L 56 54 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 56 29 L 66 41 L 69 54 L 56 67 L 43 54 L 46 41 Z" fill="url(#shadeling_3-core)" stroke="#0a1110" stroke-width="3.7"/>
+<g clip-path="url(#shadeling_3-c3)">
+<path d="M 56 29 L 56 50 L 43 54 L 46 41 Z" fill="#67698e"/>
+<path d="M 56 50 L 69 54 L 56 67 Z" fill="#151a2a"/>
+<path d="M 47 41 L 56 31 L 62 38" fill="none" stroke="#b2a5db" stroke-width="2.3"/>
+<path d="M 65 57 L 57 64" fill="none" stroke="#d2af72" stroke-width="1.8"/>
+</g>
+<path d="M 56 29 L 66 41 L 69 54 L 56 67 L 43 54 L 46 41 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 47 45 L 54 48 L 51 51 L 46 49 Z" fill="#c0b7ef" stroke="#0a1110" stroke-width="1.1"/>
+<path d="M 58 48 L 65 45 L 66 49 L 61 51 Z" fill="#d0c4ff" stroke="#0a1110" stroke-width="1.1"/>
+<path d="M 54 54 L 58 54 L 56 59 Z" fill="#0b111a"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+<linearGradient id="decal_lighthouse_2-stone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#464255"/><stop offset="0.5" stop-color="#292b39"/><stop offset="1" stop-color="#171e29"/></linearGradient>
+<linearGradient id="decal_lighthouse_2-bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#756149"/><stop offset="0.5" stop-color="#493e36"/><stop offset="1" stop-color="#222531"/></linearGradient>
+<linearGradient id="decal_lighthouse_2-cloth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#484052"/><stop offset="0.5" stop-color="#282637"/><stop offset="1" stop-color="#131b26"/></linearGradient>
+<clipPath id="decal_lighthouse_2-c0"><path d="M 13 49 Q 17 44 24 47 L 27 43 L 37 46 Q 45 42 51 48 L 55 52 Q 42 56 31 53 Q 20 56 10 53 Z" fill="#fff"/></clipPath>
+<clipPath id="decal_lighthouse_2-c1"><path d="M 15 33 Q 19 30 23 33 L 23 50 Q 19 53 15 50 Z" fill="#fff"/></clipPath>
+<clipPath id="decal_lighthouse_2-c2"><path d="M 27 19 Q 31 16 35 19 L 35 50 Q 31 53 27 50 Z" fill="#fff"/></clipPath>
+<clipPath id="decal_lighthouse_2-c3"><path d="M 39 37 Q 43 34 47 37 L 47 51 Q 43 54 39 51 Z" fill="#fff"/></clipPath>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g>
+<path d="M 13 49 Q 17 44 24 47 L 27 43 L 37 46 Q 45 42 51 48 L 55 52 Q 42 56 31 53 Q 20 56 10 53 Z" fill="#242330" stroke="#0a1110" stroke-width="1.5"/>
+<g clip-path="url(#decal_lighthouse_2-c0)">
+<path d="M 14 51 Q 22 49 28 51" fill="none" stroke="#494051" stroke-width="1"/>
+</g>
+<path d="M 13 49 Q 17 44 24 47 L 27 43 L 37 46 Q 45 42 51 48 L 55 52 Q 42 56 31 53 Q 20 56 10 53 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 15 33 Q 19 30 23 33 L 23 50 Q 19 53 15 50 Z" fill="url(#decal_lighthouse_2-cloth)" stroke="#0a1110" stroke-width="1.6"/>
+<g clip-path="url(#decal_lighthouse_2-c1)">
+<path d="M 16 34 L 18 35 L 18 49 L 16 50 Z" fill="#514759"/>
+<path d="M 18 34 Q 21 36 23 33 L 23 42 Q 20 45 20 39 Z" fill="#383140"/>
+</g>
+<path d="M 15 33 Q 19 30 23 33 L 23 50 Q 19 53 15 50 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 19 33 L 20 29" fill="none" stroke="#76644f" stroke-width="1.1"/>
+<g>
+<path d="M 27 19 Q 31 16 35 19 L 35 50 Q 31 53 27 50 Z" fill="url(#decal_lighthouse_2-cloth)" stroke="#0a1110" stroke-width="1.6"/>
+<g clip-path="url(#decal_lighthouse_2-c2)">
+<path d="M 28 20 L 30 21 L 30 49 L 28 50 Z" fill="#514759"/>
+<path d="M 30 20 Q 33 22 35 19 L 35 28 Q 32 31 32 25 Z" fill="#383140"/>
+</g>
+<path d="M 27 19 Q 31 16 35 19 L 35 50 Q 31 53 27 50 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 31 19 L 32 15" fill="none" stroke="#76644f" stroke-width="1.1"/>
+<g>
+<path d="M 39 37 Q 43 34 47 37 L 47 51 Q 43 54 39 51 Z" fill="url(#decal_lighthouse_2-cloth)" stroke="#0a1110" stroke-width="1.6"/>
+<g clip-path="url(#decal_lighthouse_2-c3)">
+<path d="M 40 38 L 42 39 L 42 50 L 40 51 Z" fill="#514759"/>
+<path d="M 42 38 Q 45 40 47 37 L 47 46 Q 44 49 44 43 Z" fill="#383140"/>
+</g>
+<path d="M 39 37 Q 43 34 47 37 L 47 51 Q 43 54 39 51 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 43 37 L 44 33" fill="none" stroke="#76644f" stroke-width="1.1"/>
+<path d="M 33 12 Q 28 8 33 5" fill="none" stroke="#74657d" stroke-width="1.1" opacity="0.25"/>
+</g>
+</svg>

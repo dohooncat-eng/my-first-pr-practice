@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<defs>
+<linearGradient id="decal_lighthouse_3-stone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#464255"/><stop offset="0.5" stop-color="#292b39"/><stop offset="1" stop-color="#171e29"/></linearGradient>
+<linearGradient id="decal_lighthouse_3-bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#756149"/><stop offset="0.5" stop-color="#493e36"/><stop offset="1" stop-color="#222531"/></linearGradient>
+<linearGradient id="decal_lighthouse_3-cloth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#484052"/><stop offset="0.5" stop-color="#282637"/><stop offset="1" stop-color="#131b26"/></linearGradient>
+<clipPath id="decal_lighthouse_3-c0"><path d="M 14 46 L 28 38 L 43 42 L 50 51 L 42 56 L 21 55 L 10 51 Z" fill="#fff"/></clipPath>
+<clipPath id="decal_lighthouse_3-c1"><path d="M 36 12 Q 44 10 51 16 L 55 27 L 46 23 L 45 30 L 40 26 L 34 29 Z" fill="#fff"/></clipPath>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<g>
+<path d="M 14 46 L 28 38 L 43 42 L 50 51 L 42 56 L 21 55 L 10 51 Z" fill="url(#decal_lighthouse_3-stone)" stroke="#0a1110" stroke-width="1.9"/>
+<g clip-path="url(#decal_lighthouse_3-c0)">
+<path d="M 28 40 L 33 50 L 45 52 L 41 55 L 21 53 L 14 49 Z" fill="#252b36"/>
+<path d="M 16 46 L 27 41 L 36 43" fill="none" stroke="#615a70" stroke-width="1.2"/>
+</g>
+<path d="M 14 46 L 28 38 L 43 42 L 50 51 L 42 56 L 21 55 L 10 51 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 29 46 L 36 9" fill="none" stroke="#0a1110" stroke-width="4"/>
+<path d="M 29 45 L 36 9" fill="none" stroke="#625449" stroke-width="1.7"/>
+<g>
+<path d="M 36 12 Q 44 10 51 16 L 55 27 L 46 23 L 45 30 L 40 26 L 34 29 Z" fill="url(#decal_lighthouse_3-cloth)" stroke="#0a1110" stroke-width="1.5"/>
+<g clip-path="url(#decal_lighthouse_3-c1)">
+<path d="M 37 14 Q 45 13 49 17 L 47 21 L 37 20 Z" fill="#51455c"/>
+<path d="M 38 15 Q 45 14 49 17" fill="none" stroke="#7a6a7e" stroke-width="1.1"/>
+<path d="M 36 25 L 40 24" fill="none" stroke="#847056" stroke-width="1"/>
+</g>
+<path d="M 36 12 Q 44 10 51 16 L 55 27 L 46 23 L 45 30 L 40 26 L 34 29 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 12 54 L 15 44 L 17 53 L 21 47 L 20 55 Z" fill="#2b2935"/>
+<path d="M 43 55 L 46 47 L 47 53 L 53 49 L 50 56 Z" fill="#262832"/>
+</g>
+</svg>

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360">
+<defs>
+<linearGradient id="stage_lighthouse-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08080f"/><stop offset="0.3333333333333333" stop-color="#1d1b31"/><stop offset="0.6666666666666666" stop-color="#2d2941"/><stop offset="1" stop-color="#111622"/></linearGradient>
+<linearGradient id="stage_lighthouse-cloud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#504369" stop-opacity="0"/><stop offset="0.5" stop-color="#504369" stop-opacity="0.33"/><stop offset="1" stop-color="#5b4b70" stop-opacity="0"/></linearGradient>
+<linearGradient id="stage_lighthouse-horizon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8473a7" stop-opacity="0"/><stop offset="0.5" stop-color="#8473a7" stop-opacity="0.17"/><stop offset="1" stop-color="#8473a7" stop-opacity="0"/></linearGradient>
+<linearGradient id="stage_lighthouse-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffd27a" stop-opacity="0"/><stop offset="0.5" stop-color="#ffd27a" stop-opacity="0.035"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0.3"/></linearGradient>
+<radialGradient id="stage_lighthouse-glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ffd27a" stop-opacity="0.45"/><stop offset="0.5" stop-color="#c79355" stop-opacity="0.1"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+<linearGradient id="stage_lighthouse-masonry" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#777180"/><stop offset="0.3333333333333333" stop-color="#4e495a"/><stop offset="0.6666666666666666" stop-color="#292a3a"/><stop offset="1" stop-color="#151c2b"/></linearGradient>
+<linearGradient id="stage_lighthouse-roof" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a28a72"/><stop offset="0.5" stop-color="#504356"/><stop offset="1" stop-color="#242535"/></linearGradient>
+<linearGradient id="stage_lighthouse-glass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c28c4c"/><stop offset="0.5" stop-color="#ffda89"/><stop offset="1" stop-color="#a77b4a"/></linearGradient>
+<linearGradient id="stage_lighthouse-rock" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="#474150"/><stop offset="0.5" stop-color="#242532"/><stop offset="1" stop-color="#101724"/></linearGradient>
+<linearGradient id="stage_lighthouse-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#242236"/><stop offset="0.5" stop-color="#101521"/><stop offset="1" stop-color="#080c15"/></linearGradient>
+<radialGradient id="stage_lighthouse-mist" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#9c89b9" stop-opacity="0.14"/><stop offset="0.5" stop-color="#6f608e" stop-opacity="0.06"/><stop offset="1" stop-color="#6f608e" stop-opacity="0"/></radialGradient>
+<filter id="stage_lighthouse-cloud-soft" x="-32" y="-32" width="704" height="424" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="3.5"/></filter>
+<linearGradient id="stage_lighthouse-bottom" x1="0" y1="0.45" x2="0" y2="1"><stop offset="0" stop-color="#08080f" stop-opacity="0"/><stop offset="0.3333333333333333" stop-color="#08080f" stop-opacity="0.5"/><stop offset="0.6666666666666666" stop-color="#08080f" stop-opacity="0.94"/><stop offset="1" stop-color="#08080f" stop-opacity="1"/></linearGradient>
+<radialGradient id="stage_lighthouse-vignette" cx="0.58" cy="0.43" r="0.74"><stop offset="0" stop-color="#08080f" stop-opacity="0"/><stop offset="0.5" stop-color="#08080f" stop-opacity="0"/><stop offset="1" stop-color="#08080f" stop-opacity="0.68"/></radialGradient>
+<clipPath id="stage_lighthouse-c0"><path d="M 363 211 L 425 208 L 441 219 L 431 231 L 363 235 L 352 225 Z" fill="#fff"/></clipPath>
+<clipPath id="stage_lighthouse-c1"><path d="M 383 96 L 419 96 L 426 196 L 433 215 Q 404 226 365 217 L 375 192 Z" fill="#fff"/></clipPath>
+<clipPath id="stage_lighthouse-c2"><path d="M 390 214 L 390 195 Q 396 185 403 194 L 405 218 Z" fill="#fff"/></clipPath>
+<clipPath id="stage_lighthouse-c3"><path d="M 374 92 Q 402 100 428 91 L 428 99 Q 402 108 374 100 Z" fill="#fff"/></clipPath>
+<clipPath id="stage_lighthouse-c4"><path d="M 382 61 L 421 61 L 421 91 Q 402 98 382 91 Z" fill="#fff"/></clipPath>
+<clipPath id="stage_lighthouse-c5"><path d="M 374 62 L 384 55 L 399 39 L 405 39 L 421 54 L 430 61 Q 405 70 374 62 Z" fill="#fff"/></clipPath>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+<rect width="640" height="360" fill="url(#stage_lighthouse-sky)"/>
+<g filter="url(#stage_lighthouse-cloud-soft)">
+<path d="M -20 89 Q 63 16 218 29 Q 306 36 351 14 Q 285 69 179 54 Q 57 48 -20 106 Z" fill="url(#stage_lighthouse-cloud)"/>
+<path d="M 470 30 Q 547 16 657 70 L 656 106 Q 561 50 475 59 Q 533 37 470 30 Z" fill="#292239" opacity="0.5"/>
+<path d="M -10 130 Q 91 87 221 108 Q 279 118 327 96 Q 307 126 239 132 Q 111 109 -10 151 Z" fill="url(#stage_lighthouse-cloud)"/>
+<path d="M 443 121 Q 535 88 653 141 L 650 167 Q 555 134 443 143 Q 500 128 443 121 Z" fill="url(#stage_lighthouse-cloud)"/>
+</g>
+<rect x="0" y="142" width="640" height="90" fill="url(#stage_lighthouse-horizon)"/>
+<g opacity="0.78">
+<path d="M 107 110 Q 81 100 80 76 Q 91 89 101 87 L 95 69 Q 118 80 121 100 L 136 103 Q 156 85 153 66 Q 168 88 154 107 L 167 134 L 185 199 L 164 181 L 171 215 L 140 205 L 119 216 L 93 202 L 72 214 L 83 181 L 63 195 L 81 136 Z" fill="#0d101d"/>
+<path d="M 111 110 L 124 98 L 138 105 L 143 126 L 128 140 L 115 133 Z" fill="#232037"/>
+<path d="M 83 81 Q 88 98 108 103 M 155 82 Q 160 96 145 108" fill="none" stroke="#514361" stroke-width="1.6" opacity="0.6"/>
+<ellipse cx="125" cy="162" rx="18" ry="21" fill="url(#stage_lighthouse-glow)" />
+<circle cx="125" cy="162" r="10" fill="#9f7846" opacity="0.35"/>
+<path d="M 113 151 L 119 158 L 117 170 L 124 179 L 116 176 L 108 165 Z" fill="#10121f"/>
+<path d="M 138 151 L 132 160 L 135 171 L 127 180 L 139 170 Z" fill="#10121f"/>
+</g>
+<path d="M 399 76 L -15 14 L -15 170 L 399 87 Z" fill="url(#stage_lighthouse-beam)"/>
+<path d="M 403 78 L 651 113 L 651 137 L 403 85 Z" fill="#f4c77b" opacity="0.035"/>
+<ellipse cx="401" cy="80" rx="79" ry="63" fill="url(#stage_lighthouse-glow)" />
+<rect x="0" y="215" width="640" height="145" fill="url(#stage_lighthouse-sea)"/>
+<ellipse cx="310" cy="213" rx="430" ry="24" fill="url(#stage_lighthouse-mist)" />
+<path d="M 251 228 L 277 211 L 315 204 L 343 192 L 378 199 L 409 191 L 440 202 L 468 211 L 493 232 L 472 251 L 449 265 L 416 274 L 381 282 L 341 274 L 308 260 L 275 253 Z" fill="url(#stage_lighthouse-rock)" stroke="#101421" stroke-width="2.5"/>
+<path d="M 263 228 L 308 216 L 346 207 L 381 212 L 413 205 L 456 217 L 484 232 L 449 243 L 413 247 L 378 253 L 338 243 L 304 244 Z" fill="#3b3746"/>
+<path d="M 281 237 L 306 242 L 319 263 L 302 257 Z M 334 245 L 351 247 L 365 277 L 343 268 Z M 393 250 L 407 247 L 399 278 L 382 282 Z M 441 243 L 463 240 L 449 265 L 427 272 Z" fill="#171c2a"/>
+<path d="M 270 225 L 311 214 L 344 207 M 415 208 L 451 219 L 479 232" fill="none" stroke="#7c6e77" stroke-width="1.5" opacity="0.55"/>
+<g>
+<path d="M 363 211 L 425 208 L 441 219 L 431 231 L 363 235 L 352 225 Z" fill="#353441" stroke="#0a1110" stroke-width="2.3"/>
+<g clip-path="url(#stage_lighthouse-c0)">
+<path d="M 363 214 L 423 211 L 436 219 L 425 224 L 359 228 Z" fill="#5a5056"/>
+<path d="M 363 230 L 428 227" fill="none" stroke="#232536" stroke-width="1.7"/>
+</g>
+<path d="M 363 211 L 425 208 L 441 219 L 431 231 L 363 235 L 352 225 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 383 96 L 419 96 L 426 196 L 433 215 Q 404 226 365 217 L 375 192 Z" fill="url(#stage_lighthouse-masonry)" stroke="#0a1110" stroke-width="2.4"/>
+<g clip-path="url(#stage_lighthouse-c1)">
+<path d="M 386 98 L 399 99 L 396 213 L 374 216 L 382 188 Z" fill="#6d6268" opacity="0.55"/>
+<path d="M 409 98 L 419 98 L 426 195 L 431 214 L 412 220 Z" fill="#232737"/>
+<path d="M 386 101 L 378 192 L 371 214" fill="none" stroke="#b49a83" stroke-width="1.6" opacity="0.85"/>
+<path d="M 388 120 L 410 119 M 380 158 L 417 157 M 376 190 L 420 189" fill="none" stroke="#242838" stroke-width="1.2" opacity="0.8"/>
+<path d="M 390 121 L 389 138 M 404 159 L 405 175 M 393 191 L 391 208" fill="none" stroke="#353342" stroke-width="1.1" opacity="0.8"/>
+<path d="M 403 133 L 407 139 L 402 145 L 408 153 L 405 173 L 412 180" fill="#1e2433" stroke="#0a1110" stroke-width="1.2"/>
+</g>
+<path d="M 383 96 L 419 96 L 426 196 L 433 215 Q 404 226 365 217 L 375 192 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<g>
+<path d="M 390 214 L 390 195 Q 396 185 403 194 L 405 218 Z" fill="#151b29" stroke="#0a1110" stroke-width="1.7"/>
+<g clip-path="url(#stage_lighthouse-c2)">
+<path d="M 392 197 Q 396 191 399 195 L 401 216" fill="none" stroke="#64534b" stroke-width="1.1"/>
+</g>
+<path d="M 390 214 L 390 195 Q 396 185 403 194 L 405 218 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 394 151 L 394 142 Q 397 138 400 142 L 400 151 Z" fill="#211f2b" stroke="#0a1110" stroke-width="1.2"/>
+<path d="M 395 143 L 398 142 L 398 149 L 395 150 Z" fill="#c89a5d" opacity="0.7"/>
+<g>
+<path d="M 374 92 Q 402 100 428 91 L 428 99 Q 402 108 374 100 Z" fill="url(#stage_lighthouse-roof)" stroke="#0a1110" stroke-width="2"/>
+<g clip-path="url(#stage_lighthouse-c3)">
+<path d="M 376 95 Q 402 102 426 94" fill="none" stroke="#b49776" stroke-width="1.3"/>
+</g>
+<path d="M 374 92 Q 402 100 428 91 L 428 99 Q 402 108 374 100 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 370 87 Q 402 97 432 86" fill="none" stroke="#111824" stroke-width="2"/>
+<path d="M 370 87 L 370 98 M 380 90 L 380 101 M 391 93 L 391 103 M 415 92 L 415 102 M 431 87 L 431 97" fill="none" stroke="#232738" stroke-width="1.7"/>
+<g>
+<path d="M 382 61 L 421 61 L 421 91 Q 402 98 382 91 Z" fill="url(#stage_lighthouse-glass)" stroke="#0a1110" stroke-width="1.8"/>
+<g clip-path="url(#stage_lighthouse-c4)">
+<path d="M 382 65 L 390 65 L 390 92 L 382 90 Z" fill="#7d684e"/>
+<path d="M 412 64 L 421 62 L 421 91 L 412 93 Z" fill="#9b764b"/>
+<path d="M 394 67 L 394 89" fill="none" stroke="#fff2b7" stroke-width="1.1" opacity="0.6"/>
+</g>
+<path d="M 382 61 L 421 61 L 421 91 Q 402 98 382 91 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 400 89 Q 391 85 397 77 Q 400 72 400 69 Q 408 77 406 84 Q 405 89 400 89 Z" fill="#fff0b6"/>
+<path d="M 400 84 Q 398 80 401 77 Q 404 80 403 84 Z" fill="#fff8d9"/>
+<path d="M 382 64 L 382 92 M 391 64 L 391 94 M 412 63 L 412 94 M 421 63 L 421 91" fill="none" stroke="#272838" stroke-width="2.2"/>
+<g>
+<path d="M 374 62 L 384 55 L 399 39 L 405 39 L 421 54 L 430 61 Q 405 70 374 62 Z" fill="url(#stage_lighthouse-roof)" stroke="#0a1110" stroke-width="2.3"/>
+<g clip-path="url(#stage_lighthouse-c5)">
+<path d="M 400 41 L 406 43 L 422 58 L 425 61 L 404 64 Z" fill="#333044"/>
+<path d="M 379 60 L 399 43" fill="none" stroke="#ba9b79" stroke-width="1.7"/>
+<path d="M 382 62 Q 400 67 424 61" fill="none" stroke="#d0ac7d" stroke-width="1.1"/>
+</g>
+<path d="M 374 62 L 384 55 L 399 39 L 405 39 L 421 54 L 430 61 Q 405 70 374 62 Z" fill="none" stroke="#0a1110" stroke-width="1.1"/>
+</g>
+<path d="M 402 39 L 403 27" fill="none" stroke="#191e2c" stroke-width="2.4"/>
+<path d="M 403 28 L 416 25 L 411 30 L 415 34 L 403 32 Z" fill="#4e4054" stroke="#0a1110" stroke-width="1"/>
+<path d="M 404 29 L 412 27" fill="none" stroke="#80677a" stroke-width="0.9"/>
+<g transform="translate(492 132) rotate(-9) scale(0.8)">
+<path d="M 0 3 L -9 -5 L -31 -14 L -24 1 L -28 9 L -14 7 L -10 15 L -4 8 L 0 13 L 4 8 L 10 15 L 14 7 L 28 9 L 24 1 L 31 -14 L 9 -5 Z" fill="#101522" stroke="#0a1110" stroke-width="1.5"/>
+<path d="M -27 -11 L -9 -3 L -3 3 M 27 -11 L 9 -3 L 3 3" fill="none" stroke="#665979" stroke-width="1.3" opacity="0.7"/>
+<path d="M 0 -6 L 5 3 L 0 13 L -5 3 Z" fill="#373147"/>
+</g>
+<g transform="translate(542 170) rotate(17) scale(0.52)">
+<path d="M 0 3 L -9 -5 L -31 -14 L -24 1 L -28 9 L -14 7 L -10 15 L -4 8 L 0 13 L 4 8 L 10 15 L 14 7 L 28 9 L 24 1 L 31 -14 L 9 -5 Z" fill="#101522" stroke="#0a1110" stroke-width="1.5"/>
+<path d="M -27 -11 L -9 -3 L -3 3 M 27 -11 L 9 -3 L 3 3" fill="none" stroke="#665979" stroke-width="1.3" opacity="0.7"/>
+<path d="M 0 -6 L 5 3 L 0 13 L -5 3 Z" fill="#373147"/>
+</g>
+<g transform="translate(259 176) rotate(-18) scale(0.4)">
+<path d="M 0 3 L -9 -5 L -31 -14 L -24 1 L -28 9 L -14 7 L -10 15 L -4 8 L 0 13 L 4 8 L 10 15 L 14 7 L 28 9 L 24 1 L 31 -14 L 9 -5 Z" fill="#101522" stroke="#0a1110" stroke-width="1.5"/>
+<path d="M -27 -11 L -9 -3 L -3 3 M 27 -11 L 9 -3 L 3 3" fill="none" stroke="#665979" stroke-width="1.3" opacity="0.7"/>
+<path d="M 0 -6 L 5 3 L 0 13 L -5 3 Z" fill="#373147"/>
+</g>
+<path d="M 219 244 Q 240 235 258 237 M 487 242 Q 520 244 538 252 M 268 270 Q 314 283 338 280 M 421 284 Q 466 274 483 265" fill="none" stroke="#5c516c" stroke-width="1.1" opacity="0.35"/>
+<path d="M 375 244 L 411 244 M 381 252 L 405 252 M 389 261 L 402 261" fill="none" stroke="#c49555" stroke-width="1.7" opacity="0.19"/>
+<path d="M 0 286 L 45 260 L 70 269 L 91 252 L 121 281 L 153 290 L 179 320 L 200 360 L 0 360 Z" fill="#090e18"/>
+<path d="M 640 268 L 603 249 L 579 265 L 558 263 L 536 288 L 504 302 L 478 360 L 640 360 Z" fill="#090e18"/>
+<path d="M 12 286 L 44 265 L 63 273 M 574 272 L 601 254 L 627 266" fill="none" stroke="#3b324b" stroke-width="1.4" opacity="0.4"/>
+<rect width="640" height="360" fill="url(#stage_lighthouse-vignette)"/>
+<rect width="640" height="360" fill="url(#stage_lighthouse-bottom)"/>
+</g>
+</svg>
