@@ -5,7 +5,7 @@
   for (let i = 0; i < 160; i++) pool.push({ life: 0, age: 0, x: 0, y: 0, vx: 0, vy: 0, size: 0, color: '', delay: 0, beam: false });
   let cv, ctx, raf = 0, last = 0, dpr = 1;
   const motions = [];
-  const quiet = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const quiet = () => document.documentElement.classList.contains('reduce-motion') || !!(G.meta && G.meta.settings.reducedMotion) || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const small = () => window.innerWidth < 600 || (G.meta && G.meta.settings.quality === 'low');
   function resize() {
     dpr = small() ? 1 : Math.min(1.5, window.devicePixelRatio || 1);
@@ -35,6 +35,7 @@
     if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
   }
   function tick(now) {
+    if (quiet()) { G.celebrate.clear(); return; }
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

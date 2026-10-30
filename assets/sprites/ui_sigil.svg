@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+<defs><radialGradient id="uis-ground"><stop stop-color="#eec77a" stop-opacity=".16"/><stop offset=".7" stop-color="#a4d6b4" stop-opacity=".04"/><stop offset="1" stop-color="#a4d6b4" stop-opacity="0"/></radialGradient></defs>
+<circle cx="200" cy="200" r="196" fill="url(#uis-ground)"/>
+<g fill="none" stroke="#c5ad74"><circle cx="200" cy="200" r="153" stroke-opacity=".4"/><circle cx="200" cy="200" r="143" stroke-opacity=".18"/><circle cx="200" cy="200" r="172" stroke-opacity=".2" stroke-dasharray="78 12 4 12"/><path d="m200 25 10 22-10 18-10-18Zm175 175-22 10-18-10 18-10ZM200 375l-10-22 10-18 10 18ZM25 200l22-10 18 10-18 10Z" stroke-opacity=".65"/><path d="m79 79 22 7-15 15Zm242 0-7 22-15-15Zm0 242-22-7 15-15Zm-242 0 7-22 15 15Z" stroke-opacity=".5"/></g>
+<g fill="#ffe6a4"><path d="m200 28 4 16-4 7-4-7ZM372 200l-16 4-7-4 7-4ZM200 372l-4-16 4-7 4 7ZM28 200l16-4 7 4-7 4Z"/><circle cx="93" cy="93" r="2"/><circle cx="307" cy="93" r="2"/><circle cx="307" cy="307" r="2"/><circle cx="93" cy="307" r="2"/></g>
+</svg>

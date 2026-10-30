@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="uib-glass" cx=".4" cy=".3"><stop stop-color="#9cddf0" stop-opacity=".75"/><stop offset=".7" stop-color="#356778" stop-opacity=".5"/><stop offset="1" stop-color="#12343e" stop-opacity=".9"/></radialGradient>
+    <linearGradient id="uib-rim" x2=".6" y2="1"><stop stop-color="#e6f6dc"/><stop offset=".5" stop-color="#8bbfbc"/><stop offset="1" stop-color="#658585"/></linearGradient>
+  </defs>
+  <path d="m32 6 22 8v19c0 12-12 21-22 26C22 54 10 45 10 33V14Z" fill="#0b201e" stroke="#091410" stroke-width="5" stroke-linejoin="round"/>
+  <path d="m32 6 22 8v19c0 12-12 21-22 26C22 54 10 45 10 33V14Z" fill="url(#uib-glass)" stroke="url(#uib-rim)" stroke-width="3"/>
+  <path d="m17 19 15-6 15 6v13c0 9-8 16-15 21-7-5-15-12-15-21Z" fill="none" stroke="#b9e6dc" stroke-opacity=".5"/>
+  <path d="m32 21 4 9 9 4-9 4-4 10-4-10-9-4 9-4Z" fill="#c7f2e8"/>
+  <path d="m32 28 3 6-3 7-3-7Z" fill="#ffde93"/>
+  <path d="m17 19 15-6v8l-9 9-6 2Z" fill="#d2f0e3" opacity=".15"/>
+</svg>

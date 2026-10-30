@@ -69,7 +69,7 @@
   }
 
   function reducedMotion() {
-    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    return document.documentElement.classList.contains('reduce-motion') || !!meta().settings.reducedMotion || !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
   // 그림이 아직 없을 때 깨진 그림 대신 빈 자리를 보이게
@@ -85,8 +85,12 @@
   }
 
   function show(name) {
+    const changed = current !== name;
     current = name;
+    document.documentElement.dataset.screen = name || 'playing';
+    document.documentElement.classList.toggle('reduce-motion', !!meta().settings.reducedMotion);
     SCREENS.forEach((s) => { $('screen-' + s).hidden = s !== name; });
+    if (changed && name) { const scroll = $('screen-' + name).querySelector('.menu-content'); if (scroll) scroll.scrollTop = 0; }
     $('pause-btn').hidden = !(name === null && game && game.state === 'playing');
   }
 
@@ -144,7 +148,10 @@
     game.pickedDifficulty = diff.id;
     $('lobby-stage-name').textContent = st.name;
     $('lobby-stage-thumb').src = G.spriteUrl(st.thumb);
-    $('lobby-rewards').textContent = '금화 ' + diff.gold + '배 · 클리어 결정 ' + diff.crystals;
+    $('lobby-rewards').textContent = '금화 ×' + diff.gold + '  ·  클리어 결정 ' + Math.round(diff.crystals * (1 + G.STAGES.indexOf(st) * 0.5));
+    const hero = G.CHAMPIONS[pickedChampion || 'keeper'];
+    $('lobby-hero-art').src = G.spriteUrl(hero.sprite + '_0');
+    $('lobby-hero-name').textContent = hero.name;
     const box = $('lobby-difficulties');
     box.textContent = '';
     G.DIFFICULTIES.forEach((d) => {
@@ -253,7 +260,7 @@
       btn.appendChild(thumb);
       const body = el('span', 'stage-body');
       const top = el('span', 'stage-top');
-      top.appendChild(el('span', 'stage-num', 'STAGE ' + (i + 1)));
+      top.appendChild(el('span', 'stage-num', '제 ' + (i + 1) + ' 장'));
       if (m.cleared && m.cleared[st.id]) top.appendChild(el('span', 'badge badge-clear', '클리어'));
       (G.DIFFICULTIES || []).forEach((d) => {
         if (d.id !== 'normal' && m.cleared && m.cleared[st.id + ':' + d.id]) top.appendChild(el('span', 'badge badge-diff-' + d.id, d.name));
@@ -277,6 +284,7 @@
       if (stageOpen && st.unlocks && st.unlocks.length) {
         body.appendChild(el('span', 'stage-unlocks is-open', '이 스테이지에서 열린 무기·패시브 ' + st.unlocks.length + '개'));
       }
+      body.appendChild(el('span', 'stage-enter', '여정 선택  ›'));
       btn.appendChild(body);
       if (unlocked) {
         btn.addEventListener('click', () => {
@@ -306,53 +314,56 @@
     list.textContent = '';
     refreshGold();
     const m = meta();
-    if (!pickedChampion || !(m.unlocked && m.unlocked[pickedChampion])) pickedChampion = 'keeper';
+    if (!pickedChampion || !m.unlocked[pickedChampion]) pickedChampion = 'keeper';
+    const selected = G.CHAMPIONS[pickedChampion];
+    const lv = m.champLv[pickedChampion] || 0;
+    const feature = $('hero-feature');
+    feature.className = 'hero-feature star-' + selected.star;
+    feature.textContent = '';
+    const art = el('div', 'hero-art');
+    art.appendChild(hideOnError(img(G.spriteUrl(selected.sprite + '_0'), '', 0, selected.name)));
+    feature.appendChild(art);
+    const info = el('div', 'hero-info');
+    info.appendChild(el('p', 'hero-rarity', stars(selected.star) + ' · Lv ' + lv));
+    info.appendChild(el('h3', 'hero-name', selected.name));
+    info.appendChild(el('p', 'hero-desc', selected.desc));
+    const weapon = el('p', 'hero-weapon');
+    weapon.appendChild(img(iconUrl(selected.weapon), '', 32, ''));
+    weapon.appendChild(el('span', '', G.WEAPONS[selected.weapon].name + ' · 시작 무기'));
+    info.appendChild(weapon);
+    info.appendChild(el('p', 'hero-trait', selected.trait));
+    info.appendChild(el('p', 'hero-build', selected.build));
+    const ability = el('div', 'hero-ability');
+    ability.appendChild(el('strong', '', selected.ability.name));
+    ability.appendChild(pips(lv, G.ABILITY_MAX));
+    info.appendChild(ability);
+    feature.appendChild(info);
+    $('hero-owned').textContent = G.CHAMPION_ORDER.filter((k) => m.unlocked[k]).length + ' / ' + G.CHAMPION_ORDER.length;
     G.CHAMPION_ORDER.forEach((key) => {
       const ch = G.CHAMPIONS[key];
-      const unlocked = !!(m.unlocked && m.unlocked[key]);
-      const lv = (m.champLv && m.champLv[key]) || 0;
-      const card = el('div', 'champ-card' + (unlocked ? '' : ' is-locked') + (key === pickedChampion ? ' is-picked' : ''));
+      const unlocked = !!m.unlocked[key];
+      const card = el('div', 'champ-card star-' + ch.star + (unlocked ? '' : ' is-locked') + (key === pickedChampion ? ' is-picked' : ''));
       const pick = el('button', 'champ-pick');
       pick.type = 'button';
       pick.id = 'champ-' + key;
       pick.setAttribute('aria-pressed', String(key === pickedChampion));
+      pick.setAttribute('aria-label', ch.name + (unlocked ? ' 선택' : ' · 영웅 소환에서 획득'));
       pick.disabled = !unlocked;
       const portrait = el('span', 'champ-portrait');
-      portrait.appendChild(img(G.spriteUrl(ch.sprite + '_0'), '', 0, ch.name));
+      portrait.appendChild(hideOnError(img(G.spriteUrl(ch.sprite + '_0'), '', 0, '')));
       pick.appendChild(portrait);
-      const body = el('span', 'champ-body');
-      body.appendChild(el('span', 'champ-name', ch.name));
-      body.appendChild(el('span', 'champ-desc', ch.desc));
-      const weapon = el('span', 'champ-weapon');
-      weapon.appendChild(img(iconUrl(ch.weapon), '', 22, ''));
-      weapon.appendChild(el('span', '', euroRo(G.WEAPONS[ch.weapon].name) + ' 시작'));
-      body.appendChild(weapon);
-      body.appendChild(el('span', 'champ-trait', ch.trait));
-      if (ch.build) body.appendChild(el('span', 'champ-trait champ-build', '잘 맞는 빌드: ' + ch.build));
-      const ab = el('span', 'champ-ability');
-      ab.appendChild(el('span', 'champ-ab-name', ch.ability.name));
-      ab.appendChild(pips(lv, G.ABILITY_MAX || 10, 'pips-small'));
-      body.appendChild(ab);
-      pick.appendChild(body);
-      card.appendChild(pick);
+      pick.appendChild(el('span', 'champ-stars', stars(ch.star)));
+      pick.appendChild(el('span', 'champ-name', ch.name));
+      if (!unlocked) { const lock = el('span', 'champ-lock'); lock.innerHTML = LOCK_SVG; pick.appendChild(lock); }
       if (unlocked) {
-        pick.addEventListener('click', () => {
-          sfx('select');
-          pickedChampion = key;
-          renderChampions();
-          const again = $('champ-' + key);
-          if (again) again.focus({ preventScroll: true });
-        });
+        pick.addEventListener('click', () => { sfx('select'); pickedChampion = key; renderChampions(); $('champ-' + key).focus({ preventScroll: true }); });
         pick.addEventListener('dblclick', startRun);
-      } else {
-        card.appendChild(el('span', 'champ-locked-note', '★'.repeat(ch.star || 1) + ' 영웅 소환에서 얻을 수 있습니다'));
       }
+      card.appendChild(pick);
       list.appendChild(card);
     });
-    const ch = G.CHAMPIONS[pickedChampion];
-    const st = G.stageById ? G.stageById(pickedStage) : G.STAGES[0];
-    const diff = pickedDiff();
-    $('champion-pick').textContent = st.name + (diff.id === 'normal' ? '' : ' ' + diff.name) + ' · ' + ch.name;
+    const st = G.stageById(pickedStage);
+    $('champion-pick').textContent = st.name + ' · ' + pickedDiff().name;
   }
 
   function openChampion(from) {
@@ -418,7 +429,7 @@
       const ch = G.CHAMPIONS[key];
       const unlocked = !!(m.unlocked && m.unlocked[key]);
       const lv = (m.champLv && m.champLv[key]) || 0;
-      const row = el('div', 'shop-row' + (unlocked ? '' : ' is-locked') + (lv >= max ? ' is-max' : ''));
+      const row = el('div', 'shop-row star-' + ch.star + ' ' + (unlocked ? '' : ' is-locked') + (lv >= max ? ' is-max' : ''));
       const portrait = el('span', 'shop-portrait');
       portrait.appendChild(img(G.spriteUrl(ch.sprite + '_0'), '', 0, ch.name));
       row.appendChild(portrait);
@@ -641,7 +652,7 @@
     res.results.forEach((r, i) => ul.appendChild(pullCard(r, i)));
     $('pull-eyebrow').textContent = ten ? '열 개의 빛 · 하나씩 깨어나는 축복' : '숲이 간직한 빛';
     $('pull-title').textContent = res.best === 3 ? '★★★ 밤을 가르는 전설' : res.best === 2 ? '★★ 달빛에 새겨진 축복' : '★ 등불에 깃든 축복';
-    $('pull-note').textContent = '★★★까지 ' + res.pityLeft + '회';
+    $('pull-note').textContent = '★★★까지 ' + (lastPull.cur === 'hero' ? G.heroPityLeft() : res.pityLeft) + '회';
     $('pull-whisper').textContent = '숲의 기억이 등불에 모입니다';
     pullPhase = 'charge';
     if (reducedMotion()) { finishPull(); return; }
@@ -725,7 +736,7 @@
     $('pull-fx').hidden = true;
     pullPhase = null;
     renderAltar();
-    if (gachaTab === 'coll') renderCollection();
+    if (gachaTab === 'coll') renderCollection(); else setGachaTab(gachaTab);
     const back = pullReturnFocus && pullReturnFocus.isConnected ? pullReturnFocus : $('pull-gold-1');
     back.focus({ preventScroll: true });
   }
@@ -785,8 +796,19 @@
 
   function setGachaTab(tab) {
     gachaTab = tab;
-    const altar = tab === 'altar';
-    $('tab-altar').setAttribute('aria-selected', String(altar));
+    $('screen-gacha').querySelector('.menu-content').scrollTop = 0;
+    const altar = tab !== 'coll';
+    const hero = tab === 'heroes';
+    $('pane-altar').dataset.mode = hero ? 'hero' : 'gear';
+    $('pane-altar').setAttribute('aria-labelledby', hero ? 'tab-heroes' : 'tab-altar');
+    $('tab-heroes').setAttribute('aria-selected', String(hero));
+    $('altar-kicker').textContent = hero ? '어둠을 함께 걸을 동료' : '모든 영웅에게 전해지는 축복';
+    $('altar-title').textContent = hero ? '밤을 걷는 영웅들' : '작은 빛, 끝없는 가능성';
+    $('gacha-pity').textContent = hero ? G.heroPityLeft() : G.gachaPityLeft();
+    const rates = hero ? G.HERO_GACHA.rates : G.GACHA.rates;
+    if (hero) $('pane-altar').querySelector('.altar-rates').textContent = '★★★ ' + (rates[3] * 100) + '% · ★★ ' + (rates[2] * 100) + '% · 10회 소환 시 ★★ 이상 1명 보장';
+    else $('pane-altar').querySelector('.altar-rates').textContent = '★★★ ' + (rates[3] * 100) + '% · ★★ ' + (rates[2] * 100) + '% · 10회 뽑기 시 ★★ 이상 1개 보장';
+    $('tab-altar').setAttribute('aria-selected', String(altar && !hero));
     $('tab-coll').setAttribute('aria-selected', String(!altar));
     $('pane-altar').hidden = !altar;
     $('pane-coll').hidden = altar;
@@ -797,17 +819,26 @@
     gachaFrom = from || 'title';
     gachaMsg('');
     renderAltar();
-    setGachaTab('altar');
+    setGachaTab(from === 'shop' ? 'heroes' : 'altar');
     show('gacha');
-    $('pull-gold-1').focus({ preventScroll: true });
+    $(from === 'shop' ? 'pull-hero-1' : 'pull-gold-1').focus({ preventScroll: true });
   }
 
   function openOdds() {
-    const o = G.gachaOdds();
+    const hero = gachaTab === 'heroes';
+    const percent = (n) => (n * 100).toFixed(3).replace(/\.?0+$/, '') + '%';
+    const o = hero ? {
+      groups: [3, 2, 1].map((star) => {
+        const keys = G.CHAMPION_ORDER.filter((k) => G.CHAMPIONS[k].star === star);
+        return { star, rateLabel: percent(G.HERO_GACHA.rates[star]), items: keys.map((k) => ({ name: G.CHAMPIONS[k].name, rateLabel: percent(G.HERO_GACHA.rates[star] / keys.length) })) };
+      }),
+      rules: ['10회 소환은 ★★ 이상 영웅 1명을 보장합니다.', G.HERO_GACHA.pity + '회 안에 ★★★ 영웅을 보장합니다. ★★★ 획득 시 횟수가 초기화됩니다.', '이미 보유한 영웅은 등급에 따라 조각으로 받습니다. ★ ' + G.HERO_GACHA.dupShards[1] + '개 · ★★ ' + G.HERO_GACHA.dupShards[2] + '개 · ★★★ ' + G.HERO_GACHA.dupShards[3] + '개', '같은 등급 안에서 각 영웅의 확률은 같습니다. 보장 소환에서는 등급 확률이 달라집니다.'],
+    } : G.gachaOdds();
+    $('odds-title').textContent = hero ? '영웅 소환 확률' : '장비 뽑기 확률';
     const body = $('odds-body');
     body.textContent = '';
     const c = G.GACHA.costs;
-    body.appendChild(el('p', 'odds-cost', '가격: 금화 1회 ' + fmtNum(c.gold.one) + ' · 10회 ' + fmtNum(c.gold.ten) +
+    body.appendChild(el('p', 'odds-cost', hero ? '별빛 결정 · 1회 ' + fmtNum(G.heroCost(1)) + ' / 10회 ' + fmtNum(G.heroCost(10)) : '가격: 금화 1회 ' + fmtNum(c.gold.one) + ' · 10회 ' + fmtNum(c.gold.ten) +
       ' / 별빛 결정 1회 ' + fmtNum(c.crystal.one) + ' · 10회 ' + fmtNum(c.crystal.ten)));
     o.groups.forEach((g) => {
       const sec = el('section', 'odds-group star-' + g.star);
@@ -818,7 +849,7 @@
       const table = el('table', 'odds-table');
       const thead = el('thead');
       const hr = el('tr');
-      hr.appendChild(el('th', '', '업그레이드'));
+      hr.appendChild(el('th', '', hero ? '영웅' : '업그레이드'));
       hr.appendChild(el('th', '', '1회 확률'));
       thead.appendChild(hr);
       table.appendChild(thead);
@@ -1033,6 +1064,7 @@
     $('set-shake').checked = s.shake;
     $('set-numbers').checked = s.numbers;
     $('set-fps').checked = s.fps;
+    $('set-motion').checked = !!s.reducedMotion;
     renderQuality();
     $('set-fullscreen').textContent = document.fullscreenElement ? '창 모드로' : '전체 화면으로';
     // 판 진행 중에는 데이터를 지울 수 없게
@@ -1074,6 +1106,7 @@
     $('set-music').addEventListener('change', () => { saveSettings(); });
     $('set-shake').addEventListener('change', (e) => { s().shake = e.target.checked; saveSettings(); sfx('click'); });
     $('set-numbers').addEventListener('change', (e) => { s().numbers = e.target.checked; saveSettings(); sfx('click'); });
+    $('set-motion').addEventListener('change', (e) => { s().reducedMotion = e.target.checked; document.documentElement.classList.toggle('reduce-motion', e.target.checked); if (e.target.checked) G.celebrate.clear(); saveSettings(); });
     $('set-fps').addEventListener('change', (e) => { s().fps = e.target.checked; saveSettings(); sfx('click'); });
     document.querySelectorAll('#set-quality .seg-btn').forEach((b) => b.addEventListener('click', () => {
       s().quality = b.dataset.q;
@@ -1254,7 +1287,7 @@
 
   // ---------- 상자 ----------
   // 연출: 떨어짐 → 흔들리며 틈새로 빛 → (등급 상승) → 자물쇠가 튕겨 나가고 뚜껑이 열리며 빛기둥 → 카드가 하나씩 솟아올라 뒤집힘
-  // 화면을 누르면 바로 마지막 상태로 건너뛴다.
+  // 컷신 길이를 지키고, 모든 보상이 나타난 뒤에만 받을 수 있다.
 
   const TIERS = ['wood', 'silver', 'gold'];
   const TIER_NAME = { wood: '나무 상자', silver: '은 상자', gold: '황금 상자' };
@@ -1371,6 +1404,8 @@
     const cards = buildChestCards(result);
     $('chest-result').setAttribute('aria-hidden', 'true');
     $('btn-chest-ok').classList.add('is-waiting');
+    $('btn-chest-ok').disabled = true;
+    $('chest-stage').setAttribute('aria-busy', 'true');
     $('chest-stage').focus({ preventScroll: true });
     const cel = G.celebrate;
     const box = () => cel.centerOf($('chest-stage').querySelector('.chest-box'));
@@ -1447,6 +1482,8 @@
     if (skipping && r && r.combo) sfx('evolve');
     $('chest-result').removeAttribute('aria-hidden');
     $('btn-chest-ok').classList.remove('is-waiting');
+    $('btn-chest-ok').disabled = false;
+    $('chest-stage').setAttribute('aria-busy', 'false');
     chestLater(80, () => { if (current === 'chest' && chestDone) $('btn-chest-ok').focus({ preventScroll: true }); });
   }
 
@@ -1528,10 +1565,12 @@
 
   function setCodexTab(tab) {
     codexTab = tab;
+    $('screen-codex').querySelector('.menu-content').scrollTop = 0;
     CODEX_TABS.forEach((t) => $('codex-tab-' + t).setAttribute('aria-selected', String(t === tab)));
     const box = $('codex-body');
     box.textContent = '';
     box.scrollTop = 0;
+    box.setAttribute('aria-labelledby', 'codex-tab-' + tab);
     if (tab === 'gacha') { const c = el('div', 'coll'); box.appendChild(c); renderCollection(c); }
     else if (tab === 'upgrade') { const c = el('div', 'shop-list'); box.appendChild(c); renderShop(c, true); }
     else if (tab === 'weapon') { const c = el('div', 'coll'); box.appendChild(c); renderCodexWeapons(c); }
@@ -1625,8 +1664,8 @@
     status.forEach((s) => { (groups[s.combo.type] || (groups[s.combo.type] = [])).push(s); });
     const labels = G.COMBO_TYPE_LABEL || { evolve: '진화', union: '무기 조합', fusion: '패시브 조합' };
     const rules = {
-      evolve: '무기 Lv 5 + 패시브 보유 → 상자에서 진화',
-      union: '두 무기 모두 Lv 5 → 상자에서 하나로, 칸 하나 더',
+      evolve: '무기 Lv ' + G.WEAPON_MAX + ' + 패시브 보유 → 상자에서 진화',
+      union: '두 무기 모두 Lv ' + G.WEAPON_MAX + ' → 상자에서 하나로, 칸 하나 더',
       fusion: '두 패시브 모두 Lv 5 → 상자에서 하나로, 칸 하나 더',
     };
     Object.keys(groups).forEach((type) => {
@@ -1714,6 +1753,8 @@
     endResult = r;
     endBonus = 0;
     const screen = $('screen-end');
+    const emblem = screen.querySelector('.end-emblem');
+    emblem.alt = r.win ? '새벽의 등불' : '잠든 등불';
     screen.classList.toggle('is-win', !!r.win);
     const st = G.stageById ? G.stageById(r.stageId) : G.STAGES[0];
     const dName = r.difficultyId && r.difficultyId !== 'normal' && G.difficultyById ? ' ' + G.difficultyById(r.difficultyId).name : '';
@@ -1825,6 +1866,15 @@
   function onKeyDown(e) {
     if (!game) return;
     const tag = e.target && e.target.tagName;
+    const modal = !$('dialog').hidden ? $('dialog') : !$('odds').hidden ? $('odds') : !$('pull-fx').hidden ? $('pull-fx') : null;
+    if (modal && e.key === 'Tab') {
+      const items = [...modal.querySelectorAll('button:not([disabled]), [tabindex="0"]')].filter((n) => n.getClientRects().length && getComputedStyle(n).visibility !== 'hidden');
+      if (!items.length) { e.preventDefault(); return; }
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) { first.focus(); e.preventDefault(); }
+    }
+    if (modal && modal !== $('pull-fx') && e.key !== 'Escape' && !e.key.startsWith('Arrow')) return;
     // 글자 입력칸: Esc(뒤로)만 화면이 처리하고 나머지 키는 입력칸이 쓴다
     if (tag === 'INPUT' && e.target.type === 'text' && e.key !== 'Escape') return;
     if (e.key === 'Escape') {
@@ -1889,9 +1939,11 @@
       $('lv-book-all').addEventListener('click', () => { sfx('click'); lvBookAll = true; renderLvBook(); });
       $('btn-lore').addEventListener('click', (e) => { e.stopPropagation(); closeLore(); });
       $('screen-lore').addEventListener('click', closeLore);
+      CODEX_TABS.forEach((t) => $('codex-tab-' + t).setAttribute('aria-controls', 'codex-body'));
       CODEX_TABS.forEach((t) => $('codex-tab-' + t).addEventListener('click', () => { sfx('click'); setCodexTab(t); }));
       $('btn-store').addEventListener('click', () => { sfx('click'); openStore('title'); });
       $('tab-altar').addEventListener('click', () => { sfx('click'); setGachaTab('altar'); });
+      $('tab-heroes').addEventListener('click', () => { sfx('click'); setGachaTab('heroes'); });
       $('tab-coll').addEventListener('click', () => { sfx('click'); setGachaTab('coll'); });
       document.querySelectorAll('#pane-altar .pull-btn').forEach((b) => b.addEventListener('click', () => doPull(Number(b.dataset.n), b.dataset.cur)));
       $('btn-odds').addEventListener('click', () => { sfx('click'); openOdds(); });

@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<defs><linearGradient id="uin-forge" x2=".7" y2="1"><stop stop-color="#fff0b7"/><stop offset=".45" stop-color="#d9bc7c"/><stop offset="1" stop-color="#947045"/></linearGradient></defs><path d="m32 5 22 9-3 26-19 18L13 40l-3-26Z" fill="#1a3834" stroke="url(#uin-forge)" stroke-width="3"/><path d="m20 41 23-23m-7-7 11 11-5 5-11-11ZM19 33l10 10-6 6-10-10Z" fill="url(#uin-forge)" stroke="#12211c" stroke-width="2"/><path d="m30 48 4-4 4 4-4 4Z" fill="#fff1b7"/>
+</svg>
