@@ -85,6 +85,9 @@
   }
 
   function show(name) {
+    if (name !== 'levelup' && !$('lv-book').hidden) toggleLvBook(false);
+    const oldTip = $('evolution-toast');
+    if (oldTip) oldTip.remove();
     const changed = current !== name;
     current = name;
     document.documentElement.dataset.screen = name || 'playing';
@@ -92,6 +95,14 @@
     SCREENS.forEach((s) => { $('screen-' + s).hidden = s !== name; });
     if (changed && name) { const scroll = $('screen-' + name).querySelector('.menu-content'); if (scroll) scroll.scrollTop = 0; }
     $('pause-btn').hidden = !(name === null && game && game.state === 'playing');
+    if (name === null && game && game.state === 'playing') {
+      const tip = G.evolution.lesson(game);
+      if (tip) {
+        tip.id = 'evolution-toast';
+        document.body.appendChild(tip);
+        setTimeout(() => tip.remove(), 10000);
+      }
+    }
   }
 
   // ---------- 확인 창 ----------
@@ -1145,7 +1156,7 @@
       const r = G.redeemCoupon ? G.redeemCoupon(code) : { ok: false, reason: 'invalid' };
       if (r.ok) {
         sfx('coin');
-        msg.textContent = '금화 ' + Number(r.gold).toLocaleString('ko-KR') + ' · 별빛 결정 ' + Number(r.crystals).toLocaleString('ko-KR') + '가 되었습니다';
+        msg.textContent = '금화 ' + Number(r.gold).toLocaleString('ko-KR') + ' · 별빛 결정 ' + Number(r.crystals).toLocaleString('ko-KR') + '가 되었습니다' + (r.granted.speedMode ? ' · 배속이 열렸습니다(일시정지 화면에서 바꿉니다)' : '');
         msg.dataset.state = 'ok';
         couponInput.value = '';
         refreshGold();
@@ -1189,6 +1200,15 @@
     else { $('lv-title').append('Lv '); const n = el('span', '', String(g.player.level)); n.id = 'lv-number'; $('lv-title').appendChild(n); }
     $('lv-sub').textContent = o.sub || '하나를 골라 등불을 키우세요';
     toggleLvBook(false);
+    if (choices[0] && choices[0].kind === 'branch') {
+      $('lv-title').textContent = choices[0].tier === 5 ? '갈래 선택' : '끝 형태 선택';
+      $('lv-sub').textContent = choices[0].tier === 5 ? '갈래를 고르면 열리는 조합 짝이 달라져요' : '끝 형태를 고르고, 짝 Lv 5와 상자에서 조합하세요';
+    }
+    const tipBox = $('lv-tip');
+    tipBox.textContent = '';
+    const tip = G.evolution.lesson(g, choices);
+    tipBox.hidden = !tip;
+    if (tip) tipBox.appendChild(tip);
     lvOnPick = onPick;
     renderCards(choices, 350);
     sfx('levelup');
@@ -1213,7 +1233,7 @@
       const body = el('span', 'card-body');
       body.appendChild(el('span', 'card-tag', d.tag));
       body.appendChild(el('span', 'card-title', d.title));
-      body.appendChild(el('span', 'card-text', d.text));
+      G.evolution.choice(game.player, c, d, body);
       if (d.max) {
         const pp = el('span', 'pips');
         pp.setAttribute('role', 'img');
@@ -1221,7 +1241,6 @@
         for (let k = 1; k <= d.max; k++) pp.appendChild(el('i', k < d.level ? 'on' : k === d.level ? 'next' : ''));
         body.appendChild(pp);
       }
-      if (d.comboHint) body.appendChild(el('span', 'card-combo', d.comboHint));
       btn.appendChild(body);
       btn.addEventListener('click', () => G.ui.pickCard(i));
       box.appendChild(btn);
@@ -1234,41 +1253,30 @@
       cardsReady = true;
       box.classList.remove('arming');
       const first = $('card-0');
-      if (first && current === 'levelup') first.focus({ preventScroll: true });
+      if (first && current === 'levelup' && $('lv-book').hidden) first.focus({ preventScroll: true });
     }, armMs);
   }
 
   // ---------- 선택창 안의 조합 도감 ----------
   let lvBookAll = false;
+  let lvBookReturn = null;
   function renderLvBook() {
-    const p = game.player;
     $('lv-book-mine').setAttribute('aria-selected', String(!lvBookAll));
     $('lv-book-all').setAttribute('aria-selected', String(lvBookAll));
-    const ul = $('lv-book-list');
-    ul.textContent = '';
-    const rows = G.xcomboBook(p, lvBookAll);
-    if (!rows.length) ul.appendChild(el('li', 'lv-book-empty', '아직 이어지는 조합이 없습니다. 무기를 Lv 5까지 올려 갈래를 고르면 조합 상대가 정해집니다.'));
-    rows.forEach((x) => {
-      const li = el('li', 'lv-book-row' + (x.ready ? ' is-ready' : ''));
-      li.appendChild(img(iconUrl(x.c.main), '', 32, ''));
-      const body = el('span', 'lv-book-body');
-      body.appendChild(el('span', 'lv-book-name', x.def.name + (x.ready ? ' · 다음 상자에서 조합!' : '')));
-      const br = G.branchById(x.c.main, 5, x.c.b5);
-      const need = '메인 ' + G.WEAPONS[x.c.main].name + '(' + br.name + ') ' + (x.m ? 'Lv ' + x.m.level : '없음') + '/10 + ' +
-        G.WEAPONS[x.c.sub].name + ' ' + (x.s ? 'Lv ' + x.s.level : '없음') + '/5';
-      body.appendChild(el('span', 'lv-book-need', need));
-      body.appendChild(el('span', 'lv-book-fx', G.fxText(G.COMBO_SIG[x.c.sub].fx)));
-      li.appendChild(body);
-      ul.appendChild(li);
-    });
+    $('lv-book-list').setAttribute('aria-labelledby', lvBookAll ? 'lv-book-all' : 'lv-book-mine');
+    G.evolution.library($('lv-book-list'), game.player, lvBookAll, false);
+    $('lv-book-list').scrollTop = 0;
   }
   function toggleLvBook(force) {
     const open = force !== undefined ? force : $('lv-book').hidden;
+    const wasOpen = !$('lv-book').hidden;
+    if (open && !wasOpen) lvBookReturn = document.activeElement;
     $('lv-book').hidden = !open;
     $('cards').hidden = open;
+    $('screen-levelup').querySelector('.lv-wrap').inert = open;
     $('btn-lv-book').setAttribute('aria-expanded', String(open));
-    $('btn-lv-book').textContent = open ? '카드로 돌아가기' : '조합 도감';
-    if (open) renderLvBook();
+    if (open) { renderLvBook(); $('lv-book-close').focus({ preventScroll: true }); }
+    else if (wasOpen && lvBookReturn && lvBookReturn.isConnected) lvBookReturn.focus({ preventScroll: true });
   }
 
   function renderReroll() {
@@ -1279,7 +1287,7 @@
 
   // 가챠 운명 바꾸기: 카드를 새로 받는다
   function reroll() {
-    if (current !== 'levelup' || !cardsReady || !game.rerollChoices) return;
+    if (current !== 'levelup' || !$('lv-book').hidden || !cardsReady || !game.rerollChoices) return;
     const c = game.rerollChoices();
     if (!c) return;
     sfx('whoosh');
@@ -1287,7 +1295,7 @@
   }
 
   function pickCard(i) {
-    if (!cardsReady || !cardHandler || !$('card-' + i)) return;
+    if (!$('lv-book').hidden || !cardsReady || !cardHandler || !$('card-' + i)) return;
     cardsReady = false;
     sfx('select');
     const h = cardHandler;
@@ -1586,23 +1594,16 @@
     else if (tab === 'weapon') { const c = el('div', 'coll'); box.appendChild(c); renderCodexWeapons(c); }
     else if (tab === 'passive') { const c = el('div', 'coll'); box.appendChild(c); renderCodexPassives(c); }
     else if (tab === 'combo') {
-      const ul = el('ul', 'lv-book-list codex-xcombo');
-      G.XCOMBOS.forEach((x) => {
-        const locked = !G.isItemUnlocked('weapon', x.main) || !G.isItemUnlocked('weapon', x.sub);
-        const li = el('li', 'lv-book-row' + (locked ? ' is-locked' : ''));
-        li.appendChild(img(iconUrl(x.main), '', 32, ''));
-        const body = el('span', 'lv-book-body');
-        body.appendChild(el('span', 'lv-book-name', locked ? '???' : G.WEAPONS[x.key].name));
-        body.appendChild(el('span', 'lv-book-need', locked ? '다음 스테이지에서 열립니다' : '메인 ' + G.WEAPONS[x.main].name + '(' + G.branchById(x.main, 5, x.b5).name + ') Lv 10 + ' + G.WEAPONS[x.sub].name + ' Lv 5'));
-        if (!locked) body.appendChild(el('span', 'lv-book-fx', G.fxText(G.COMBO_SIG[x.sub].fx)));
-        li.appendChild(body);
-        ul.appendChild(li);
-      });
-      const h = el('h3', 'coll-title', '무기 조합 ' + G.XCOMBOS.length + '개');
-      box.appendChild(h);
-      box.appendChild(ul);
+      const routes = el('div');
+      box.appendChild(routes);
+      G.evolution.library(routes, null, true, true);
+      const more = el('button', 'btn btn-small evo-legacy-toggle', '패시브 진화·기존 조합 보기');
+      more.type = 'button';
+      more.setAttribute('aria-expanded', 'false');
       const c = el('div', 'combo-book');
-      box.appendChild(c);
+      c.hidden = true;
+      more.addEventListener('click', () => { c.hidden = !c.hidden; more.setAttribute('aria-expanded', String(!c.hidden)); });
+      box.append(more, c);
       renderComboBook(game, c, true);
     }
     else renderCodexWorld(box);
@@ -1669,6 +1670,11 @@
   function renderComboBook(g, target, catalog) {
     const book = target || $('combo-book');
     book.textContent = '';
+    if (!catalog) {
+      const routes = el('div');
+      book.appendChild(routes);
+      G.evolution.library(routes, g.player, false, false);
+    }
     const status = G.comboStatus ? G.comboStatus(catalog ? { weapons: [], passives: {}, fusions: [] } : g.player) : [];
     const groups = { evolve: [], union: [], fusion: [] };
     status.forEach((s) => { (groups[s.combo.type] || (groups[s.combo.type] = [])).push(s); });
@@ -1825,6 +1831,7 @@
     if (!$('dialog').hidden) { closeDialog(); return true; }
     if (!$('odds').hidden) { closeOdds(); return true; }
     if (!$('pull-fx').hidden) { if (pullPhase === 'done') closePull(); else finishPull(); return true; }
+    if (!$('lv-book').hidden) { toggleLvBook(false); return true; }
     switch (current) {
       case 'stage': showTitleScreen(); $('btn-new').focus({ preventScroll: true }); return true;
       case 'champion':
@@ -1862,7 +1869,7 @@
 
   // 방향키로 보이는 화면 안의 버튼 사이를 이동
   function moveFocus(dir) {
-    const root = !$('dialog').hidden ? $('dialog') : !$('odds').hidden ? $('odds') : !$('pull-fx').hidden ? $('pull-fx') : current && $('screen-' + current);
+    const root = !$('dialog').hidden ? $('dialog') : !$('odds').hidden ? $('odds') : !$('pull-fx').hidden ? $('pull-fx') : !$('lv-book').hidden ? $('lv-book') : current && $('screen-' + current);
     if (!root) return false;
     const items = [...root.querySelectorAll('button:not([disabled]), input:not([disabled])')]
       .filter((n) => n.offsetParent !== null && !n.closest('[hidden]'));
@@ -1876,7 +1883,7 @@
   function onKeyDown(e) {
     if (!game) return;
     const tag = e.target && e.target.tagName;
-    const modal = !$('dialog').hidden ? $('dialog') : !$('odds').hidden ? $('odds') : !$('pull-fx').hidden ? $('pull-fx') : null;
+    const modal = !$('dialog').hidden ? $('dialog') : !$('odds').hidden ? $('odds') : !$('pull-fx').hidden ? $('pull-fx') : !$('lv-book').hidden ? $('lv-book') : null;
     if (modal && e.key === 'Tab') {
       const items = [...modal.querySelectorAll('button:not([disabled]), [tabindex="0"]')].filter((n) => n.getClientRects().length && getComputedStyle(n).visibility !== 'hidden');
       if (!items.length) { e.preventDefault(); return; }
@@ -1945,6 +1952,8 @@
       $('btn-gacha').addEventListener('click', () => { sfx('click'); openGacha('title'); });
       $('btn-codex').addEventListener('click', () => { sfx('click'); openCodex(); });
       $('btn-lv-book').addEventListener('click', () => { sfx('click'); toggleLvBook(); });
+      $('lv-book-close').addEventListener('click', () => toggleLvBook(false));
+      $('lv-book-return').addEventListener('click', () => toggleLvBook(false));
       $('lv-book-mine').addEventListener('click', () => { sfx('click'); lvBookAll = false; renderLvBook(); });
       $('lv-book-all').addEventListener('click', () => { sfx('click'); lvBookAll = true; renderLvBook(); });
       $('btn-lore').addEventListener('click', (e) => { e.stopPropagation(); closeLore(); });

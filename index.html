@@ -367,19 +367,10 @@
       <h2 class="lv-title" id="lv-title">Lv <span id="lv-number">2</span></h2>
       <p class="lv-sub" id="lv-sub">하나를 골라 등불을 키우세요</p>
     </header>
+    <div id="lv-tip" hidden></div>
     <div id="cards" class="cards"></div>
-    <div id="lv-book" class="lv-book" hidden>
-      <div class="lv-book-head">
-        <h3>조합 도감</h3>
-        <div class="tabs" role="tablist" aria-label="보기">
-          <button id="lv-book-mine" class="tab" type="button" role="tab" aria-selected="true">내 빌드</button>
-          <button id="lv-book-all" class="tab" type="button" role="tab" aria-selected="false">전체</button>
-        </div>
-      </div>
-      <ul id="lv-book-list" class="lv-book-list"></ul>
-    </div>
     <div class="lv-foot lv-foot-book">
-      <button id="btn-lv-book" class="btn btn-ghost btn-small" type="button" aria-expanded="false">조합 도감</button>
+      <button id="btn-lv-book" class="btn btn-ghost btn-small" type="button" aria-expanded="false" aria-controls="lv-book" aria-haspopup="dialog">진화·조합 도감</button>
     </div>
     <div class="lv-foot">
       <button id="btn-reroll" class="btn btn-ghost btn-small" type="button" hidden>
@@ -388,6 +379,18 @@
       </button>
     </div>
   </div>
+  <section id="lv-book" class="lv-book" hidden role="dialog" aria-modal="true" aria-labelledby="lv-book-title">
+    <header class="lv-book-head">
+      <div><p class="eyebrow">등불의 성장 지도</p><h3 id="lv-book-title">진화·조합 도감</h3></div>
+      <button id="lv-book-close" class="btn btn-small" type="button">닫기 ✕</button>
+    </header>
+    <div class="tabs lv-book-tabs" role="tablist" aria-label="진화 경로 보기">
+      <button id="lv-book-mine" class="tab" type="button" role="tab" aria-controls="lv-book-list" aria-selected="true">내 무기</button>
+      <button id="lv-book-all" class="tab" type="button" role="tab" aria-controls="lv-book-list" aria-selected="false">전체</button>
+    </div>
+    <div id="lv-book-list" class="lv-book-list" role="tabpanel" aria-labelledby="lv-book-mine"></div>
+    <footer class="lv-book-foot"><button id="lv-book-return" class="btn btn-primary" type="button">선택 카드로 돌아가기</button></footer>
+  </section>
 </section>
 
 <!-- 상자 -->
@@ -569,6 +572,7 @@
 <script src="src/fx/juice.js"></script>
 <script src="src/ui/hud.js"></script>
 <script src="src/ui/celebrate.js"></script>
+<script src="src/ui/evolution.js"></script>
 <script src="src/ui/screens.js"></script>
 <script src="src/game.js"></script>
 <script src="src/main.js"></script>

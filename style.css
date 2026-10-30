@@ -1690,6 +1690,192 @@ html.reduce-motion *,html.reduce-motion *::before,html.reduce-motion *::after { 
 html.reduce-motion .ch-open .cp-lid,html.reduce-motion .ch-open .cp-lock { opacity:0; }
 html.reduce-motion .ch-open .cp-lidopen,html.reduce-motion .ch-open .cp-beam { opacity:1; transform:none; }
 html.reduce-motion .ph-burst .pull-lantern { opacity:0; }
+/* 진화 지도: 4단계, 갈래 미리보기, 짝과 결과. 게임 수치와 무관한 표시 전용. */
+.evo-library { width:100%; max-width:960px; margin-inline:auto; }
+.evo-library-body { display:grid; align-content:start; gap:14px; }
+.evo-intro { display:flex; flex-direction:column; gap:4px; margin-bottom:16px; padding:12px 14px; border-left:3px solid #c7a66a; background:#20372a; }
+.evo-intro strong { color:#ffe2a0; font-size:15px; }
+.evo-intro>span { color:#c2ceb8; font-size:12px; }
+.evo-path { min-width:0; padding:16px; border:1px solid #657952; border-radius:8px 2px; background:linear-gradient(135deg,#243a2c,#14271e); }
+.evo-path.is-ready { border-color:#ddbd76; }
+.evo-path-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.evo-path-head>div { min-width:0; }
+.evo-kicker { color:#bbc7a6; font-size:11px; }
+.evo-path-title { font:22px/1.3 var(--font-display); color:#f5e6c6; }
+.evo-badge { margin-left:auto; flex:none; color:#f8d99a; font-size:12px; border:1px solid #9d8856; border-radius:3px; padding:5px 8px; background:#3a4027; }
+.evo-icon { position:relative; display:inline-grid; place-items:center; flex:none; width:42px; height:42px; border:1px solid #7f905260; border-radius:8px 2px; background:#091a14; vertical-align:middle; }
+.evo-icon>img { width:36px; height:36px; }
+.evo-icon>.evo-sub-icon { position:absolute; bottom:-3px; right:-4px; width:22px; height:22px; border:1px solid #c6b77b; border-radius:50%; background:#13291f; }
+.evo-icon.no-art { color:#ffe2a0; font:22px var(--font-display); }
+.evo-steps { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; list-style:none; margin:0; padding:0; }
+.evo-step { position:relative; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 2px 6px; border:1px solid #576747; border-radius:4px; background:#0c2118; text-align:center; font-size:12px; color:#c9d4bd; }
+.evo-step+.evo-step::before { content:'›'; position:absolute; top:36px; left:-11px; font:21px/1 var(--font-body); color:#b8a773; }
+.evo-step-num { position:absolute; left:4px; top:1px; color:#bcab7a; font-size:10px; }
+.evo-step .evo-icon { width:34px; height:34px; border:0; background:transparent; }
+.evo-step .evo-icon>img { width:32px; height:32px; }
+.evo-chest { width:34px; height:34px; }
+.evo-step>strong { font-size:13px; color:#efe1bd; }
+.evo-step-state { font-size:10px; color:#aabd9e; }
+.evo-step.is-current { border:2px solid #e4bf76; padding:7px 1px 5px; background:#4a482a; }
+.evo-step.is-current .evo-step-state { color:#ffe6a8; font-weight:700; }
+.evo-step.is-done { border-color:#879d64; }
+.evo-step.is-locked { border-style:dashed; }
+.evo-step.is-locked .evo-icon,.evo-step.is-locked .evo-chest { opacity:.55; }
+.evo-next { padding:10px 0; color:#f3dca5; font-size:13px; line-height:1.55; }
+.evo-section-label { color:#d5d8b8; font-size:12px; font-weight:600; margin:12px 0 8px; }
+.evo-branches { display:flex; gap:7px; }
+.evo-branch { display:flex; flex:1; min-width:0; align-items:center; justify-content:center; gap:6px; min-height:48px; padding:7px; background:#0e2119; border:1px solid #6d7e51; border-radius:4px; font-size:13px; }
+.evo-branch[aria-pressed=true] { border-color:#e1bd72; color:#ffe5a6; background:#4a482b; }
+.evo-letter { font:bold 12px var(--font-body); color:#e1c487; }
+.evo-branch-desc { font-size:12px; color:#c6d1bb; padding:9px 0 0; }
+.evo-preview { color:#efcd90; background:#4d3d233d; padding:9px; border-left:2px solid #c6a25f; font-size:12px; }
+.evo-ends { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.evo-end { display:flex; align-items:start; gap:6px; padding:8px; border:1px solid #62764e77; border-radius:3px; }
+.evo-end .evo-icon { width:26px; height:26px; }
+.evo-end .evo-icon>img { width:24px; height:24px; }
+.evo-end>span:last-child { display:flex; flex-direction:column; gap:3px; }
+.evo-end strong { font-size:13px; font-weight:600; color:#e9e3c7; }
+.evo-end small { color:#adbea3; font-size:11px; line-height:1.45; }
+.evo-end.is-picked { background:#41472b; border-color:#c3a568; }
+.evo-end-toggle { min-height:44px; width:100%; padding:8px 12px; text-align:left; color:#cbd5b9; border:1px solid #6e7e4e88; border-radius:3px; background:#14291d; font-size:12px; }
+.evo-end-toggle+.evo-ends { margin-top:6px; }
+.evo-result { border:1px solid #61794c80; border-radius:4px; padding:10px; margin-top:8px; background:#10251c; }
+.evo-result.is-ready { border-color:#ccae69; background:#3b4125; }
+.evo-pair { display:grid; grid-template-columns:36px minmax(0,.85fr) 16px 36px minmax(0,1.2fr); gap:8px; align-items:center; }
+.evo-pair>.evo-icon { width:36px; height:36px; }
+.evo-pair>.evo-icon>img { width:32px; height:32px; }
+.evo-pair>.evo-icon>.evo-sub-icon { width:19px; height:19px; }
+.evo-pair>span:not(.evo-icon):not(.evo-sign) { display:flex; flex-direction:column; gap:3px; min-width:0; }
+.evo-pair strong { font-size:14px; color:#f4e1b6; }
+.evo-pair small { font-size:11px; color:#b5c5a9; }
+.evo-requirement { border-top:1px solid #6b7d5140; margin-top:9px; padding-top:7px; color:#d7c99f; font-size:12px; }
+.evo-pair-level { display:block; color:#becbb2; margin-top:4px; font-size:12px; }
+.evo-formula { display:grid; grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr) 16px minmax(0,1.25fr); gap:6px; align-items:center; width:100%; }
+.evo-term { display:flex; align-items:center; text-align:center; flex-direction:column; gap:5px; min-width:0; }
+.evo-term strong { font:600 14px/1.35 var(--font-body); color:#f6e9c9; }
+.evo-term small { color:#c1cfb2; font-size:11px; }
+.evo-term .evo-role { color:#ebc780; font-size:12px; font-weight:700; }
+.evo-sign { text-align:center; color:#dabe7e; font-size:22px; }
+.evo-ready { padding:14px; border:1px solid #dfbd78; background:linear-gradient(130deg,#4d482a,#293823); border-radius:5px; }
+.evo-ready h3 { color:#ffe4a4; font:19px var(--font-display); margin-bottom:14px; }
+.evo-ready .evo-formula+.evo-formula { border-top:1px solid #c4ac6755; margin-top:12px; padding-top:12px; }
+.evo-weapon-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }
+.evo-weapon { min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; min-height:115px; padding:10px 5px; background:#1f3528; border:1px solid #788354; border-radius:5px; text-align:center; }
+.evo-weapon strong { font-size:13px; font-weight:600; }
+.evo-weapon small { font-size:10px; color:#bbcaac; }
+.evo-weapon.is-owned { border-color:#a0b47b; background:#2c4430; }
+.evo-weapon.is-ready { border-color:#e5bf72; background:#51482a; }
+.evo-back { justify-self:start; }
+.evo-legacy-toggle { margin-top:16px; }
+.evo-empty { color:#c5d0b7; padding:20px 0; }
+/* 시트는 선택창과 독립된 스크롤. 위와 아래 두 곳에서 닫을 수 있다. */
+#lv-book { position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; gap:12px; overflow:hidden; min-height:0; padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px)); border:0; border-top:2px solid #ae9259; border-radius:14px 14px 0 0; background:#10231a; animation:evo-sheet-in .22s ease-out; }
+@keyframes evo-sheet-in { from { transform:translateY(35px); opacity:0; } }
+#lv-book>.lv-book-head,#lv-book>.lv-book-tabs,#lv-book>.lv-book-foot { width:100%; max-width:960px; margin:0 auto; flex:none; }
+#lv-book>.lv-book-head { flex-wrap:nowrap; }
+#lv-book .lv-book-head h3 { font-size:25px; }
+#lv-book .lv-book-head .eyebrow { font-size:10px; margin-bottom:3px; }
+#lv-book-close { min-width:84px; min-height:48px; }
+#lv-book-list { flex:1; min-height:0; display:block; overflow-y:auto; overscroll-behavior:contain; padding:2px 3px 12px; margin:0 auto; width:100%; max-width:966px; scroll-padding:10px; }
+.lv-book-foot { border-top:1px solid #8f824b77; padding-top:10px; }
+#lv-book-return { width:100%; min-height:48px; }
+.screen-levelup:has(#lv-book:not([hidden]))>.lv-wrap { visibility:hidden; }
+/* 선택의 결과를 먼저 읽고 세부 수치는 뒤에서 읽는다. */
+.cards { flex:0 1 auto; }
+.card-body { min-width:0; }
+.card-action { display:block; font:700 15px/1.45 var(--font-body); color:#ffe5ad; }
+.card-text { font-size:12px; line-height:1.5; color:#c5d2b9; }
+.card-combo { font-size:12px; line-height:1.5; padding:7px 9px; }
+.card-partners { display:flex; flex-wrap:wrap; align-items:center; gap:7px; padding-top:6px; }
+.card-partners>small { width:100%; color:#d8c997; font-size:11px; }
+.card-partners>span { display:flex; align-items:center; gap:5px; font-size:12px; color:#ebe0ba; }
+.card-partners .evo-icon { width:28px; height:28px; }
+.card-partners .evo-icon>img { width:26px; height:26px; }
+.card.kind-xcombo { border-color:#d4b679; background:linear-gradient(145deg,#4b482e,#233020); }
+.card.kind-xcombo>.card-icon,.card.kind-oldcombo>.card-icon,.card.kind-nocombo>.card-icon { display:none; }
+.card.kind-xcombo .card-title { font-size:21px; }
+.card.kind-xcombo .evo-formula { padding:10px 0; }
+.evo-tip { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid #d6b66f; border-radius:9px 9px 9px 2px; background:#3e4429; color:#f4e6bf; }
+.evo-tip>span { display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; font-size:12px; }
+.evo-tip strong { font-size:13px; color:#ffe5ab; }
+.evo-tip-close { flex:none; min-height:44px; padding:8px; border:1px solid #b39b5e; background:#243522; border-radius:4px; color:#ffe3a7; font-size:13px; }
+#lv-tip { flex:none; }
+#evolution-toast { position:fixed; z-index:12; left:max(12px,env(safe-area-inset-left,0px)); right:max(12px,env(safe-area-inset-right,0px)); top:max(106px,calc(env(safe-area-inset-top,0px) + 92px)); max-width:520px; margin-inline:auto; }
+/* 세로 웹뷰에서 남는 높이를 행 사이에 분배하지 않고 항상 위부터 채운다. */
+.screen-menu { align-items:stretch; }
+.screen-menu>.menu-wrap { height:auto; min-height:0; align-self:stretch; }
+#screen-stage>.menu-wrap { display:grid; grid-template-rows:auto minmax(0,1fr); align-content:start; }
+#screen-stage .menu-content { display:block; height:auto; align-content:start; }
+#stage-list { align-content:start; align-items:start; grid-auto-rows:max-content; margin-top:12px; }
+@media (max-width:600px) {
+  .screen-levelup { align-items:stretch; }
+  .lv-wrap { max-height:none; height:100%; gap:10px; }
+  .lv-wrap>.cards { flex:1; }
+  .card { gap:10px; padding:13px 12px; align-items:start; }
+  .card-icon { width:42px; height:42px; margin:9px 4px; }
+  .card-icon img { width:41px; height:41px; }
+  .card-tag { font-size:11px; letter-spacing:0; }
+  .card-title { font-size:21px; }
+  .card-action { font-size:14px; }
+  .card-text,.card-combo { font-size:12px; }
+  .card-partners { gap:6px; }
+  .card.kind-branch { display:block; }
+  .card.kind-branch>.card-icon { float:left; margin:3px 14px 8px 3px; }
+  .card.kind-branch>.card-body { display:block; }
+  .card.kind-branch .card-body>span,.card.kind-branch .card-action { margin-bottom:6px; }
+  .card.kind-branch .card-partners { display:flex; clear:both; }
+  .card.kind-branch .card-text { display:block; clear:both; }
+  .card.kind-branch .card-tag,.card.kind-branch .card-title,.card.kind-branch .card-combo { display:block; }
+  .evo-path { padding:12px; }
+  .evo-path-title { font-size:20px; }
+  .evo-path-head { gap:8px; }
+  .evo-steps { gap:9px; }
+  .evo-step { font-size:11px; }
+  .evo-step+.evo-step::before { left:-9px; font-size:17px; }
+  .evo-ends { grid-template-columns:1fr; gap:5px; }
+  .evo-end { padding:6px 8px; align-items:center; }
+  .evo-end>span:last-child { flex-direction:row; flex-wrap:wrap; align-items:baseline; gap:4px 8px; }
+  .evo-end small { font-size:11px; }
+  .evo-pair { grid-template-columns:30px minmax(0,.85fr) 12px 30px minmax(0,1.2fr); gap:5px; }
+  .evo-pair>.evo-icon { width:30px; height:30px; }
+  .evo-pair>.evo-icon>img { width:28px; height:28px; }
+  .evo-pair strong { font-size:13px; }
+  .evo-pair small { font-size:10px; }
+  .evo-branch { font-size:12px; padding:6px 4px; gap:4px; }
+  .evo-weapon-grid { gap:7px; }
+  .evo-weapon { min-height:108px; }
+  .evo-weapon strong { font-size:12px; }
+  .evo-weapon small { font-size:10px; }
+  .evo-intro { padding:10px; margin-bottom:12px; }
+  .evo-intro strong { font-size:14px; }
+  .evo-intro>span { font-size:11px; }
+  #lv-book { gap:10px; padding-left:max(10px,env(safe-area-inset-left,0px)); padding-right:max(10px,env(safe-area-inset-right,0px)); }
+  #lv-book .lv-book-head h3 { font-size:22px; }
+}
+@media (max-height:500px) and (min-width:601px) {
+  .lv-wrap,.lv-wrap:has(#btn-reroll:not([hidden])) { display:flex; height:100%; gap:6px; }
+  .lv-wrap>.cards { flex:1; }
+  .cards,.cards.n-2,.cards.n-4,.cards.n-5 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .card-action { font-size:13px; }
+  .card-text,.card-combo { font-size:11px; }
+  .card-icon { width:32px; height:32px; }
+  .card-icon img { width:30px; height:30px; }
+  .card.kind-xcombo,.card.kind-oldcombo { padding:10px; }
+  .card.kind-xcombo .card-title,.card.kind-oldcombo .card-title { display:none; }
+  .card.kind-xcombo .evo-formula,.card.kind-oldcombo .evo-formula { padding:2px 0; }
+  .card .evo-term { gap:2px; }
+  .card .evo-term .evo-icon { width:32px; height:32px; }
+  .card .evo-term .evo-icon>img { width:30px; height:30px; }
+  .card .evo-term .evo-icon>.evo-sub-icon { width:18px; height:18px; }
+  .card .evo-term strong { font-size:12px; }
+  .card .evo-term small { font-size:10px; }
+  #lv-book { gap:7px; padding-top:max(8px,env(safe-area-inset-top,0px)); padding-bottom:max(8px,env(safe-area-inset-bottom,0px)); }
+  #lv-book .lv-book-head .eyebrow { display:none; }
+  #lv-book .lv-book-head h3 { font-size:22px; }
+  .lv-book-foot { padding-top:6px; }
+  .evo-weapon-grid { grid-template-columns:repeat(8,minmax(0,1fr)); }
+  #lv-tip .evo-tip { padding:4px 10px; }
+}
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
   .ch-open .cp-lid,.ch-open .cp-lock { opacity:0; }
