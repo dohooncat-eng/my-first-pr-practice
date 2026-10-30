@@ -2,56 +2,91 @@
 (function (G) {
   'use strict';
 
-  const MAX_NUMBERS = 60;
-  const MAX_PARTICLES = 300;
+  const MAX_NUMBERS = 54;
+  const MAX_PARTICLES = 220;
+  const MAX_RINGS = 24;
+  // 활성 목록과 빈 슬롯을 분리한다. 처치가 몰려도 새 효과 객체를 만들지 않는다.
+  function bank(n) { const a = []; for (let i = 0; i < n; i++) a.push({}); return a; }
+  const numberBank = bank(MAX_NUMBERS), particleBank = bank(MAX_PARTICLES), ringBank = bank(MAX_RINGS);
+  const freeNumbers = [], freeParticles = [], freeRings = [];
+  const flashSlot = {};
+  function rand(lo, hi) { return lo + G.fx.random() * (hi - lo); }
+  function take(list, free, cap) {
+    if (list.length >= cap || !free.length) return null;
+    const v = free.pop(); v.dead = false; list.push(v); return v;
+  }
+  function sweep(list, free, dt) {
+    let n = 0;
+    for (let i = 0; i < list.length; i++) {
+      const v = list[i]; v.life -= dt;
+      if (v.life <= 0 || v.dead) { v.sprite = null; free.push(v); }
+      else list[n++] = v;
+    }
+    list.length = n;
+  }
+  G.resetEffects = function (game) {
+    freeNumbers.length = freeParticles.length = freeRings.length = 0;
+    for (const v of numberBank) freeNumbers.push(v);
+    for (const v of particleBank) { v.sprite = null; freeParticles.push(v); }
+    for (const v of ringBank) freeRings.push(v);
+    game.dustTimer = 0;
+  };
 
   // style: '' 보통, 'big' 큰 피해, 'soft' 지속 피해, 'crit' 치명타, 'heal' 회복
   G.addDamageNumber = function (game, x, y, n, style) {
     if (game.settings && !game.settings.numbers && style !== 'heal') return;
-    const arr = game.numbers;
-    if (arr.length >= MAX_NUMBERS) arr.shift();
+    if (!G.inView(game, x, y, 60)) return;
+    const arr = game.numbers, cap = G.fx.low(game) ? 26 : MAX_NUMBERS;
+    // 작은 지속 피해가 치명타·회복 숫자를 밀어내지 않게 여유를 남긴다.
+    if (style === 'soft' && arr.length > cap * 0.55) return;
+    let d = take(arr, freeNumbers, cap);
+    if (!d && (style === 'crit' || style === 'heal')) {
+      for (const v of arr) if (v.style !== 'crit' && v.style !== 'heal') { d = v; break; }
+    }
+    if (!d) return;
     const life = style === 'soft' ? 0.45 : style === 'heal' ? 0.9 : 0.65;
-    arr.push({ x: x + G.rand(-6, 6), y, n, style, life, max: life });
+    d.x = x + rand(-8, 8); d.y = y; d.n = String(n); d.style = style; d.life = d.max = life;
+    d.vx = style === 'crit' ? rand(-30, 30) : rand(-10, 10);
+    d.vy = style === 'crit' ? -100 : style === 'big' ? -75 : -42;
   };
 
   // 한 점에서 사방으로 튀는 파티클. glow면 가산 합성으로 빛난다.
-  G.burst = function (game, x, y, color, count, speed, glow) {
-    const arr = game.particles;
-    for (let i = 0; i < count && arr.length < MAX_PARTICLES; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const s = speed * G.rand(0.3, 1);
-      const life = G.rand(0.3, 0.6);
-      arr.push({
-        x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - speed * 0.2,
-        life, max: life, size: G.rand(2, 4.5), color, glow: !!glow,
-      });
+  G.burst = function (game, x, y, color, count, speed, glow, family) {
+    if (!G.inView(game, x, y, 100)) return;
+    const arr = game.particles, low = G.fx.low(game), quiet = game.fx && game.fx.quiet;
+    const cap = low ? 56 : MAX_PARTICLES;
+    if (low) count = Math.ceil(count * 0.3);
+    if (quiet) { count = Math.ceil(count * 0.45); speed *= 0.45; }
+    for (let i = 0; i < count; i++) {
+      const p = take(arr, freeParticles, cap); if (!p) break;
+      const a = rand(0, Math.PI * 2), s = speed * rand(0.3, 1), life = rand(0.22, 0.48);
+      p.x = x; p.y = y; p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s - speed * 0.15;
+      p.life = p.max = life; p.size = rand(2, 4.5); p.color = color; p.glow = !!glow;
+      p.sprite = glow ? G.fx.fragment(family === undefined ? G.fx.family(G.curWeaponKey) : family) : null;
     }
   };
 
-  // 흔들림은 약하게: 들어온 세기의 0.4배, 최대 6px, 빨리 가라앉는다
-  G.addShake = function (game, amount) {
-    if (game.settings && !game.settings.shake) return;
-    amount *= game.reducedMotion ? 0.15 : 0.4;
-    game.shake = Math.min(6, game.shake + amount);
-  };
+  G.addShake = function (game, amount, dx, dy) { G.fx.shake(game, amount, dx, dy); };
 
   // 퍼져 나가는 빛 고리 (가산 합성으로 그린다)
-  const MAX_RINGS = 40;
   G.ring = function (game, x, y, r0, r1, life, color, width) {
-    if (game.rings.length >= MAX_RINGS) game.rings.shift();
-    game.rings.push({ x, y, r0, r1, life, max: life, color, width: width || 4 });
+    if (!G.inView(game, x, y, r1)) return;
+    const r = take(game.rings, freeRings, G.fx.low(game) ? 8 : MAX_RINGS); if (!r) return;
+    r.x = x; r.y = y; r.r0 = r0; r.r1 = r1; r.life = r.max = life; r.color = color; r.width = width || 4;
   };
 
   // 화면 전체가 잠깐 물드는 효과 (rgb는 '255, 210, 120' 형식)
   G.screenFlash = function (game, rgb, alpha, life) {
-    if (game.reducedMotion) alpha *= 0.4;
-    game.flash = { rgb, alpha, life, max: life };
+    if (G.fx.quiet(game)) alpha *= 0.25;
+    const f = game.flash = flashSlot;
+    f.rgb = rgb; f.alpha = Math.min(0.24, alpha); f.life = f.max = life;
   };
 
   // 레벨업 선택 직후: 금빛 충격파가 주변 적을 밀어낸다
   const blastList = [];
   G.levelUpBlast = function (game) {
     const p = game.player;
+    G.fx.level(game);
     G.ring(game, p.x, p.y, 10, 240, 0.55, 'rgba(255, 214, 130, 0.95)', 7);
     G.ring(game, p.x, p.y, 10, 150, 0.4, 'rgba(255, 245, 210, 0.9)', 3);
     G.burst(game, p.x, p.y - 10, 'rgba(255, 210, 120, 0.95)', 24, 260, true);
@@ -69,28 +104,19 @@
   };
 
   G.updateEffects = function (game, dt) {
+    sweep(game.numbers, freeNumbers, dt);
     for (const d of game.numbers) {
-      d.life -= dt;
-      d.y -= 38 * dt;
-      if (d.life <= 0) d.dead = true;
+      d.x += d.vx * dt; d.y += d.vy * dt;
+      d.vy += (d.style === 'crit' || d.style === 'big' ? 155 : 25) * dt;
     }
-    G.compact(game.numbers);
-
+    sweep(game.particles, freeParticles, dt);
     for (const p of game.particles) {
-      p.life -= dt;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
       p.vx *= 1 - Math.min(1, dt * 4);
       p.vy *= 1 - Math.min(1, dt * 4);
-      if (p.life <= 0) p.dead = true;
     }
-    G.compact(game.particles);
-
-    for (const r of game.rings) {
-      r.life -= dt;
-      if (r.life <= 0) r.dead = true;
-    }
-    G.compact(game.rings);
+    sweep(game.rings, freeRings, dt);
     if (game.flash) {
       game.flash.life -= dt;
       if (game.flash.life <= 0) game.flash = null;
@@ -98,21 +124,15 @@
 
     // 발걸음 먼지
     const p = game.player;
-    if (p && p.moving) {
+    if (p && p.moving && !G.fx.low(game) && !game.fx.quiet) {
       game.dustTimer = (game.dustTimer || 0) - dt;
       if (game.dustTimer <= 0 && game.particles.length < MAX_PARTICLES - 40) {
         game.dustTimer = 0.16;
         const dust = game.stage && game.stage.dust || 'rgba(120, 110, 90, 0.5)';
-        for (let i = 0; i < 2; i++) {
-          game.particles.push({
-            x: p.x + G.rand(-6, 6), y: p.y + 13, vx: -p.face.x * G.rand(10, 40) + G.rand(-15, 15), vy: G.rand(-18, -4),
-            life: 0.45, max: 0.45, size: G.rand(2, 3.5), color: dust, glow: false,
-          });
-        }
+        G.burst(game, p.x, p.y + 13, dust, 2, 25, false);
       }
     }
 
-    game.shake = Math.max(0, game.shake - dt * 40);
     if (game.banner) {
       game.banner.life -= dt;
       if (game.banner.life <= 0) game.banner = null;
@@ -133,35 +153,17 @@
     ctx.globalAlpha = 1;
   };
 
-  // 맞았을 때(0.45초)와 체력이 낮을 때(계속 맥박) 화면 가장자리를 붉게
-  function hurtVignette(ctx, game) {
-    const p = game.player;
-    const hit = game.hurtAt === undefined ? 0 : Math.max(0, 1 - (game.clock - game.hurtAt) / 0.45);
-    const low = p && p.hp > 0 && p.hp / p.maxHp < 0.3 ? 0.28 + Math.sin(game.clock * 6) * 0.1 : 0;
-    const a = Math.max(hit * 0.75, low) * (game.reducedMotion ? 0.6 : 1);
-    if (a <= 0.01) return;
-    const w = game.w, h = game.h;
-    const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.32, w / 2, h / 2, Math.hypot(w, h) * 0.55);
-    g.addColorStop(0, 'rgba(180, 10, 30, 0)');
-    g.addColorStop(1, 'rgba(180, 10, 30, ' + a + ')');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-  }
-
-  G.drawScreenFlash = function (ctx, game) {
-    hurtVignette(ctx, game);
-    const f = game.flash;
-    if (!f) return;
-    ctx.fillStyle = 'rgba(' + f.rgb + ', ' + (f.alpha * f.life / f.max) + ')';
-    ctx.fillRect(0, 0, game.w, game.h);
-  };
+  G.drawScreenFlash = function (ctx, game) { G.fx.drawScreen(ctx, game); };
 
   G.drawParticles = function (ctx, game, glowPass) {
     for (const p of game.particles) {
       if (p.glow !== glowPass) continue;
       const a = p.life / p.max;
-      if (glowPass) {
-        G.drawGlow(ctx, p.color, p.x, p.y, p.size * 3.2, a);
+      if (!G.inView(game, p.x, p.y, 15)) continue;
+      if (glowPass && p.sprite) {
+        ctx.globalAlpha = Math.min(1, a * 1.7);
+        const r = p.size * (0.65 + a * 0.35) * 2;
+        ctx.drawImage(p.sprite, p.x - r, p.y - r, r * 2, r * 2);
       } else {
         ctx.globalAlpha = a;
         ctx.fillStyle = p.color;
@@ -218,12 +220,12 @@
     for (const d of game.numbers) {
       const t = d.life / d.max;
       // 처음에 살짝 커졌다 작아지는 팝
-      const pop = t > 0.8 ? 1 + (t - 0.8) * 2.5 : 1;
+      const pop = game.fx.quiet ? 1 : t > 0.8 ? 1 + Math.sin((1 - t) * Math.PI / 0.2) * 0.35 : 1;
       const st = d.style || '';
-      const size = (st === 'crit' ? 20 : st === 'big' || st === 'heal' ? 17 : st === 'soft' ? 10 : 13) * pop;
+      const size = (st === 'crit' ? 23 : st === 'big' || st === 'heal' ? 17 : st === 'soft' ? 10 : 13) * pop;
       const k = size / BAKE;
       const glyphs = atlas.map[st] || atlas.map[''];
-      const str = String(d.n);
+      const str = d.n;
       let total = 0;
       for (let i = 0; i < str.length; i++) {
         const g = glyphs[str[i]];

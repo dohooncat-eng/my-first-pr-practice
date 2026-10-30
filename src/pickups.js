@@ -66,7 +66,7 @@
         g.dead = true;
         G.gainXp(game, g.value);
         game.gemSparkle = 0.12;
-        if (game.particles.length < 380) G.burst(game, p.x, p.y - 6, ['rgba(127, 212, 255, 0.9)', 'rgba(94, 240, 180, 0.9)', 'rgba(199, 139, 255, 0.9)'][g.tier], 1, 70, true);
+        G.fx.collect(game, g.tier);
         if (G.sfx) G.sfx.play('gem');
       }
     }
@@ -89,7 +89,9 @@
     for (const g of game.gems) {
       if (!G.inView(game, g.x, g.y, 30)) continue;
       const spr = G.art.get('gem_' + g.tier);
-      const bob = Math.sin(game.clock * 3 + g.phase) * 2;
+      const bob = game.fx.quiet || g.pull ? 0 : Math.sin(game.clock * 3 + g.phase) * 2;
+      // 당김의 기존 가속·획득 시점은 보존하고 속도에 비례하는 꼬리만 더한다.
+      if (g.pull) G.fx.trail(ctx, game, g.x, g.y, game.player.x - g.x, game.player.y - g.y, g.sp, g.tier === 2 ? 5 : g.tier === 1 ? 3 : 1, 0.55);
       if (spr) G.drawSprite(ctx, spr, g.x, g.y + bob, 1, false, 0);
       else {
         ctx.fillStyle = ['#7fd4ff', '#5ef0b4', '#c78bff'][g.tier];
@@ -97,10 +99,12 @@
       }
     }
     for (const it of game.items) {
-      if (!G.inView(game, it.x, it.y, 40)) continue;
+      if (!G.inView(game, it.x, it.y, 110)) continue;
+      G.fx.beacon(ctx, game, it);
+      if (it.kind !== 'coin' && !game.fx.low) G.fx.shadow(ctx, it.x, it.y + 5, it.kind === 'chest' ? 23 : 13, 0.7);
       const name = it.kind === 'heal' || it.kind === 'magnet' ? 'item_' + it.kind : it.kind === 'chest' && it.value === 'boss' ? 'chest_boss' : it.kind;
       const spr = G.art.get(name) || G.art.get(it.kind);
-      const bob = it.kind === 'chest' ? 0 : Math.sin(game.clock * 2.5 + it.phase) * 3;
+      const bob = it.kind === 'chest' || game.fx.quiet ? 0 : Math.sin(game.clock * 2.5 + it.phase) * 3;
       const scale = it.kind === 'coin' ? Math.min(1.8, 1 + it.value / 40) : 1;
       if (spr) G.drawSprite(ctx, spr, it.x, it.y + bob, scale, false, 0);
       else {
@@ -117,17 +121,17 @@
     heal: 'rgba(255, 120, 120, 0.7)', magnet: 'rgba(127, 212, 255, 0.8)',
     coin: 'rgba(255, 210, 110, 0.7)', chest: 'rgba(255, 200, 90, 0.9)',
   };
-  const MAX_GEM_GLOWS = 120;
+  const MAX_GEM_GLOWS = 70;
   G.drawPickupGlow = function (ctx, game) {
     // 결정이 많을 때는 빛 번짐을 일부만 그린다 (큰 결정 먼저 보이게 뒤에서부터)
     let n = 0;
-    for (let i = game.gems.length - 1; i >= 0 && n < MAX_GEM_GLOWS; i--) {
+    for (let i = game.gems.length - 1; i >= 0 && n < (game.fx.low ? 14 : MAX_GEM_GLOWS); i--) {
       const g = game.gems[i];
       if (G.inView(game, g.x, g.y, 30)) { G.drawGlow(ctx, GEM_GLOW[g.tier], g.x, g.y, 10 + g.tier * 4, 0.55); n++; }
     }
     for (const it of game.items) {
       if (!G.inView(game, it.x, it.y, 40)) continue;
-      const pulse = 0.5 + Math.sin(game.clock * 4 + it.phase) * 0.2;
+      const pulse = game.fx.quiet ? 0.5 : 0.5 + Math.sin(game.clock * 4 + it.phase) * 0.2;
       G.drawGlow(ctx, ITEM_GLOW[it.kind], it.x, it.y - (it.kind === 'chest' ? 14 : 0), it.kind === 'chest' ? 60 : it.kind === 'coin' ? 16 : 30, pulse);
     }
   };

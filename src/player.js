@@ -114,7 +114,7 @@
     p.invuln = 0.45;
     p.hurt = 0.25;
     game.hurtAt = game.clock; // 화면 가장자리 붉은 번쩍임
-    G.addShake(game, 7);
+    G.addShake(game, 7, source ? p.x - source.x : -p.face.x, source ? p.y - source.y : -p.face.y);
     G.burst(game, p.x, p.y - 6, '#e0445a', 7, 140);
     if (G.sfx) G.sfx.play('hurt');
     // 은빛 기사 각성: 맞으면 주변을 반격해 벤다
@@ -154,6 +154,7 @@
       p.level++;
       p.xpNext = G.xpToNext(p.level);
       game.pendingLevelUps++;
+      if (game.fx) { game.fx.xp = 1; game.fx.level = 0.65; }
     }
   };
 
@@ -164,17 +165,14 @@
 
   G.drawPlayer = function (ctx, game) {
     const p = game.player;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.beginPath();
-    ctx.ellipse(p.x, p.y + 14, 15, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
+    G.fx.shadow(ctx, p.x, p.y + 14, 17);
 
-    const blink = p.invuln > 0 && Math.floor(game.clock * 22) % 2 === 0;
-    ctx.globalAlpha = blink ? 0.5 : 1;
+    const blink = !game.fx.quiet && p.invuln > 0 && Math.floor(game.clock * 16) % 2 === 0;
+    ctx.globalAlpha = blink ? 0.32 : 1;
     const frame = p.moving ? Math.floor(p.walk) % 4 : 0;
     const sprite = G.CHAMPIONS[p.champion].sprite;
     const spr = G.art.get(sprite, frame) || G.art.get('player', frame);
-    const breathe = p.moving ? 0 : Math.sin(game.clock * 2.6) * 0.02;
+    const breathe = p.moving || game.fx.quiet ? 0 : Math.sin(game.clock * 2.6) * 0.02;
     if (spr) {
       ctx.save();
       ctx.translate(p.x, p.y + 14);
@@ -188,6 +186,10 @@
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+    if (p.invuln > 0) {
+      ctx.strokeStyle = '#fff0c4'; ctx.globalAlpha = game.fx.quiet ? 0.6 : 0.35;
+      ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(p.x, p.y + 12, 21, 8, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+    }
 
     // 반격 베기 효과
     if (game.retaliateFx > 0) {

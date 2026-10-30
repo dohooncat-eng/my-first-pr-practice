@@ -213,10 +213,7 @@
     ctx.arc(0, 0, r, -2.5, 2.5);
     ctx.arc(-r * 0.38, 0, r * 0.82, 2.15, -2.15, true);
     ctx.closePath();
-    const g = ctx.createLinearGradient(-r, -r, r, r);
-    g.addColorStop(0, look.light);
-    g.addColorStop(1, look.dark);
-    ctx.fillStyle = g;
+    ctx.fillStyle = look.light;
     ctx.fill();
     ctx.lineWidth = Math.max(1.5, r * 0.1);
     ctx.strokeStyle = '#0a1110';
@@ -240,7 +237,7 @@
       const spr = look.sprite && (look.tint ? G.tintedSprite(look.sprite, look.tint) : G.art.get(look.sprite));
       // 지나간 궤적을 옅은 선으로
       const tr = b.trail;
-      if (tr.length >= 6) {
+      if (tr.length >= 6 && !game.fx.low && !game.fx.quiet) {
         ctx.lineCap = 'round';
         for (let i = 0; i + 3 < tr.length; i += 3) {
           ctx.strokeStyle = look.trail + (0.5 * (1 - i / tr.length)) + ')';
@@ -251,7 +248,7 @@
           ctx.stroke();
         }
       }
-      drawBladeAt(ctx, b, look, spr, tr[6] === undefined ? b.x : tr[6], tr[7] === undefined ? b.y : tr[7], tr[8] || b.rot, 0.3);
+      if (!game.fx.low && !game.fx.quiet) drawBladeAt(ctx, b, look, spr, tr[6] === undefined ? b.x : tr[6], tr[7] === undefined ? b.y : tr[7], tr[8] || b.rot, 0.3);
       drawBladeAt(ctx, b, look, spr, b.x, b.y, b.rot, 1);
     }
   };
@@ -331,14 +328,7 @@
         const size = r * 2.35;
         ctx.drawImage(spr.img, -size / 2, -size / 2, size, size);
       } else {
-        const g = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r * 1.05);
-        g.addColorStop(0, garden ? 'rgba(200, 245, 90, 0.55)' : 'rgba(182, 227, 90, 0.45)');
-        g.addColorStop(0.6, garden ? 'rgba(90, 160, 50, 0.45)' : 'rgba(79, 122, 58, 0.38)');
-        g.addColorStop(1, 'rgba(40, 70, 30, 0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(0, 0, r * 1.05, 0, TAU);
-        ctx.fill();
+        G.fx.disc(ctx, garden ? 'garden' : 'poison', 0, 0, r * 1.05, 1, garden ? '#c8f55a8c' : '#b6e35a73', garden ? '#5aa03273' : '#4f7a3a61');
       }
       ctx.restore();
       if (garden) {
@@ -425,6 +415,7 @@
           m.done = true;
           m.boom = BOOM;
           G.hitCircle(game, m.x, m.y, m.r, m.dmg, { knock: 260 });
+          G.fx.area(game, m.x, m.y, m.r, m.blue ? 1 : 0);
           if (G.sfx) G.sfx.play('impact');
           G.burst(game, m.x, m.y, m.blue ? 'rgba(170, 210, 255, 0.95)' : 'rgba(255, 170, 80, 0.95)', 10, 260, true);
           G.burst(game, m.x, m.y, 'rgba(70, 58, 46, 0.85)', 6, 120, false);
@@ -468,14 +459,7 @@
         const k = 1 - m.boom / BOOM;
         const a = 1 - k;
         const r = m.r * (0.75 + 0.45 * k);
-        const g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, r);
-        g.addColorStop(0, m.blue ? 'rgba(235, 245, 255, ' + a + ')' : 'rgba(255, 240, 200, ' + a + ')');
-        g.addColorStop(0.45, 'rgba(' + (m.blue ? '140, 180, 255' : '255, 140, 60') + ', ' + a * 0.6 + ')');
-        g.addColorStop(1, 'rgba(60, 20, 10, 0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, r, 0, TAU);
-        ctx.fill();
+        G.fx.disc(ctx, m.blue ? 'meteor-ice' : 'meteor-fire', m.x, m.y, r, a, m.blue ? '#ebf5ff' : '#fff0c8', m.blue ? '#8cb4ff99' : '#ff8c3c99');
         ctx.lineWidth = 3;
         ctx.strokeStyle = 'rgba(255, 230, 190, ' + a * 0.7 + ')';
         ctx.beginPath();
@@ -505,10 +489,7 @@
       if (spr) {
         G.drawSprite(ctx, spr, 0, 0, sc, false, 0);
       } else {
-        const g = ctx.createLinearGradient(0, 0, 0, -60 * sc);
-        g.addColorStop(0, m.blue ? 'rgba(220, 235, 255, 0.95)' : 'rgba(255, 220, 150, 0.95)');
-        g.addColorStop(1, 'rgba(255, 120, 60, 0)');
-        ctx.strokeStyle = g;
+        ctx.strokeStyle = m.blue ? '#dcebff88' : '#ffdc9688';
         ctx.lineCap = 'round';
         ctx.lineWidth = 8 * sc;
         ctx.beginPath();
@@ -632,10 +613,7 @@
     ctx.quadraticCurveTo(5 * s, 2 * s, 4 * s, -8 * s);
     ctx.quadraticCurveTo(0, -12.5 * s, -4 * s, -8 * s);
     ctx.closePath();
-    const g = ctx.createLinearGradient(-9 * s, -12 * s, 9 * s, 6 * s);
-    g.addColorStop(0, earth ? '#f0c88a' : '#ffe8b0');
-    g.addColorStop(1, earth ? '#7a4a20' : '#c98a2a');
-    ctx.fillStyle = g;
+    ctx.fillStyle = earth ? '#d4a666' : '#eaca83';
     ctx.fill();
     ctx.lineWidth = 1.6;
     ctx.strokeStyle = '#0a1110';

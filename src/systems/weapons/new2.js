@@ -35,14 +35,7 @@
       if (!G.inView(game, f.x, f.y, f.r + 20)) continue;
       const a = Math.min(1, f.life / f.max * 2);
       const flick = 0.85 + Math.sin(game.clock * 18 + f.x) * 0.15;
-      const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * flick);
-      g.addColorStop(0, 'rgba(255, 210, 120, ' + 0.5 * a + ')');
-      g.addColorStop(0.5, 'rgba(255, 110, 50, ' + 0.35 * a + ')');
-      g.addColorStop(1, 'rgba(120, 30, 20, 0)');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, f.r * flick, 0, TAU);
-      ctx.fill();
+      G.fx.disc(ctx, 'flame', f.x, f.y, f.r * flick, a, '#ffd27880', '#ff6e3259');
     }
   }
 
@@ -189,13 +182,8 @@
       ctx.save();
       ctx.translate(b.x, b.y);
       ctx.rotate(b.a);
-      const g = ctx.createLinearGradient(0, 0, b.len, 0);
-      g.addColorStop(0, gold ? 'rgba(255, 236, 170, ' + t + ')' : 'rgba(220, 240, 255, ' + t + ')');
-      g.addColorStop(0.7, gold ? 'rgba(255, 200, 90, ' + t * 0.8 + ')' : 'rgba(140, 210, 255, ' + t * 0.8 + ')');
-      g.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      ctx.fillStyle = g;
       const wd = b.width * (0.4 + t * 0.6);
-      ctx.fillRect(0, -wd / 2, b.len, wd);
+      G.fx.beam(ctx, gold, b.len, wd, t);
       ctx.fillStyle = 'rgba(255, 255, 255, ' + t + ')';
       ctx.fillRect(0, -wd * 0.15, b.len * 0.9, wd * 0.3);
       ctx.restore();

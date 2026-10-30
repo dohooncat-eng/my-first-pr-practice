@@ -61,6 +61,7 @@
     e.kx += (kx || 0) * resist;
     e.ky += (ky || 0) * resist;
     G.addDamageNumber(game, e.x, e.y - e.r - 4, dmg, crit ? 'crit' : soft ? 'soft' : dmg >= 30 ? 'big' : '');
+    G.fx.hit(game, e, dmg, crit, kx, ky, soft);
     // 무기 갈래·조합의 맞힐 때 효과 (처형으로 이미 쓰러졌으면 끝)
     if (G.curFx && G.applyHitFx) {
       G.applyHitFx(game, e, dmg, G.curFx);
@@ -90,12 +91,12 @@
   G.killEnemy = function (game, e) {
     e.dead = true;
     game.kills++;
+    G.fx.death(game, e);
     if (e.boss) { G.onBossKilled(game, e); return; }
     const t = G.ENEMY_TYPES[e.type];
     const gemScale = 1 + Math.floor(G.curveTime(game) / 180) * 0.25;
     G.dropGem(game, e.x, e.y, e.xp * gemScale);
-    G.burst(game, e.x, e.y, t.color, e.elite ? 26 : 7, e.elite ? 260 : 150);
-    if (game.rings.length < 30) G.ring(game, e.x, e.y, e.r * 0.4, e.r * (e.elite ? 3.2 : 1.9), e.elite ? 0.45 : 0.28, 'rgba(255, 236, 200, 0.7)', e.elite ? 5 : 2.5);
+    if (!G.fx.low(game)) G.burst(game, e.x, e.y, t.color, e.elite ? 8 : 2, e.elite ? 140 : 70);
     if (G.sfx) G.sfx.play(e.elite || G.ENEMY_TYPES[e.type].role === 'tank' ? 'killBig' : 'kill');
     if (e.elite) {
       G.burst(game, e.x, e.y, 'rgba(255, 150, 70, 0.9)', 16, 220, true);
@@ -225,46 +226,41 @@
   }
 
   function spriteName(e) { return e.boss ? 'boss_' + e.type : e.type; }
+  function depth(a, b) { return a.y - b.y; }
 
   G.drawEnemies = function (ctx, game) {
     const p = game.player;
     const vis = game._visEnemies || (game._visEnemies = []);
     vis.length = 0;
     for (const e of game.enemies) if (!e.dead && inView(game, e)) vis.push(e);
-    vis.sort((a, b) => a.y - b.y);
-
-    // 그림자 먼저 한 번에
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.38)';
-    ctx.beginPath();
-    for (const e of vis) {
-      const sp = spec(e);
-      const sy = e.y + (sp.fly ? 18 : sp.feet) * e.scale;
-      const rx = sp.shadow * e.scale;
-      ctx.moveTo(e.x + rx, sy);
-      ctx.ellipse(e.x, sy, rx, rx * 0.36, 0, 0, Math.PI * 2);
-    }
-    ctx.fill();
+    vis.sort(depth);
 
     for (const e of vis) {
       const sp = spec(e);
       if (e.elite || e.boss) {
-        const pulse = 0.6 + Math.sin(game.clock * 6 + e.phase) * 0.25;
+        const pulse = game.fx.quiet ? 0.75 : 0.7 + Math.sin(game.fx.anim * 4 + e.phase) * 0.15;
         ctx.strokeStyle = e.boss ? 'rgba(255, 70, 90, ' + pulse + ')' : 'rgba(255, 107, 61, ' + pulse + ')';
         ctx.lineWidth = e.boss ? 3.5 : 2.5;
         ctx.beginPath();
         ctx.ellipse(e.x, e.y + sp.feet * e.scale, e.r * 1.25, e.r * 0.45, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
-      const frame = Math.floor(game.clock * sp.fps + e.phase) % 4;
-      const spr = G.art.get(spriteName(e), frame);
-      const bob = sp.fly ? Math.sin(game.clock * 4 + e.phase) * 3 : 0;
-      const stunWobble = e.stun > 0 ? Math.sin(game.clock * 30) * 2 : 0;
+      const frame = Math.floor(game.fx.anim * sp.fps + e.phase) % 4;
+      let spr = G.art.get(spriteName(e), frame);
+      if (spr && (!game.fx.low || e.elite || e.boss)) spr = G.unitSprite(spr, sp);
+      const bob = sp.fly && !game.fx.quiet ? Math.sin(game.fx.anim * 4 + e.phase) * 3 : 0;
+      const stunWobble = e.stun > 0 && !game.fx.quiet ? Math.sin(game.fx.anim * 30) * 1.2 : 0;
       if (spr) {
-        // 엘리트·보스는 계속 맞으므로 번쩍임을 약하게
-        const flash = e.flash > 0 ? (e.flash / 0.1) * (e.boss || e.elite ? 0.3 : 0.55) : 0;
-        G.drawSprite(ctx, spr, e.x + stunWobble, e.y + sp.feet * e.scale + bob - (e.lift || 0), e.scale, p.x < e.x, flash);
+        const age = e.fxHit === undefined ? 1 : game.fx.real - e.fxHit;
+        const hit = Math.max(0, 1 - age / 0.15), squash = game.fx.quiet ? 0 : hit * (e.boss ? 0.045 : 0.12);
+        const recoil = game.fx.quiet ? 0 : Math.sin(Math.min(1, age / 0.15) * Math.PI) * (e.boss ? 1.5 : 4);
+        const flash = age < 0.065 ? (1 - age / 0.065) * (game.fx.quiet ? 0.35 : 0.92) : 0;
+        G.drawSprite(ctx, spr, e.x + stunWobble + (e.fxDX || 0) * recoil,
+          e.y + sp.feet * e.scale + bob - (e.lift || 0) + (e.fxDY || 0) * recoil,
+          e.scale, p.x < e.x, flash, 1 + squash, 1 - squash);
       } else {
         const t = e.boss ? G.BOSS_TYPES[e.type] : G.ENEMY_TYPES[e.type];
+        if (!game.fx.low || e.elite || e.boss) G.fx.shadow(ctx, e.x, e.y + sp.feet * e.scale, sp.shadow * e.scale);
         ctx.fillStyle = e.flash > 0 ? '#fff' : t.color;
         ctx.beginPath();
         ctx.arc(e.x, e.y + bob, e.r, 0, Math.PI * 2);
@@ -290,7 +286,7 @@
       if (e.dead) continue;
       if (e.boss) G.drawGlow(ctx, 'rgba(255, 80, 90, 0.45)', e.x, e.y, e.r * 2.6, 0.6);
       else if (e.elite) G.drawGlow(ctx, 'rgba(255, 90, 50, 0.5)', e.x, e.y, e.r * 2.4, 0.7);
-      else if (G.ENEMY_TYPES[e.type].role === 'tank') G.drawGlow(ctx, 'rgba(255, 140, 60, 0.3)', e.x, e.y - 4, e.r * 1.2, 0.45);
+      else if (!game.fx.low && G.ENEMY_TYPES[e.type].role === 'tank' && (e.id & 1) === 0) G.drawGlow(ctx, 'rgba(255, 140, 60, 0.3)', e.x, e.y - 4, e.r * 1.2, 0.3);
     }
   };
 })(window.G);

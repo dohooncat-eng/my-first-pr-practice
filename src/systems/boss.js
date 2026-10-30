@@ -29,6 +29,7 @@
     game.enemies.push(e);
     game.boss = e;
     if (silent) return e;
+    G.fx.boss(game, e);
     const hasBatchim = (bt.name.charCodeAt(bt.name.length - 1) - 0xac00) % 28 !== 0;
     G.announce(game, final ? bt.name + (hasBatchim ? '이' : '가') + ' 깨어났습니다! 쓰러뜨리면 새벽이 옵니다' : bt.name + (hasBatchim ? '이' : '가') + ' 나타났습니다!');
     G.addShake(game, 10);
@@ -406,30 +407,37 @@
   };
 
   // ---------- 그리기 ----------
+  const WARNING_DASH = [7, 5];
+  const SOLID_LINE = [];
   G.drawTelegraphs = function (ctx, game) {
     for (const t of game.telegraphs) {
       const k = 1 - t.life / t.max;
       ctx.save();
       if (t.kind === 'circle') {
-        ctx.fillStyle = 'rgba(255, 70, 70, ' + (0.08 + k * 0.14) + ')';
-        ctx.strokeStyle = 'rgba(255, 90, 80, ' + (0.5 + k * 0.4) + ')';
-        ctx.lineWidth = 2.5;
+        ctx.fillStyle = 'rgba(255, 55, 81, ' + (0.06 + k * 0.08) + ')';
+        ctx.strokeStyle = '#210a16';
+        ctx.lineWidth = 6;
         ctx.beginPath();
         ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
+        ctx.strokeStyle = '#ff6675'; ctx.lineWidth = 2.5; ctx.setLineDash(WARNING_DASH); ctx.stroke(); ctx.setLineDash(SOLID_LINE);
+        ctx.strokeStyle = '#ffe3cb'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(t.x, t.y, t.r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * k); ctx.stroke();
         ctx.beginPath();
         ctx.arc(t.x, t.y, t.r * k, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 90, 80, 0.18)';
+        ctx.fillStyle = 'rgba(255, 90, 100, 0.09)';
         ctx.fill();
+        ctx.strokeStyle = '#ffced2'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(t.x - 6, t.y); ctx.lineTo(t.x + 6, t.y); ctx.moveTo(t.x, t.y - 6); ctx.lineTo(t.x, t.y + 6); ctx.stroke();
       } else {
         ctx.translate(t.x, t.y);
         ctx.rotate(t.angle);
-        ctx.fillStyle = 'rgba(255, 80, 60, ' + (0.1 + k * 0.2) + ')';
+        ctx.fillStyle = 'rgba(255, 65, 90, ' + (0.12 + k * 0.16) + ')';
         ctx.fillRect(0, -t.width / 2, t.len, t.width);
-        ctx.strokeStyle = 'rgba(255, 110, 70, ' + (0.5 + k * 0.4) + ')';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#240915'; ctx.lineWidth = 5;
         ctx.strokeRect(0, -t.width / 2, t.len, t.width);
+        ctx.strokeStyle = '#ff8a91'; ctx.lineWidth = 1.5; ctx.strokeRect(0, -t.width / 2, t.len, t.width);
+        ctx.fillStyle = '#ffe3cb'; ctx.fillRect(0, -1, t.len * k, 2);
       }
       ctx.restore();
     }
@@ -438,18 +446,7 @@
   G.drawEnemyBullets = function (ctx, game) {
     for (const b of game.enemyBullets) {
       if (!G.inView(game, b.x, b.y, 30)) continue;
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r + 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#1a0306';
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fillStyle = b.color;
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r * 0.45, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff6ee';
-      ctx.fill();
+      G.fx.enemyBullet(ctx, b);
     }
   };
 

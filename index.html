@@ -325,6 +325,13 @@
           <button class="seg-btn" type="button" role="radio" data-q="low">낮음</button>
         </div>
       </div>
+      <div class="set-row set-quality">
+        <span id="set-fx-quality-label">효과 품질</span>
+        <div id="set-fx-quality" class="seg" role="radiogroup" aria-labelledby="set-fx-quality-label">
+          <button class="seg-btn" type="button" role="radio" data-q="high">높음</button>
+          <button class="seg-btn" type="button" role="radio" data-q="low">낮음</button>
+        </div>
+      </div>
       <div class="set-row">
         <label for="set-fps">FPS 표시</label>
         <input id="set-fps" class="switch" type="checkbox" role="switch">
@@ -559,6 +566,7 @@
 <script src="src/spawner.js"></script>
 <script src="src/pickups.js"></script>
 <script src="src/systems/save.js"></script>
+<script src="src/fx/juice.js"></script>
 <script src="src/ui/hud.js"></script>
 <script src="src/ui/celebrate.js"></script>
 <script src="src/ui/screens.js"></script>

@@ -67,14 +67,7 @@
       for (const b of w.state.booms || []) {
         const k = 1 - b.life / b.max;
         const r = b.r * (0.6 + 0.5 * k);
-        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, r);
-        g.addColorStop(0, 'rgba(255, 236, 190, ' + (1 - k) * 0.9 + ')');
-        g.addColorStop(0.5, 'rgba(255, 110, 40, ' + (1 - k) * 0.55 + ')');
-        g.addColorStop(1, 'rgba(120, 30, 10, 0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, r, 0, TAU);
-        ctx.fill();
+        G.fx.disc(ctx, 'inferno', b.x, b.y, r, 1 - k, '#ffecbee6', '#ff6e288c');
       }
     },
     glow(ctx, game, w) {
@@ -153,7 +146,7 @@
       // 지나간 자리에 남는 빛 꼬리
       for (const o of w.state.orbs || []) {
         if (!o) continue;
-        for (let k = 1; k <= 5; k++) {
+        for (let k = 1; k <= (game.fx.low || game.fx.quiet ? 0 : 4); k++) {
           const a = o.a - k * 0.09;
           ctx.fillStyle = 'rgba(232, 255, 160, ' + 0.42 * (1 - k / 6) + ')';
           ctx.beginPath();
@@ -192,18 +185,7 @@
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(game.clock * 0.35);
-      const g = ctx.createLinearGradient(0, 0, r, 0);
-      g.addColorStop(0, 'rgba(255, 240, 200, ' + (0.16 + pulse * 0.08) + ')');
-      g.addColorStop(1, 'rgba(255, 236, 190, 0)');
-      ctx.fillStyle = g;
-      for (let k = 0; k < 8; k++) {
-        ctx.rotate(TAU / 8);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, r, -0.1, 0.1);
-        ctx.closePath();
-        ctx.fill();
-      }
+      G.fx.rays(ctx, r, 0.65 + pulse * 0.35);
       ctx.restore();
       G.drawAuraRing(ctx, game, r, pulse, '255, 236, 190');
     },
@@ -369,11 +351,7 @@
     }
     ctx.closePath();
     ctx.fill();
-    const g = ctx.createRadialGradient(-5, -5, 2, 0, 0, 20);
-    g.addColorStop(0, '#fff6d0');
-    g.addColorStop(0.5, '#ffc766');
-    g.addColorStop(1, '#ff6b3d');
-    ctx.fillStyle = g;
+    ctx.fillStyle = '#ffc766';
     ctx.beginPath();
     ctx.arc(0, 0, 19, 0, TAU);
     ctx.fill();

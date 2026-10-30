@@ -72,11 +72,22 @@
     ctx.fillStyle = '#a1e0d8'; ctx.fillRect(L + 1, T + 4, (xpW - 2) * xp, 2);
     for (let i = 1; i < 10; i++) { ctx.fillStyle = '#08171088'; ctx.fillRect(L + xpW * i / 10, T + 4, 1, 6); }
     if (xp > 0) diamond(ctx, L + (xpW - 2) * xp, T + 7, 3, '#d5f5e3');
+    if (game.fx && game.fx.xp > 0) {
+      ctx.globalAlpha = game.fx.xp * (quiet ? 0.3 : 0.7);
+      ctx.fillStyle = '#d5ffe9'; ctx.fillRect(L + 1, T + 4, (xpW - 2) * xp, 2);
+      if (xp > 0) diamond(ctx, L + (xpW - 2) * xp, T + 7, quiet ? 3 : 3 + game.fx.xp * 2, '#fff9d7');
+      ctx.globalAlpha = 1;
+    }
     // 레벨 인장과 시간판은 서로 독립된 폭을 갖는다.
     plate(ctx, L, T + 20, 44, 43, '#c5a86d');
     ctx.fillStyle = '#c7b47e'; ctx.font = '600 8px ' + BODY; ctx.textAlign = 'center'; ctx.fillText('레벨', L + 22, T + 32);
     ctx.font = (p.level > 99 ? 18 : 23) + 'px ' + DISPLAY; ctx.fillStyle = '#f4e6ba'; ctx.fillText(String(p.level), L + 22, T + 56);
     diamond(ctx, L + 22, T + 20, 3, '#e9c888');
+    if (game.fx && game.fx.level > 0) {
+      ctx.globalAlpha = game.fx.level / 0.65;
+      ctx.strokeStyle = '#ffe5a0'; ctx.lineWidth = 2;
+      G.roundRect(ctx, L - 2, T + 18, 48, 47, 5); ctx.stroke(); ctx.globalAlpha = 1;
+    }
     const win = G.runTime(game);
     plate(ctx, w / 2 - 58, T + 19, 116, 43, '#8d9867');
     ctx.textAlign = 'center'; ctx.fillStyle = game.time >= win - 60 ? '#f5ca83' : '#f0e8cd';

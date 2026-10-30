@@ -119,6 +119,7 @@
     }
     if (b.angle === undefined) b.angle = Math.atan2(b.vy, b.vx);
     game.projectiles.push(b);
+    G.fx.muzzle(game, b);
     return b;
   };
 
@@ -157,6 +158,7 @@
   G.drawProjectiles = function (ctx, game) {
     for (const b of game.projectiles) {
       if (!G.inView(game, b.x, b.y, 60)) continue;
+      G.fx.trail(ctx, game, b.x, b.y, b.vx, b.vy, Math.hypot(b.vx, b.vy), G.fx.family(b.wkey), 0.55);
       const spr = b.sprite && G.art.get(b.sprite);
       if (spr) {
         ctx.save();
@@ -175,6 +177,7 @@
   };
 
   G.drawProjectileGlow = function (ctx, game) {
+    if (game.fx.low) return;
     for (const b of game.projectiles) {
       if (b.glow && G.inView(game, b.x, b.y, 60)) G.drawGlow(ctx, b.glow, b.x, b.y, b.glowR * b.scale, 0.7);
     }

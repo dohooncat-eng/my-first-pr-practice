@@ -141,9 +141,28 @@
     return c;
   }
 
+  // 유닛의 부드러운 바닥 그림자도 걷기 프레임에 함께 굽는다.
+  // 수백 마리의 그림자를 별도 drawImage로 찍지 않고 본체와 한 번에 그린다.
+  G.unitSprite = function (spr, spec) {
+    if (spr.unit) return spr.unit;
+    const res = spr.img.width / spr.w, offset = spec.fly ? 18 - spec.feet : 0;
+    const left = Math.max(spr.w * spr.ax, spec.shadow * 1.25);
+    const right = Math.max(spr.w * (1 - spr.ax), spec.shadow * 1.25);
+    const top = spr.h * spr.ay;
+    const bottom = Math.max(spr.h * (1 - spr.ay), offset + spec.shadow * 0.5);
+    const w = left + right, h = top + bottom;
+    const c = document.createElement('canvas'); c.width = Math.ceil(w * res); c.height = Math.ceil(h * res);
+    const cx = c.getContext('2d'); cx.scale(res, res);
+    G.fx.shadow(cx, left, top + offset, spec.shadow, spec.fly ? 0.65 : 1);
+    cx.drawImage(spr.img, left - spr.ax * spr.w, 0, spr.w, spr.h);
+    const f = document.createElement('canvas'); f.width = c.width; f.height = c.height;
+    const fc = f.getContext('2d'); fc.scale(res, res); fc.drawImage(spr.flash, left - spr.ax * spr.w, 0, spr.w, spr.h);
+    return spr.unit = { img: c, flash: f, w, h, ax: left / w, ay: top / h };
+  };
+
   // 기준점이 (x, y)에 오도록 그린다. flash(0~1)만큼 흰 실루엣을 겹친다.
-  G.drawSprite = function (ctx, spr, x, y, scale, flipX, flash) {
-    const w = spr.w * scale, h = spr.h * scale;
+  G.drawSprite = function (ctx, spr, x, y, scale, flipX, flash, stretchX, stretchY) {
+    const w = spr.w * scale * (stretchX || 1), h = spr.h * scale * (stretchY || 1);
     let img = spr.img, fl = spr.flash, ax = spr.ax;
     if (flipX) {
       if (!spr.imgFlip) { spr.imgFlip = mirror(spr.img); spr.flashFlip = mirror(spr.flash); }

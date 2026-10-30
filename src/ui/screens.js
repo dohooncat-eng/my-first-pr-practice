@@ -1039,6 +1039,7 @@
     if (typeof s.numbers !== 'boolean') s.numbers = true;
     if (typeof s.fps !== 'boolean') s.fps = false;
     if (['auto', 'high', 'medium', 'low'].indexOf(s.quality) === -1) s.quality = 'auto';
+    if (s.fxQuality !== 'low') s.fxQuality = 'high';
     return s;
   }
 
@@ -1046,6 +1047,11 @@
     const q = settingsObj().quality;
     document.querySelectorAll('#set-quality .seg-btn').forEach((b) => {
       const on = b.dataset.q === q;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-checked', String(on));
+    });
+    document.querySelectorAll('#set-fx-quality .seg-btn').forEach((b) => {
+      const on = b.dataset.q === settingsObj().fxQuality;
       b.classList.toggle('is-on', on);
       b.setAttribute('aria-checked', String(on));
     });
@@ -1114,6 +1120,10 @@
       if (G.applyQuality) G.applyQuality();
       sfx('click');
       renderQuality();
+    }));
+    document.querySelectorAll('#set-fx-quality .seg-btn').forEach((b) => b.addEventListener('click', () => {
+      s().fxQuality = b.dataset.q;
+      saveSettings(); sfx('click'); renderQuality();
     }));
     $('set-fullscreen').addEventListener('click', () => {
       sfx('click');

@@ -61,6 +61,8 @@
     game.autosave = AUTOSAVE_EVERY;
     game.cam.x = 0;
     game.cam.y = 0;
+    G.resetEffects(game);
+    G.fx.reset(game);
     game.lastRun = { stageId: game.stage.id, championId: game.player.champion, difficultyId: game.difficulty.id };
     G.recalcStats(game);
     game.player.hp = game.player.maxHp;
@@ -258,23 +260,27 @@
     });
   }
 
-  function update(dt) {
+  function update(realDt) {
+    const dt = G.fx.tick(game, realDt);
     // 배속: 판 시간과 적 등장만 빨라지고, 움직임·공격은 그대로
-    const tdt = dt * G.speedMul();
+    // 히트스톱·감속에도 판 시계와 등장 일정은 실제 간격을 따른다.
+    const tdt = realDt * G.speedMul();
     game.time += tdt;
     const p = game.player;
-    G.updatePlayer(game, dt);
-    game.grid.clear();
-    for (const e of game.enemies) game.grid.insert(e);
-    G.updateSpawner(game, tdt);
-    G.updateEnemies(game, dt);
-    G.updateDots(game, dt);
-    G.updateWeapons(game, dt);
-    G.updateProjectiles(game, dt);
-    G.updateBossFx(game, dt);
-    G.compact(game.enemies);
-    G.updatePickups(game, dt);
-    G.updateEffects(game, dt);
+    if (dt > 0) {
+      G.updatePlayer(game, dt);
+      game.grid.clear();
+      for (const e of game.enemies) game.grid.insert(e);
+      G.updateSpawner(game, tdt);
+      G.updateEnemies(game, dt);
+      G.updateDots(game, dt);
+      G.updateWeapons(game, dt);
+      G.updateProjectiles(game, dt);
+      G.updateBossFx(game, dt);
+      G.compact(game.enemies);
+      G.updatePickups(game, dt);
+    } else G.updateSpawner(game, tdt);
+    G.updateEffects(game, realDt);
     game.retaliateFx = Math.max(0, game.retaliateFx - dt);
 
     music('setIntensity', G.curveTime(game) / G.WIN_TIME);
@@ -285,11 +291,9 @@
       if (game.heartbeat <= 0) { game.heartbeat = 0.85; if (G.sfx) G.sfx.play('lowhp'); }
     }
 
-    const k = Math.min(1, dt * 8);
-    game.cam.x += (p.x - game.cam.x) * k;
-    game.cam.y += (p.y - game.cam.y) * k;
+    G.fx.camera(game, realDt);
 
-    game.autosave -= dt;
+    game.autosave -= realDt;
     if (game.autosave <= 0) {
       game.autosave = AUTOSAVE_EVERY;
       G.saveRun(game);
@@ -319,10 +323,8 @@
   const DECAL_CELL = 110;
   const patterns = {};
 
-  function drawGround(ctx) {
+  function paintGround(ctx, x0, y0, x1, y1, staticMap) {
     const st = game.stage;
-    const x0 = game.cam.x - game.viewW / 2 - 40, y0 = game.cam.y - game.viewH / 2 - 40;
-    const x1 = x0 + game.viewW + 80, y1 = y0 + game.viewH + 80;
     const tile = G.art.get(st.ground);
     if (tile) {
       if (!patterns[st.ground]) {
@@ -352,14 +354,35 @@
         G.drawSprite(ctx, spr, cx * DECAL_CELL + ox, cy * DECAL_CELL + oy, sc, h < 0.2, 0);
       }
     }
-    G.drawMap(ctx, game, x0, y0, x1, y1);
+    if (staticMap) G.drawMap(ctx, game, x0, y0, x1, y1);
   }
 
-  function toScreen(x, y, sx, sy) {
-    return {
-      x: (x - game.cam.x) * game.zoom + game.w / 2 + sx,
-      y: (y - game.cam.y) * game.zoom + game.h / 2 + sy,
-    };
+  // 타일·장식·고정 지형을 여백 있는 한 장에 구워 이동 중 여러 프레임에 재사용한다.
+  // 동적인 경기장 경계는 매번 따로 그려 판정 위치와 정확히 일치시킨다.
+  const groundCache = { canvas: null, stage: null, x: 0, y: 0, w: 0, h: 0, res: 0 };
+  function drawGround(ctx) {
+    const c = groundCache, pad = 170;
+    const w = Math.ceil(game.viewW + pad * 2), h = Math.ceil(game.viewH + pad * 2);
+    const res = Math.min(game.fx.low ? 1 : 1.5, game.dpr * game.zoom);
+    const type = game.stage.map && game.stage.map.type;
+    const staticMap = type === 'pillars' || type === 'ponds';
+    const left = game.cam.x - game.viewW / 2, top = game.cam.y - game.viewH / 2;
+    if (!c.canvas || c.stage !== game.stage || c.w !== w || c.h !== h || c.res !== res ||
+        left < c.x + 35 || top < c.y + 35 || left + game.viewW > c.x + w - 35 || top + game.viewH > c.y + h - 35) {
+      if (!c.canvas) c.canvas = document.createElement('canvas');
+      c.stage = game.stage; c.w = w; c.h = h; c.res = res;
+      c.x = Math.floor(left - pad); c.y = Math.floor(top - pad);
+      c.canvas.width = Math.ceil(w * res); c.canvas.height = Math.ceil(h * res);
+      const cg = c.canvas.getContext('2d'); cg.setTransform(res, 0, 0, res, -c.x * res, -c.y * res);
+      paintGround(cg, c.x, c.y, c.x + w, c.y + h, staticMap);
+    }
+    ctx.drawImage(c.canvas, c.x, c.y, w, h);
+    if (!staticMap && type !== 'open') G.drawMap(ctx, game, left - 40, top - 40, left + game.viewW + 40, top + game.viewH + 40);
+  }
+
+  function worldTransform(ctx, dpr, zoom, sx, sy) {
+    ctx.setTransform(dpr * zoom, 0, 0, dpr * zoom,
+      dpr * (game.w / 2 - game.cam.x * zoom + sx), dpr * (game.h / 2 - game.cam.y * zoom + sy));
   }
 
   // 레벨업·상자·일시정지 화면이 떠 있을 때는 HUD 글자가 겹쳐 보이지 않게 그리지 않는다
@@ -367,65 +390,52 @@
 
   function render() {
     const ctx = game.ctx;
-    const { w, h, dpr, zoom } = game;
+    const { w, h, dpr } = game;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#0d1513';
     ctx.fillRect(0, 0, w, h);
     const p = game.player;
     if (!p || game.state === 'menu' || game.state === 'loading') return;
 
-    const sx = game.shake ? G.rand(-game.shake, game.shake) : 0;
-    const sy = game.shake ? G.rand(-game.shake, game.shake) : 0;
-    const world = () => ctx.setTransform(
-      dpr * zoom, 0, 0, dpr * zoom,
-      dpr * (w / 2 - game.cam.x * zoom + sx),
-      dpr * (h / 2 - game.cam.y * zoom + sy),
-    );
-
-    world();
+    const fx = G.fx.prepare(game), zoom = game.zoom * fx.zoom, sx = fx.sx, sy = fx.sy;
+    worldTransform(ctx, dpr, zoom, sx, sy);
     drawGround(ctx);
     G.drawPickups(ctx, game);
-    G.drawTelegraphs(ctx, game);
     G.drawWeaponsUnder(ctx, game);
+    G.drawRings(ctx, game);
+    G.fx.drawGhosts(ctx, game);
     G.drawEnemies(ctx, game);
     const dying = game.state === 'dying' || game.state === 'end';
     if (!dying) G.drawPlayer(ctx, game);
     G.drawProjectiles(ctx, game);
     G.drawWeaponsOver(ctx, game);
-    G.drawEnemyBullets(ctx, game);
     G.drawParticles(ctx, game, false);
 
     // 어둠: 등불에서 멀어질수록 짙어진다 (스테이지마다 어둠의 색이 다르다)
-    const lp = G.lanternPos(p);
-    const ls = toScreen(lp.x, lp.y, sx, sy);
-    const flicker = 1 + Math.sin(game.clock * 11) * 0.015 + Math.sin(game.clock * 23.7) * 0.01;
-    const inner = (dying ? 30 : 80) * zoom * flicker;
-    const outer = Math.max(w, h) * (dying ? 0.45 : 0.62);
-    const c = game.stage.dark.join(', ');
+    const lx = p.x + (p.flip ? -15 : 15), ly = p.y - 1;
+    const lsx = (lx - game.cam.x) * zoom + w / 2 + sx, lsy = (ly - game.cam.y) * zoom + h / 2 + sy;
+    const flicker = fx.quiet ? 1 : 1 + Math.sin(game.clock * 11) * 0.015 + Math.sin(game.clock * 23.7) * 0.01;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const dark = ctx.createRadialGradient(ls.x, ls.y, inner, ls.x, ls.y, outer);
-    dark.addColorStop(0, 'rgba(' + c + ', 0)');
-    dark.addColorStop(0.4, 'rgba(' + c + ', 0.32)');
-    dark.addColorStop(1, 'rgba(' + c + ', 0.84)');
-    ctx.fillStyle = dark;
-    ctx.fillRect(0, 0, w, h);
+    G.fx.drawAtmosphere(ctx, game, lsx, lsy, dying);
 
     // 빛: 가산 합성
-    world();
+    worldTransform(ctx, dpr, zoom, sx, sy);
     ctx.globalCompositeOperation = 'lighter';
     if (!dying) {
-      G.drawGlow(ctx, 'rgba(255, 160, 70, 0.5)', lp.x, lp.y, 170 * flicker, 0.55);
-      G.drawGlow(ctx, 'rgba(255, 226, 160, 0.9)', lp.x, lp.y, 18 * flicker, 0.9);
+      if (!fx.low) G.drawGlow(ctx, 'rgba(255, 160, 70, 0.5)', lx, ly, 190 * flicker, 0.48);
+      G.drawGlow(ctx, 'rgba(255, 226, 160, 0.9)', lx, ly, 18 * flicker, 0.85);
     }
     G.drawPickupGlow(ctx, game);
     G.drawProjectileGlow(ctx, game);
-    G.drawWeaponGlow(ctx, game);
+    if (!fx.low) G.drawWeaponGlow(ctx, game);
     G.drawEnemyGlow(ctx, game);
-    G.drawDotGlow(ctx, game);
-    G.drawEnemyBulletGlow(ctx, game);
-    G.drawRings(ctx, game);
+    if (!fx.low) G.drawDotGlow(ctx, game);
     G.drawParticles(ctx, game, true);
     ctx.globalCompositeOperation = 'source-over';
+    G.fx.drawHits(ctx, game);
+    // 위험 표시는 분위기와 아군 섬광 위에 그려 밝은 전투에서도 놓치지 않게 한다.
+    G.drawTelegraphs(ctx, game);
+    G.drawEnemyBullets(ctx, game);
 
     G.drawEnemyOverlay(ctx, game);
     if (!dying) G.drawPlayerBar(ctx, game);
@@ -433,16 +443,6 @@
 
     // 맞았을 때·체력이 낮을 때 붉은 테두리
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const low = p.hp / p.maxHp < 0.3 && !dying ? 0.35 + Math.sin(game.clock * 6) * 0.15 : 0;
-    const red = Math.max(p.hurt * 2.4, low);
-    if (red > 0) {
-      const v = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.35, w / 2, h / 2, Math.max(w, h) * 0.75);
-      v.addColorStop(0, 'rgba(224, 68, 90, 0)');
-      v.addColorStop(1, 'rgba(224, 68, 90, ' + Math.min(0.6, red) + ')');
-      ctx.fillStyle = v;
-      ctx.fillRect(0, 0, w, h);
-    }
-
     G.drawScreenFlash(ctx, game);
     if (HUD_STATES.indexOf(game.state) !== -1) G.drawHUD(ctx, game);
   }
@@ -511,6 +511,7 @@
     }
     else if (game.state === 'dying') {
       game.dieTimer -= dt;
+      G.fx.tick(game, dt);
       G.updateEffects(game, dt * 0.5);
       if (game.dieTimer <= 0) endRun(false);
     }
@@ -548,7 +549,7 @@
 
   // 테스트용: 고정 시간 간격으로 직접 진행
   game.step = function (dt, n) {
-    for (let i = 0; i < (n || 1); i++) if (game.state === 'playing') update(dt);
+    for (let i = 0; i < (n || 1); i++) if (game.state === 'playing') { game.clock += dt; update(dt); }
   };
 
   game.render = render; // 테스트·성능 측정용
