@@ -109,7 +109,99 @@
   }
 
   // ---------- 스테이지 보스 고유 패턴 ----------
+  // 부채꼴로 탄을 뿌린다 (가운데가 플레이어 쪽)
+  function cone(game, e, p, n, spread, speed, dmg, color) {
+    const a = Math.atan2(p.y - e.y, p.x - e.x);
+    for (let i = 0; i < n; i++) G.fireEnemyBullet(game, e.x, e.y - 10, a + (i / (n - 1) - 0.5) * spread, speed * G.rand(0.9, 1.1), dmg, color);
+    if (G.sfx) G.sfx.play('bossShot');
+  }
   const PATTERNS = {
+    // 겨울 아귀: 경고선 뒤 얼음 숨결(넓은 부채꼴), 그리고 돌진
+    frostbreath(game, e, dt, p) {
+      const ai = e.ai;
+      if (ai.mode === 'breath') {
+        ai.t -= dt;
+        ai.shot = (ai.shot || 0) - dt;
+        if (ai.shot <= 0) { ai.shot = 0.12; cone(game, e, p, 3, 1.1, 260, e.damage * 0.4, 'rgba(180, 230, 255, 0.95)'); }
+        if (ai.t <= 0) ai.mode = 'walk';
+        return 0;
+      }
+      if (ai.mode === 'charge') {
+        ai.t -= dt;
+        e.x += Math.cos(ai.angle) * 560 * dt;
+        e.y += Math.sin(ai.angle) * 560 * dt;
+        if (ai.t <= 0) ai.mode = 'walk';
+        return 0;
+      }
+      ai.timerA -= dt;
+      ai.timerB -= dt;
+      if (ai.timerA <= 0) { ai.timerA = 6; ai.mode = 'breath'; ai.t = 1.2; telegraphLine(game, e.x, e.y, Math.atan2(p.y - e.y, p.x - e.x), 360, 120, 0.5); }
+      else if (ai.timerB <= 0) {
+        ai.timerB = 7.5;
+        ai.angle = Math.atan2(p.y - e.y, p.x - e.x);
+        telegraphLine(game, e.x, e.y, ai.angle, 440, e.r * 2, 0.7);
+        ai.mode = 'aimc'; ai.t = 0.7;
+      }
+      if (ai.mode === 'aimc') { ai.t -= dt; if (ai.t <= 0) { ai.mode = 'charge'; ai.t = 0.7; } return 0; }
+      return 1;
+    },
+    // 대장간 심장: 플레이어 주위에 쇳물 장판을 떨어뜨리고, 불씨 부하를 부른다
+    forge(game, e, dt, p) {
+      const ai = e.ai;
+      ai.timerA -= dt;
+      ai.timerB -= dt;
+      if (ai.timerA <= 0) {
+        ai.timerA = 5;
+        for (let i = 0; i < 4; i++) {
+          const x = p.x + G.rand(-130, 130), y = p.y + G.rand(-130, 130);
+          telegraphCircle(game, x, y, 70, 1.0 + i * 0.15, e.damage, () => {
+            G.burst(game, x, y, 'rgba(255, 140, 60, 0.95)', 16, 240, true);
+            for (let k = 0; k < 6; k++) G.fireEnemyBullet(game, x, y, (k / 6) * Math.PI * 2, 150, e.damage * 0.35, 'rgba(255, 150, 60, 0.95)');
+          });
+        }
+      }
+      if (ai.timerB <= 0) {
+        ai.timerB = 9;
+        const kind = game.stage.enemies.basic;
+        for (let i = 0; i < 8; i++) {
+          const a = (i / 8) * Math.PI * 2;
+          G.spawnEnemy(game, kind, e.x + Math.cos(a) * 80, e.y + Math.sin(a) * 80, false);
+        }
+      }
+      return 0.8;
+    },
+    // 시든 여왕: 플레이어를 가로지르는 가시 줄 여러 개(경고 뒤 탄이 줄을 따라 솟음)
+    thorns(game, e, dt, p) {
+      const ai = e.ai;
+      ai.timerA -= dt;
+      if (ai.timerA <= 0) {
+        ai.timerA = 5.5;
+        const base = Math.random() * Math.PI;
+        for (let i = 0; i < 3; i++) {
+          const a = base + (i / 3) * Math.PI;
+          const sx = p.x - Math.cos(a) * 260, sy = p.y - Math.sin(a) * 260;
+          // 경고가 끝나는 순간(게임 시간 기준) 줄을 따라 가시가 솟는다
+          game.telegraphs.push({ kind: 'line', x: sx, y: sy, angle: a, len: 520, width: 34, life: 0.9, max: 0.9, onEnd: () => {
+            for (let k = 0; k <= 10; k++) {
+              const x = sx + Math.cos(a) * 52 * k, y = sy + Math.sin(a) * 52 * k;
+              const dx = p.x - x, dy = p.y - y;
+              if (dx * dx + dy * dy < 30 * 30) G.damagePlayer(game, e.damage * 0.8);
+              if (game.particles.length < 250) G.burst(game, x, y, 'rgba(200, 140, 255, 0.9)', 3, 120);
+            }
+          } });
+        }
+      }
+      return 1;
+    },
+    // 끝없는 밤: 가시 줄 + 나선 탄막 + 순간 이동을 번갈아
+    nightfall(game, e, dt, p) {
+      const ai = e.ai;
+      ai.phaseT = (ai.phaseT || 0) + dt;
+      const which = Math.floor(ai.phaseT / 9) % 3;
+      if (which === 0) return PATTERNS.thorns(game, e, dt, p);
+      if (which === 1) return PATTERNS.eclipse(game, e, dt, p);
+      return PATTERNS.frostbreath(game, e, dt, p);
+    },
     // 고목 수호자: 부하 소환 + 뿌리 내려찍기
     treant(game, e, dt, p) {
       const ai = e.ai;

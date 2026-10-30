@@ -69,12 +69,12 @@
     treant: { name: '고목 수호자', hp: 1400, speed: 40, r: 44, damage: 22, pattern: 'treant', color: '#8fb36a' },
     marshqueen: { name: '늪의 여왕', hp: 1500, speed: 44, r: 44, damage: 24, pattern: 'marshqueen', color: '#b6e35a' },
     ashknight: { name: '잿빛 기사', hp: 1650, speed: 52, r: 40, damage: 26, pattern: 'ashknight', color: '#ff6b3d' },
-    wintermaw: { name: '겨울 아귀', hp: 2000, speed: 46, r: 44, damage: 30, pattern: 'ashknight', color: '#bfe9ff' },
-    forgeheart: { name: '대장간 심장', hp: 2200, speed: 40, r: 46, damage: 32, pattern: 'treant', color: '#ff8a3d' },
+    wintermaw: { name: '겨울 아귀', hp: 2000, speed: 46, r: 44, damage: 30, pattern: 'frostbreath', color: '#bfe9ff' },
+    forgeheart: { name: '대장간 심장', hp: 2200, speed: 40, r: 46, damage: 32, pattern: 'forge', color: '#ff8a3d' },
     lakemother: { name: '호수의 어머니', hp: 2400, speed: 44, r: 44, damage: 33, pattern: 'marshqueen', color: '#9fd8ff' },
     tempestlord: { name: '폭풍의 주인', hp: 2600, speed: 50, r: 42, damage: 34, pattern: 'eclipse', color: '#c9f0ff' },
-    witheredqueen: { name: '시든 여왕', hp: 2800, speed: 42, r: 44, damage: 36, pattern: 'treant', color: '#d6a0ff' },
-    nightless: { name: '끝없는 밤', hp: 3200, speed: 44, r: 46, damage: 38, pattern: 'eclipse', color: '#8f84e0' },
+    witheredqueen: { name: '시든 여왕', hp: 2800, speed: 42, r: 44, damage: 36, pattern: 'thorns', color: '#d6a0ff' },
+    nightless: { name: '끝없는 밤', hp: 3200, speed: 44, r: 46, damage: 38, pattern: 'nightfall', color: '#8f84e0' },
     eclipse: { name: '월식의 군주', hp: 1850, speed: 42, r: 40, damage: 28, pattern: 'eclipse', color: '#cfe6ff' },
   };
   // 곡선 초(20분 기준): 판 시간의 1/3·2/3에 중간 보스, 끝에 최종 보스(index 2). 최종 보스를 쓰러뜨리면 클리어
