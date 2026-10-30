@@ -126,6 +126,38 @@
   // 동작은 메인 무기 것을 그대로 쓴다 (동작 파일이 모두 불린 뒤라 여기서 연결)
   G.XCOMBOS.forEach((c) => { G.WEAPON_BEHAVIORS[c.key] = G.WEAPON_BEHAVIORS[c.main]; });
 
+  // 이 무기(다음 레벨 lv)가 지금 빌드에서 어떤 조합에 이어지는지 한 줄
+  G.xcomboHint = function (p, key, lv) {
+    const own = p.weapons.find((w) => w.key === key);
+    const lines = [];
+    G.XCOMBOS.forEach((c) => {
+      const def = G.WEAPONS[c.key];
+      if (c.main === key && own && own.b5 === c.b5) {
+        const s = p.weapons.find((w) => w.key === c.sub);
+        if (s) lines.push(def.name + ' 메인까지 Lv ' + lv + '/10 · ' + G.WEAPONS[c.sub].name + ' Lv ' + s.level + '/5');
+      }
+      if (c.sub === key) {
+        const m = p.weapons.find((w) => w.key === c.main && w.b5 === c.b5);
+        if (m) lines.push(def.name + '의 재료 (' + G.WEAPONS[c.main].name + ' Lv ' + m.level + '/10, 이것 Lv ' + lv + '/5)');
+      }
+    });
+    if (!lines.length && own && !own.b5 && lv < 5) return 'Lv 5 갈래에 따라 조합 상대가 정해집니다';
+    return lines[0] || '';
+  };
+
+  // 지금 빌드와 관련된 조합들(선택창의 조합 도감): 준비됨 → 재료 일부 → 나머지
+  G.xcomboBook = function (p, all) {
+    const rows = G.XCOMBOS.map((c) => {
+      const m = p.weapons.find((w) => w.key === c.main);
+      const s = p.weapons.find((w) => w.key === c.sub);
+      const mainOk = !!m && m.level >= 10 && m.b5 === c.b5 && !!m.b10;
+      const subOk = !!s && s.level >= 5;
+      const related = (m && (!m.b5 || m.b5 === c.b5)) || !!s;
+      return { c, def: G.WEAPONS[c.key], m, s, ready: mainOk && subOk, related, score: (mainOk ? 2 : m ? 1 : 0) + (subOk ? 2 : s ? 1 : 0) };
+    });
+    return rows.filter((x) => all || x.related).sort((a, b) => (b.ready - a.ready) || (b.score - a.score));
+  };
+
   // 지금 만들 수 있는 조합: 메인 Lv 10(두 갈래 고름) + 상대 Lv 5 이상
   G.xcomboOptions = function (p) {
     const out = [];

@@ -3254,6 +3254,26 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .codex-lore.is-locked .codex-lore-art { filter: brightness(0.2); }
 @media (prefers-reduced-motion: reduce) { .lore-art { animation: none; } .lore-para { transition: none; } }
 
+/* 선택창: 카드 종류별 테두리, 조합 도감 */
+.card.kind-branch { border-color: rgba(255, 210, 122, 0.8); background: linear-gradient(180deg, rgba(60, 46, 20, 0.97), rgba(16, 14, 10, 0.97)); }
+.card.kind-branch .card-tag { background: #f5c467; color: #31210d; }
+.card.kind-xcombo, .card.kind-oldcombo { border-color: #ffe3a0; box-shadow: 0 0 0 1px rgba(255, 227, 160, 0.6), 0 0 26px rgba(255, 190, 90, 0.35); background: linear-gradient(160deg, rgba(70, 40, 80, 0.97), rgba(30, 22, 12, 0.97)); }
+.card.kind-nocombo { opacity: 0.85; }
+.lv-foot-book { justify-content: center; }
+.lv-book { width: 100%; max-height: min(60vh, 520px); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px; box-sizing: border-box; border-radius: 14px; border: 1px solid rgba(199, 171, 98, 0.45); background: rgba(9, 18, 15, 0.96); }
+.lv-book-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lv-book-head h3 { font: 20px/1.1 var(--font-display); color: #ffe7b0; }
+.lv-book-list { display: flex; flex-direction: column; gap: 6px; }
+.lv-book-row { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid transparent; }
+.lv-book-row.is-ready { border-color: #ffd27a; background: rgba(255, 181, 71, 0.14); }
+.lv-book-row.is-locked { opacity: 0.5; }
+.lv-book-row img { flex: none; }
+.lv-book-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lv-book-name { font: 16px/1.2 var(--font-display); color: var(--bone); }
+.lv-book-need { font-size: 12px; color: var(--dim); }
+.lv-book-fx { font-size: 12px; color: var(--lamp-hot); }
+.lv-book-empty { font-size: 13px; color: var(--dim); padding: 8px; }
+
 /* 판 끝·일시정지 단추는 폭을 나눠 꽉 채운다 */
 .end-panel .row .btn, .pause-actions .btn { flex: 1 1 auto; justify-content: center; }
 

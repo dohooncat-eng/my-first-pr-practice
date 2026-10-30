@@ -15,6 +15,7 @@
       armor: 0, regen: 0, luck: 1, crit: 0.05, critMult: 1.5, xpMul: 1, revive: 0,
       choices: 3, retaliate: 0, extraWeapon: 0,
       goldMul: 1, startLevel: 0, rerolls: 0, chestBonus: 0, duration: 1, dodge: 0, rage: 0,
+      barrier: 0, barrierRegen: 0,
     };
   };
 
@@ -77,6 +78,11 @@
     p.hurt = Math.max(0, p.hurt - dt);
     p.retaliateCd = Math.max(0, p.retaliateCd - dt);
     if (p.stats.regen > 0 && p.hp > 0) p.hp = Math.min(p.maxHp, p.hp + p.stats.regen * dt);
+    // 방어막: 마지막으로 맞은 뒤 4초가 지나면 초당 barrierRegen씩 차오른다
+    if (p.stats.barrier > 0) {
+      p.shieldWait = Math.max(0, (p.shieldWait || 0) - dt);
+      if (p.shieldWait <= 0) p.shield = Math.min(p.stats.barrier, (p.shield || 0) + p.stats.barrierRegen * dt);
+    }
   };
 
   G.damagePlayer = function (game, amount, source) {
@@ -88,7 +94,20 @@
       G.addDamageNumber(game, p.x, p.y - 34, 'MISS', 'soft');
       return;
     }
-    const dmg = amount * (1 - p.stats.armor);
+    let dmg = amount * (1 - p.stats.armor);
+    if (p.stats.barrier > 0) {
+      p.shieldWait = 4;
+      if (p.shield > 0) {
+        const took = Math.min(p.shield, dmg);
+        p.shield -= took;
+        dmg -= took;
+        if (p.shield <= 0) {
+          G.burst(game, p.x, p.y - 6, 'rgba(140, 210, 255, 0.95)', 14, 220, true);
+          if (G.sfx) G.sfx.play('w_frost');
+        }
+        if (dmg <= 0) { p.invuln = 0.3; G.burst(game, p.x, p.y - 6, 'rgba(140, 210, 255, 0.9)', 5, 140, true); return; }
+      }
+    }
     p.hp = Math.max(0, p.hp - dmg);
     p.invuln = 0.45;
     p.hurt = 0.25;
@@ -187,5 +206,13 @@
     ctx.fillRect(x, y, w * ratio, h);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.fillRect(x, y, w * ratio, 1.5);
+    // 방어막: 체력 막대 위 하늘색 막대
+    if (p.stats.barrier > 0) {
+      const sr = Math.max(0, (p.shield || 0) / p.stats.barrier);
+      ctx.fillStyle = 'rgba(8, 12, 11, 0.85)';
+      ctx.fillRect(x - 1.5, y - 5.5, w + 3, 4.5);
+      ctx.fillStyle = '#7fd4ff';
+      ctx.fillRect(x, y - 4.5, w * sr, 2.5);
+    }
   };
 })(window.G);

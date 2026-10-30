@@ -1,4 +1,4 @@
-// 패시브 데이터: 기본 패시브 15개(레벨 1~5) + 패시브 조합 3개
+// 패시브 데이터: 기본 패시브 16개(레벨 1~5) + 패시브 조합 3개
 // apply(s, lv)는 스탯 묶음 s에 그 레벨만큼의 효과를 더한다 (G.recalcStats가 매번 처음부터 계산).
 (function (G) {
   'use strict';
@@ -10,6 +10,8 @@
 
   G.PASSIVES = {
     vitality: { name: '튼튼한 몸', desc: '최대 체력 +20', apply(s, lv) { s.maxHp += 20 * lv; } },
+    // 방어막: 체력 위의 보호막이 피해를 먼저 받고, 4초 동안 맞지 않으면 다시 차오른다
+    barrier: { name: '방어막', desc: '보호막 +18 (4초 맞지 않으면 다시 참)', apply(s, lv) { s.barrier += 18 * lv; s.barrierRegen += 6 + 3 * lv; } },
     swift: { name: '가벼운 발', desc: '이동 속도 +8%', apply(s, lv) { s.speed += 0.08 * lv; } },
     might: { name: '불꽃 심지', desc: '모든 피해 +10%', apply(s, lv) { s.damage += 0.1 * lv; } },
     haste: { name: '숙련', desc: '공격 대기 시간 -8%', apply(s, lv) { s.cooldown *= Math.pow(0.92, lv); } },

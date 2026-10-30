@@ -323,6 +323,19 @@
       <p class="lv-sub" id="lv-sub">하나를 골라 등불을 키우세요</p>
     </header>
     <div id="cards" class="cards"></div>
+    <div id="lv-book" class="lv-book" hidden>
+      <div class="lv-book-head">
+        <h3>조합 도감</h3>
+        <div class="tabs" role="tablist" aria-label="보기">
+          <button id="lv-book-mine" class="tab" type="button" role="tab" aria-selected="true">내 빌드</button>
+          <button id="lv-book-all" class="tab" type="button" role="tab" aria-selected="false">전체</button>
+        </div>
+      </div>
+      <ul id="lv-book-list" class="lv-book-list"></ul>
+    </div>
+    <div class="lv-foot lv-foot-book">
+      <button id="btn-lv-book" class="btn btn-ghost btn-small" type="button" aria-expanded="false">조합 도감</button>
+    </div>
     <div class="lv-foot">
       <button id="btn-reroll" class="btn btn-ghost btn-small" type="button" hidden>
         <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M15.5 7.5A6 6 0 0 0 4.6 6.2M4.5 12.5a6 6 0 0 0 10.9 1.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4.2 2.8v3.8H8M15.8 17.2v-3.8H12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>

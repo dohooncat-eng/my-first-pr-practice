@@ -90,6 +90,8 @@
   // 이 선택이 조합에 어떻게 이어지는지 한 줄
   function comboHint(p, c) {
     if (c.kind === 'weapon') {
+      const xh = G.xcomboHint ? G.xcomboHint(p, c.key, c.level) : '';
+      if (xh) return xh;
       for (const cb of G.COMBOS) {
         if (cb.type === 'evolve' && cb.weapon === c.key && c.level === G.WEAPON_MAX) {
           const has = p.passives[cb.passive] || passiveInFusion(p, cb.passive);
