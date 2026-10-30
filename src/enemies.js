@@ -49,7 +49,7 @@
   G.damageEnemy = function (game, e, base, kx, ky, soft) {
     if (e.dead) return false;
     const s = game.player.stats;
-    let dmg = base * s.damage * G.rand(0.9, 1.1);
+    let dmg = base * s.damage * G.rand(0.9, 1.1) * (G.heroDmgMul ? G.heroDmgMul(game, e) : 1);
     // 분노의 불씨: 체력이 절반 아래면 피해 증가
     if (s.rage > 0 && game.player.hp < game.player.maxHp * 0.5) dmg *= 1 + s.rage;
     const crit = !soft && Math.random() < s.crit;
@@ -64,6 +64,11 @@
     // 무기 갈래·조합의 맞힐 때 효과 (처형으로 이미 쓰러졌으면 끝)
     if (G.curFx && G.applyHitFx) {
       G.applyHitFx(game, e, dmg, G.curFx);
+      if (e.dead) return true;
+    }
+    // 영웅의 "모든 무기에" 효과
+    if (G.curWeaponKey && G.applyHitFx && G.hasGlobalFx(s)) {
+      G.applyHitFx(game, e, dmg, s.globalFx);
       if (e.dead) return true;
     }
     if (!soft) {

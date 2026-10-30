@@ -16,6 +16,8 @@
       choices: 3, retaliate: 0, extraWeapon: 0,
       goldMul: 1, startLevel: 0, rerolls: 0, chestBonus: 0, duration: 1, dodge: 0, rage: 0,
       barrier: 0, barrierRegen: 0,
+      // 영웅 빌드 궁합 (src/systems/heroes.js)
+      affinity: {}, globalFx: {}, frozenBonus: 0, burnBonus: 0, comboDmg: 0,
     };
   };
 

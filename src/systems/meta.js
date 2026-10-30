@@ -25,6 +25,8 @@
       pass: { until: -1, lastClaim: -1 },
       runsSinceAd: 0,
       coupons: {},
+      shards: {}, // 영웅 조각 { 영웅: 개수 }
+      heroGacha: { pulls: 0, pity: 0 },
       lore: {}, // 본 세계관 설명 { 키: true }
     };
   }
@@ -95,6 +97,8 @@
       m.crystals = Math.min(G.CURRENCY_MAX.crystals, Math.max(0, num(saved.crystals, 0)));
       Object.assign(m.coupons, saved.coupons);
       Object.assign(m.lore, saved.lore);
+      Object.assign(m.shards, saved.shards);
+      if (saved.heroGacha) m.heroGacha = { pulls: num(saved.heroGacha.pulls, 0), pity: num(saved.heroGacha.pity, 0) };
       loadGacha(m, saved.gacha);
       Object.assign(m.purchases, saved.purchases);
       m.noAds = !!saved.noAds;

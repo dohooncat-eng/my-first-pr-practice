@@ -111,7 +111,7 @@
   G.fireProjectile = function (game, p) {
     const b = Object.assign({
       r: 7, pierce: 1, life: 1.5, sprite: 'bolt', scale: 1, spin: 0, knock: 0.3,
-      glow: 'rgba(255, 150, 60, 0.9)', glowR: 22, hits: [], age: 0, fx: G.curFx,
+      glow: 'rgba(255, 150, 60, 0.9)', glowR: 22, hits: [], age: 0, fx: G.curFx, wkey: G.curWeaponKey,
     }, p);
     if (b.vx === undefined) {
       b.vx = Math.cos(b.angle || 0) * (b.speed || 400);
@@ -143,9 +143,11 @@
         if (dx * dx + dy * dy > (e.r + b.r) * (e.r + b.r)) continue;
         b.hits.push(e.id);
         G.curFx = b.fx;
+        G.curWeaponKey = b.wkey;
         G.damageEnemy(game, e, b.dmg, b.vx * b.knock, b.vy * b.knock);
         if (b.onHit) b.onHit(game, b, e);
         G.curFx = null;
+        G.curWeaponKey = null;
         if (--b.pierce <= 0) { b.dead = true; break; }
       }
     }
@@ -222,8 +224,10 @@
       const s = G.weaponStats(w);
       if (own) G.sfx.muted = true;
       G.curFx = s.fx || null;
+      G.curWeaponKey = w.key;
       b.update(game, w, s, dt);
       G.curFx = null;
+      G.curWeaponKey = null;
       if (own) G.sfx.muted = false;
       // 쿨다운이 다시 채워졌으면 = 방금 쐈다
       if (own && w.timer > before + 0.02) G.sfx.play(name);

@@ -194,7 +194,7 @@
     if (inFx || !fx) return;
     inFx = true;
     const p = game.player;
-    if (fx.burn) { e.burnDps = Math.max(e.burnDps || 0, dmg * fx.burn); e.burnT = 3; }
+    if (fx.burn) { e.burnDps = Math.max(e.burnDps || 0, dmg * fx.burn * (1 + p.stats.burnBonus)); e.burnT = 3; }
     if (fx.poison) { e.poisonDps = Math.min((e.poisonDps || 0) + dmg * fx.poison * 0.5, dmg * fx.poison * 4); e.poisonT = 4; }
     if (fx.chill) {
       e.slow = Math.max(e.slow || 0, 1.5);

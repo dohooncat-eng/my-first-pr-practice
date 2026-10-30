@@ -328,9 +328,10 @@
       weapon.appendChild(el('span', '', euroRo(G.WEAPONS[ch.weapon].name) + ' 시작'));
       body.appendChild(weapon);
       body.appendChild(el('span', 'champ-trait', ch.trait));
+      if (ch.build) body.appendChild(el('span', 'champ-trait champ-build', '잘 맞는 빌드: ' + ch.build));
       const ab = el('span', 'champ-ability');
       ab.appendChild(el('span', 'champ-ab-name', ch.ability.name));
-      ab.appendChild(pips(lv, G.ABILITY_MAX || 5, 'pips-small'));
+      ab.appendChild(pips(lv, G.ABILITY_MAX || 10, 'pips-small'));
       body.appendChild(ab);
       pick.appendChild(body);
       card.appendChild(pick);
@@ -344,25 +345,7 @@
         });
         pick.addEventListener('dblclick', startRun);
       } else {
-        const price = G.championPrice ? G.championPrice(key) : ch.price;
-        const buy = el('button', 'btn btn-primary btn-small champ-buy');
-        buy.type = 'button';
-        buy.id = 'buy-' + key;
-        const affordable = meta().gold >= price;
-        buy.disabled = !affordable;
-        buy.innerHTML = '';
-        buy.appendChild(el('span', 'coin', ''));
-        buy.appendChild(el('span', '', fmtNum(price) + ' 금화로 해금'));
-        buy.addEventListener('click', () => {
-          if (G.buyChampion && G.buyChampion(key)) {
-            sfx('coin');
-            pickedChampion = key;
-            renderChampions();
-            const b = $('champ-' + key);
-            if (b) b.focus({ preventScroll: true });
-          }
-        });
-        card.appendChild(buy);
+        card.appendChild(el('span', 'champ-locked-note', '★'.repeat(ch.star || 1) + ' 영웅 소환에서 얻을 수 있습니다'));
       }
       list.appendChild(card);
     });
@@ -430,7 +413,7 @@
     list.textContent = '';
     refreshGold();
     const m = meta();
-    const max = G.ABILITY_MAX || 5;
+    const max = G.ABILITY_MAX || 10;
     G.CHAMPION_ORDER.forEach((key) => {
       const ch = G.CHAMPIONS[key];
       const unlocked = !!(m.unlocked && m.unlocked[key]);
@@ -441,45 +424,46 @@
       row.appendChild(portrait);
       const body = el('div', 'shop-body');
       const head = el('div', 'shop-head');
-      head.appendChild(el('span', 'shop-name', ch.name));
+      head.appendChild(el('span', 'shop-name', '★'.repeat(ch.star || 1) + ' ' + ch.name));
       head.appendChild(el('span', 'shop-ab', ch.ability.name));
       body.appendChild(head);
       const lvRow = el('div', 'shop-lv');
       lvRow.appendChild(pips(lv, max));
       lvRow.appendChild(el('span', 'shop-lv-text', 'Lv ' + lv + ' / ' + max));
       body.appendChild(lvRow);
-      body.appendChild(el('p', 'shop-per', 'Lv 1~4: ' + ch.ability.perLevel));
-      const awaken = el('p', 'shop-awaken' + (lv >= max ? ' is-on' : ''));
-      awaken.appendChild(el('span', 'badge badge-awaken', 'Lv 5 각성'));
-      awaken.appendChild(el('span', '', ch.ability.awaken));
-      body.appendChild(awaken);
+      body.appendChild(el('p', 'shop-per', (ch.build ? '빌드: ' + ch.build + ' · ' : '') + 'Lv마다 ' + ch.ability.perLevel));
+      [[5, ch.ability.awaken], [10, ch.ability.awaken2]].forEach(([at, txt]) => {
+        if (!txt) return;
+        const awaken = el('p', 'shop-awaken' + (lv >= at ? ' is-on' : ''));
+        awaken.appendChild(el('span', 'badge badge-awaken', 'Lv ' + at + ' 각성'));
+        awaken.appendChild(el('span', '', txt));
+        body.appendChild(awaken);
+      });
+      if (unlocked) body.appendChild(el('p', 'shop-per', '조각 ' + fmtNum((m.shards && m.shards[key]) || 0) + '개'));
       row.appendChild(body);
 
       const act = el('div', 'shop-act');
       if (readOnly) {
         act.appendChild(el('span', 'shop-max', !unlocked ? '잠김' : lv >= max ? '각성 완료' : 'Lv ' + lv));
       } else if (!unlocked) {
-        const price = G.championPrice ? G.championPrice(key) : ch.price;
-        const buy = el('button', 'btn btn-ghost btn-small');
-        buy.type = 'button';
-        buy.disabled = m.gold < price;
-        buy.appendChild(el('span', 'coin', ''));
-        buy.appendChild(el('span', '', fmtNum(price) + ' 해금'));
-        buy.addEventListener('click', () => {
-          if (G.buyChampion && G.buyChampion(key)) { sfx('coin'); renderShop(); focusShop(key); }
-        });
-        buy.id = 'shop-buy-' + key;
-        act.appendChild(buy);
+        // 영웅은 소환으로만 얻는다
+        const go = el('button', 'btn btn-ghost btn-small');
+        go.type = 'button';
+        go.id = 'shop-buy-' + key;
+        go.textContent = '영웅 소환에서 얻기';
+        go.addEventListener('click', () => { sfx('click'); openGacha('shop'); });
+        act.appendChild(go);
       } else if (lv >= max) {
         act.appendChild(el('span', 'shop-max', '각성 완료'));
       } else {
-        const cost = G.abilityCost ? G.abilityCost(key) : G.ABILITY_COSTS[lv];
+        const cost = G.abilityCost(key);
         const up = el('button', 'btn btn-primary btn-small');
         up.type = 'button';
         up.id = 'shop-up-' + key;
-        up.disabled = cost === null || m.gold < cost;
+        up.disabled = !G.canUpgradeHero(key);
+        up.appendChild(el('span', '', '조각 ' + cost.shards + ' · '));
         up.appendChild(el('span', 'coin', ''));
-        up.appendChild(el('span', '', fmtNum(cost) + (lv + 1 === max ? ' 각성' : ' 강화')));
+        up.appendChild(el('span', '', fmtNum(cost.gold) + (lv + 1 === 5 || lv + 1 === max ? ' 각성' : ' 강화')));
         up.addEventListener('click', () => {
           if (G.upgradeAbility && G.upgradeAbility(key)) {
             sfx(lv + 1 >= max ? 'evolve' : 'levelup');
@@ -521,6 +505,7 @@
   function stars(n) { return '★'.repeat(n); }
 
   function costLabel(n, cur) {
+    if (cur === 'hero') return fmtNum(G.heroCost(n)) + ' 결정';
     return fmtNum(G.gachaCost(n, cur)) + (cur === 'gold' ? ' 금화' : ' 결정');
   }
 
@@ -538,6 +523,7 @@
   function renderAltar() {
     refreshGold();
     $('gacha-pity').textContent = G.gachaPityLeft();
+    $('hero-pity').textContent = '★★★까지 ' + G.heroPityLeft() + '회';
     document.querySelectorAll('#pane-altar .pull-btn').forEach((b) => {
       const n = Number(b.dataset.n), cur = b.dataset.cur;
       const cost = b.querySelector('.js-cost');
@@ -546,7 +532,7 @@
         cost.appendChild(el('span', cur === 'gold' ? 'coin' : 'crystal', ''));
         cost.appendChild(el('span', '', costLabel(n, cur)));
       }
-      const ok = G.gachaCanAfford(n, cur);
+      const ok = cur === 'hero' ? G.heroCanAfford(n) : G.gachaCanAfford(n, cur);
       b.classList.toggle('is-short', !ok);
       b.setAttribute('aria-disabled', String(!ok));
     });
@@ -562,18 +548,20 @@
     if (cur === 'gold') return '금화가 ' + fmtNum(G.gachaCost(n, 'gold') - meta().gold) + ' 모자랍니다. 판을 돌아 금화를 모으거나, 상점에서 별빛 결정을 금화로 바꿀 수 있습니다.';
     if (cur === 'crystal') return '별빛 결정이 ' + fmtNum(G.gachaCost(n, 'crystal') - meta().crystals) + ' 모자랍니다. 스테이지·난이도를 처음 깨면 결정을 받습니다.';
     if (cur === 'ticket2') return '★★ 확정권이 없습니다.';
+    if (cur === 'hero') return '별빛 결정이 ' + fmtNum(G.heroCost(n) - meta().crystals) + ' 모자랍니다. 판을 깨면 결정을 받습니다.';
     return '오늘 무료 뽑기는 이미 썼습니다.';
   }
 
   function doPull(n, cur) {
     if (pullBusy || pullPhase) return;
-    if (!G.gachaCanAfford(n, cur)) {
+    const can = cur === 'hero' ? G.heroCanAfford(n) : G.gachaCanAfford(n, cur);
+    if (!can) {
       sfx('click');
-      gachaMsg(shortMsg(n, cur), cur === 'gold' || cur === 'crystal');
+      gachaMsg(shortMsg(n, cur), cur === 'gold' || cur === 'crystal' || cur === 'hero');
       return;
     }
     const go = () => {
-      const res = G.gachaPull(n, cur);
+      const res = cur === 'hero' ? G.heroPull(n) : G.gachaPull(n, cur);
       if (!res.ok) { gachaMsg(shortMsg(n, cur)); return; }
       lastPull = { n, cur };
       gachaMsg('');
@@ -596,7 +584,8 @@
     const li = el('li', 'pcard star-' + r.star + (r.isNew ? ' is-new' : '') + (r.refund ? ' is-refund' : ''));
     li.style.setProperty('--i', i);
     let detail;
-    if (!r.key) detail = '모두 모았습니다 · 결정으로 돌려받음';
+    if (r.hero) detail = r.isNew ? '새 영웅!' : '조각 +' + r.shards;
+    else if (!r.key) detail = '모두 모았습니다 · 결정으로 돌려받음';
     else if (r.refund) detail = '최대 레벨 · ' + (r.refund.gold ? '금화 ' + fmtNum(r.refund.gold) : '결정 ' + fmtNum(r.refund.crystals)) + ' 돌려받음';
     else if (r.isNew) detail = '새로 얻음 · Lv ' + r.to;
     else detail = 'Lv ' + r.from + ' → ' + r.to;
@@ -716,14 +705,14 @@
     [...$('pull-cards').children].forEach((li) => { li.classList.add('is-flipped'); li.removeAttribute('aria-hidden'); });
     pullPhase = 'done';
     const again = $('pull-again');
-    const canAgain = lastPull && lastPull.cur !== 'free' && G.gachaCanAfford(lastPull.n, lastPull.cur);
+    const canAgain = lastPull && lastPull.cur !== 'free' && (lastPull.cur === 'hero' ? G.heroCanAfford(lastPull.n) : G.gachaCanAfford(lastPull.n, lastPull.cur));
     again.hidden = !canAgain;
     if (canAgain) {
       again.textContent = '';
       again.appendChild(el('span', '', (lastPull.n === 10 ? '10회 더' : '한 번 더')));
-      if (lastPull.cur === 'gold' || lastPull.cur === 'crystal') {
+      if (lastPull.cur === 'gold' || lastPull.cur === 'crystal' || lastPull.cur === 'hero') {
         again.appendChild(el('span', lastPull.cur === 'gold' ? 'coin' : 'crystal', ''));
-        again.appendChild(el('span', 'again-cost', fmtNum(G.gachaCost(lastPull.n, lastPull.cur))));
+        again.appendChild(el('span', 'again-cost', fmtNum(lastPull.cur === 'hero' ? G.heroCost(lastPull.n) : G.gachaCost(lastPull.n, lastPull.cur))));
       }
     }
     pullLater(60, () => { if (pullPhase === 'done') $('pull-ok').focus({ preventScroll: true }); });
@@ -1796,6 +1785,7 @@
         $('btn-shop').focus({ preventScroll: true });
         return true;
       case 'gacha':
+        if (gachaFrom === 'shop') { openShop(shopFrom); return true; }
         showTitleScreen();
         $('btn-gacha').focus({ preventScroll: true });
         return true;
