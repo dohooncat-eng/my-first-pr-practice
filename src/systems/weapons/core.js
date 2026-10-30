@@ -202,10 +202,25 @@
   };
 
   // ---------- 매 프레임 ----------
+  // 무기마다 다른 발사음: 진화·조합 무기는 재료(첫 재료) 무기의 소리를 낮고 크게 쓴다
+  function soundOf(key) {
+    const def = G.WEAPONS[key];
+    const fam = def.kind === 'base' ? key : Array.isArray(def.from) ? def.from[0] : def.from;
+    return 'w_' + fam + (def.kind === 'base' ? '' : '_big');
+  }
+
   G.updateWeapons = function (game, dt) {
     for (const w of game.player.weapons) {
       const b = G.WEAPON_BEHAVIORS[w.key];
-      if (b && b.update) b.update(game, w, G.weaponStats(w), dt);
+      if (!b || !b.update) continue;
+      const name = soundOf(w.key);
+      const own = G.sfx && G.sfx.names.indexOf(name) !== -1;
+      const before = w.timer;
+      if (own) G.sfx.muted = true;
+      b.update(game, w, G.weaponStats(w), dt);
+      if (own) G.sfx.muted = false;
+      // 쿨다운이 다시 채워졌으면 = 방금 쐈다
+      if (own && w.timer > before + 0.02) G.sfx.play(name);
     }
   };
 

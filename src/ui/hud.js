@@ -228,6 +228,32 @@
       bannerY = by + 40;
     }
 
+    // 화면 밖 보스: 가장자리에 붉은 화살표
+    if (boss && !boss.dead) {
+      const sx = (boss.x - game.cam.x) * game.zoom + w / 2, sy = (boss.y - game.cam.y) * game.zoom + game.h / 2;
+      const m = 34;
+      if (sx < 0 || sx > w || sy < 0 || sy > game.h) {
+        const a = Math.atan2(sy - game.h / 2, sx - w / 2);
+        const ex = G.clamp(sx, m, w - m), ey = G.clamp(sy, m + T + 120, game.h - m - s.b);
+        ctx.save();
+        ctx.translate(ex, ey);
+        ctx.rotate(a);
+        ctx.globalAlpha = 0.75 + Math.sin(game.clock * 8) * 0.25;
+        ctx.fillStyle = '#ff4d5e';
+        ctx.strokeStyle = '#1a0306';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(16, 0);
+        ctx.lineTo(-10, -12);
+        ctx.lineTo(-4, 0);
+        ctx.lineTo(-10, 12);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
     // 알림 문구
     if (game.banner) {
       const b = game.banner;

@@ -1127,7 +1127,7 @@ input[type="range"]:focus-visible {
 .chest-sparks i.gold { background: var(--lamp-hot); box-shadow: 0 0 12px rgba(255, 200, 100, 1); }
 
 /* 단계 */
-.ch-drop .chest-drop { animation: chest-fall 0.9s cubic-bezier(0.35, 0, 0.5, 1) both; }
+.ch-drop .chest-drop { animation: chest-summon 0.95s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
 .ch-shake .chest-shaker { animation: chest-rattle 0.65s ease-in-out infinite; }
 .ch-shake .cp-seam { animation: seam-pulse 0.75s ease-in-out infinite alternate; }
 .ch-shake .chest-aura { opacity: 0.6; }
@@ -1259,6 +1259,42 @@ input[type="range"]:focus-visible {
 
 #btn-chest-ok { margin-top: 4px; }
 #btn-chest-ok.is-waiting { visibility: hidden; }
+
+/* 바닥의 빛 고리에서 돌며 솟아오른다 */
+@keyframes chest-summon {
+  0% { transform: translateY(55%) scale(0.15) rotate(-24deg); opacity: 0; filter: brightness(3); }
+  45% { opacity: 1; }
+  70% { transform: translateY(-10%) scale(1.12) rotate(4deg); filter: brightness(1.6); }
+  85% { transform: translateY(2%) scale(0.97, 1.03) rotate(-1deg); }
+  100% { transform: none; filter: none; }
+}
+
+/* 컷신 동안 위아래 검은 띠 + 바닥 빛 고리 */
+.screen-chest::before, .screen-chest::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 11vh;
+  background: #000;
+  z-index: 3;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.screen-chest::before { top: 0; transform: translateY(-100%); }
+.screen-chest::after { bottom: 0; transform: translateY(100%); }
+.screen-chest.ch-cine::before, .screen-chest.ch-cine::after { transform: none; }
+.ch-cine .chest-aura { opacity: 0.9; animation: summon-ring 1.2s ease-out both; }
+@keyframes summon-ring {
+  0% { transform: scale(0.2); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: scale(1.15); opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ch-drop .chest-drop, .ch-shake .chest-shaker, .ch-cine .chest-aura { animation: chest-fade 0.6s ease-out both !important; }
+}
+html.reduce-motion .ch-drop .chest-drop, html.reduce-motion .ch-shake .chest-shaker, html.reduce-motion .ch-cine .chest-aura { animation: chest-fade 0.6s ease-out both !important; }
+@keyframes chest-fade { from { opacity: 0; } }
 
 @keyframes chest-fall {
   0% { transform: translateY(-170%) scale(0.9); opacity: 0; }
@@ -3181,7 +3217,7 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .pause-btn:active { transform: translateY(2px); box-shadow: none; }
 
 /* 도감 */
-.codex-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.codex-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .codex-tabs .tab { padding: 0 4px; font-size: 14px; white-space: nowrap; }
 .codex-body { min-height: 50vh; }
 .codex-card .coll-tile { display: grid; place-items: center; }
@@ -3189,6 +3225,34 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .codex-card.is-locked { opacity: 0.6; }
 .codex-card.is-locked .coll-icon { filter: brightness(0) opacity(0.5); }
 @media (max-width: 400px) { .codex-tabs .tab { font-size: 12px; } }
+
+/* 세계관 설명 */
+.screen-lore { padding: 0; background: #050a08; align-items: flex-end; overflow: hidden; }
+.lore-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55; animation: lore-pan 18s ease-out both; }
+.lore-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 10, 8, 0.3) 0%, rgba(5, 10, 8, 0.55) 40%, rgba(5, 10, 8, 0.96) 78%); }
+.lore-wrap {
+  position: relative;
+  width: min(100%, 640px);
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 24px max(20px, env(safe-area-inset-right, 0px)) max(28px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lore-title { font: clamp(30px, 7vw, 46px)/1.1 var(--font-display); color: #ffe7b0; text-shadow: 0 2px 0 #000, 0 0 24px rgba(255, 181, 71, 0.35); }
+.lore-text { display: flex; flex-direction: column; gap: 12px; min-height: 9em; }
+.lore-para { font-size: 16px; line-height: 1.75; color: #e8e2d0; opacity: 0; transform: translateY(8px); transition: opacity 0.9s ease, transform 0.9s ease; }
+.lore-para.is-in { opacity: 1; transform: none; }
+.lore-wrap .btn { align-self: flex-end; }
+@keyframes lore-pan { from { transform: scale(1.12); } }
+.codex-world { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.codex-lore { width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 12px; border: 1px solid rgba(199, 171, 98, 0.35); background: #0b1915; color: var(--bone); cursor: pointer; }
+.codex-lore-art { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 8px; }
+.codex-lore-title { font: 16px/1.2 var(--font-display); }
+.codex-lore.is-locked { opacity: 0.45; cursor: default; }
+.codex-lore.is-locked .codex-lore-art { filter: brightness(0.2); }
+@media (prefers-reduced-motion: reduce) { .lore-art { animation: none; } .lore-para { transition: none; } }
 
 /* 판 끝·일시정지 단추는 폭을 나눠 꽉 채운다 */
 .end-panel .row .btn, .pause-actions .btn { flex: 1 1 auto; justify-content: center; }

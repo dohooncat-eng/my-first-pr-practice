@@ -133,7 +133,23 @@
     ctx.globalAlpha = 1;
   };
 
+  // 맞았을 때(0.45초)와 체력이 낮을 때(계속 맥박) 화면 가장자리를 붉게
+  function hurtVignette(ctx, game) {
+    const p = game.player;
+    const hit = game.hurtAt === undefined ? 0 : Math.max(0, 1 - (game.clock - game.hurtAt) / 0.45);
+    const low = p && p.hp > 0 && p.hp / p.maxHp < 0.3 ? 0.28 + Math.sin(game.clock * 6) * 0.1 : 0;
+    const a = Math.max(hit * 0.75, low) * (game.reducedMotion ? 0.6 : 1);
+    if (a <= 0.01) return;
+    const w = game.w, h = game.h;
+    const g = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.32, w / 2, h / 2, Math.hypot(w, h) * 0.55);
+    g.addColorStop(0, 'rgba(180, 10, 30, 0)');
+    g.addColorStop(1, 'rgba(180, 10, 30, ' + a + ')');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+
   G.drawScreenFlash = function (ctx, game) {
+    hurtVignette(ctx, game);
     const f = game.flash;
     if (!f) return;
     ctx.fillStyle = 'rgba(' + f.rgb + ', ' + (f.alpha * f.life / f.max) + ')';

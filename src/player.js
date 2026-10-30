@@ -91,7 +91,8 @@
     p.hp = Math.max(0, p.hp - dmg);
     p.invuln = 0.45;
     p.hurt = 0.25;
-    G.addShake(game, 5);
+    game.hurtAt = game.clock; // 화면 가장자리 붉은 번쩍임
+    G.addShake(game, 7);
     G.burst(game, p.x, p.y - 6, '#e0445a', 7, 140);
     if (G.sfx) G.sfx.play('hurt');
     // 은빛 기사 각성: 맞으면 주변을 반격해 벤다

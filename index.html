@@ -230,8 +230,20 @@
       <button id="codex-tab-weapon" class="tab" type="button" role="tab" aria-selected="false">무기</button>
       <button id="codex-tab-passive" class="tab" type="button" role="tab" aria-selected="false">패시브</button>
       <button id="codex-tab-combo" class="tab" type="button" role="tab" aria-selected="false">조합</button>
+      <button id="codex-tab-world" class="tab" type="button" role="tab" aria-selected="false">세계</button>
     </div>
     <div id="codex-body" class="codex-body" role="tabpanel"></div>
+  </div>
+</section>
+
+<section id="screen-lore" class="screen screen-lore" hidden>
+  <img id="lore-art" class="lore-art" alt="">
+  <div class="lore-shade" aria-hidden="true"></div>
+  <div class="lore-wrap">
+    <p class="eyebrow">세계</p>
+    <h2 id="lore-title" class="lore-title"></h2>
+    <div id="lore-text" class="lore-text"></div>
+    <button id="btn-lore" class="btn btn-primary" type="button">계속 <kbd>Enter</kbd></button>
   </div>
 </section>
 
@@ -324,7 +336,7 @@
 <section id="screen-chest" class="screen screen-chest" hidden>
   <div class="chest-wrap">
     <p id="chest-banner" class="chest-banner" aria-live="polite"></p>
-    <button id="chest-stage" class="chest-stage" type="button" aria-label="상자 열기 (누르면 바로 결과)">
+    <button id="chest-stage" class="chest-stage" type="button" aria-label="상자가 열리는 중">
       <span class="chest-aura" aria-hidden="true"></span>
       <span class="chest-rays" aria-hidden="true"></span>
       <span class="chest-box" aria-hidden="true">
@@ -345,7 +357,6 @@
       <span class="chest-flash" aria-hidden="true"></span>
       <span class="chest-sparks" aria-hidden="true"></span>
     </button>
-    <p class="chest-skip">화면을 누르면 건너뜁니다</p>
     <div id="chest-result" class="chest-result">
       <p class="eyebrow" id="chest-eyebrow">상자</p>
       <h2 class="chest-title" id="chest-title"></h2>
@@ -472,6 +483,7 @@
 <script src="src/data/stages.js"></script>
 <script src="src/data/gacha.js"></script>
 <script src="src/data/store.js"></script>
+<script src="src/data/lore.js"></script>
 <script src="src/systems/meta.js"></script>
 <script src="src/systems/gacha.js"></script>
 <script src="src/systems/billing.js"></script>

@@ -11,7 +11,7 @@
     // 모든 것을 최대 레벨로 만든 뒤 뽑으면 등급별로 돌려주는 별빛 결정 (중복·최대 레벨은 나오지 않는다)
     refund: { 3: { crystals: 50 }, 2: { crystals: 15 }, 1: { crystals: 5 } },
     // 스테이지·난이도를 처음 깼을 때 덤으로 받는 별빛 결정 (깰 때마다 받는 양은 난이도의 crystals)
-    firstClearCrystals: { normal: 100, hard: 300, max: 800 },
+    firstClearCrystals: { normal: 300, hard: 900, max: 2000 },
   };
 
   G.GACHA_STAR_LABEL = { 1: '★', 2: '★★', 3: '★★★' };

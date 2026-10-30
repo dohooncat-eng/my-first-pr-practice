@@ -55,6 +55,7 @@
     game.shake = 0;
     game.banner = null;
     game.boss = null;
+    game.finalBossDown = false;
     game.bossMusic = false;
     game.retaliateFx = 0;
     game.autosave = AUTOSAVE_EVERY;
@@ -93,7 +94,7 @@
     music('play', game.stage.id);
     music('setBoss', false);
     music('duck', false);
-    G.announce(game, game.stage.name + (game.difficulty.id === 'normal' ? '' : ' · ' + game.difficulty.name) + ' · ' + G.runTime(game) / 60 + '분을 버티세요');
+    G.announce(game, game.stage.name + (game.difficulty.id === 'normal' ? '' : ' · ' + game.difficulty.name) + ' · ' + G.runTime(game) / 60 + '분 버티고 최종 보스를 쓰러뜨리세요');
     G.saveRun(game);
   };
 
@@ -281,10 +282,10 @@
       G.addShake(game, 12);
       return;
     }
+    // 판 시간이 다 되면 시간은 멈추고 최종 보스가 나온다. 쓰러뜨리면 클리어(시간 제한 없음)
     if (game.time >= G.runTime(game)) {
       game.time = G.runTime(game);
-      endRun(true);
-      return;
+      if (game.finalBossDown) { endRun(true); return; }
     }
     if (game.chestQueue.length) openChest();
     else if (game.pendingLevelUps > 0) openLevelUp();

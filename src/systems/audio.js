@@ -209,11 +209,13 @@
   const GAP = {
     shoot: 0.07, slash: 0.09, hit: 0.045, kill: 0.05, gem: 0.03, coin: 0.06,
     levelup: 0.3, chest: 0.5, evolve: 0.5, boss: 1, hurt: 0.2, heal: 0.25, select: 0.04, click: 0.03,
+    killBig: 0.08,
     zap: 0.08, whoosh: 0.1, impact: 0.12, gong: 0.4, bubble: 0.15, warn: 0.5, bossShot: 0.2, bossDie: 1,
     elite: 0.8, crit: 0.06, pickupChest: 0.4, lowhp: 0.7, victory: 2, defeat: 2, swarm: 1.5,
   };
   // 동시 소리가 많을 때 먼저 버리는 자잘한 소리
   const MINOR = { hit: 1, gem: 1, shoot: 1, kill: 1, zap: 1, whoosh: 1, crit: 1, bubble: 1 };
+  // 무기 발사음은 자잘한 소리로 친다(동시 소리가 많으면 먼저 버린다)
   const lastPlayed = {};
   let gemStreak = 0;
   let gemStreakAt = 0;
@@ -242,10 +244,17 @@
       noise(t, { filter: { type: 'highpass', f: 5000 }, release: 0.03, gain: 0.05, dests: S });
       osc(t, { type: 'square', f: v(180), f1: 90, release: 0.07, gain: 0.03, filter: { type: 'lowpass', f: 1200 }, dests: S });
     },
+    // 적이 죽는 소리: 작은 적은 터지는 "퐁", 단단한 적·엘리트는 묵직한 "쿵"
     kill(t) {
-      osc(t, { type: 'triangle', f: v(340), f1: 85, release: 0.14, gain: 0.06, dests: S });
-      noise(t, { filter: { type: 'bandpass', f: 1100, f1: 260, q: 1.4 }, release: 0.12, gain: 0.05, dests: S });
-      osc(t + 0.01, { type: 'sine', f: v(1320), f1: 1760, release: 0.06, gain: 0.012, dests: S });
+      const p = rnd(0.85, 1.2);
+      osc(t, { type: 'triangle', f: 420 * p, f1: 70, release: 0.13, gain: 0.09, dests: S });
+      noise(t, { filter: { type: 'bandpass', f: 1500 * p, f1: 300, q: 1.6 }, release: 0.1, gain: 0.08, dests: S });
+      osc(t + 0.012, { type: 'sine', f: 1600 * p, f1: 2300 * p, release: 0.05, gain: 0.02, dests: S });
+    },
+    killBig(t) {
+      osc(t, { type: 'sine', f: v(150), f1: 40, release: 0.3, gain: 0.16, dests: S });
+      noise(t, { filter: { type: 'lowpass', f: 1600, f1: 160, time: 0.25 }, release: 0.28, gain: 0.12, dests: S });
+      osc(t, { type: 'square', f: v(90), f1: 45, release: 0.12, gain: 0.03, filter: { type: 'lowpass', f: 900 }, dests: S });
     },
     gem(t) {
       const now = performance.now();
@@ -379,9 +388,77 @@
     },
   };
 
+  // ---------- 무기마다 다른 발사음 ----------
+  // b: 진화·조합 무기(낮고 크게). 기본 무기 키와 같은 이름(w_키)으로 부른다
+  const WEAPON_SOUNDS = {
+    bolt(t, b) { // 불씨가 치익 하고 날아감
+      noise(t, { filter: { type: 'highpass', f: 2400 * b.p }, release: 0.07, gain: 0.05 * b.g, dests: S });
+      osc(t, { type: 'triangle', f: v(700) * b.p, f1: 1300 * b.p, release: 0.07, gain: 0.04 * b.g, dests: S });
+    },
+    sword(t, b) { // 쇳소리 섞인 휘두름
+      noise(t, { filter: { type: 'bandpass', f: 900 * b.p, f1: 4200 * b.p, q: 1.4, time: 0.12 }, attack: 0.015, release: 0.13, gain: 0.1 * b.g, dests: S });
+      osc(t + 0.03, { type: 'sine', f: v(3100) * b.p, release: 0.22, gain: 0.018 * b.g, dests: S });
+      osc(t + 0.03, { type: 'sine', f: v(4650) * b.p, release: 0.16, gain: 0.01 * b.g, dests: S });
+    },
+    aura(t, b) { // 낮게 웅 하고 맥박
+      osc(t, { type: 'sine', f: 82 * b.p, f1: 70 * b.p, attack: 0.03, release: 0.25, gain: 0.05 * b.g, dests: S });
+      osc(t, { type: 'triangle', f: 164 * b.p, attack: 0.03, release: 0.18, gain: 0.015 * b.g, dests: S });
+    },
+    chain(t, b) { // 지지직 하고 갈라지는 전기
+      for (let i = 0; i < 5; i++) noise(t + i * 0.018, { filter: { type: 'bandpass', f: rnd(3000, 7000) * b.p, q: 6 }, release: 0.025, gain: 0.06 * b.g, dests: S });
+      osc(t, { type: 'sawtooth', f: v(1800) * b.p, f1: 180, release: 0.1, gain: 0.025 * b.g, filter: { type: 'lowpass', f: 5000 }, dests: S });
+    },
+    scythe(t, b) { // 휘이잉 도는 날
+      for (let i = 0; i < 3; i++) noise(t + i * 0.06, { filter: { type: 'bandpass', f: (1300 + i * 500) * b.p, q: 3 }, attack: 0.02, release: 0.07, gain: 0.05 * b.g, dests: S });
+    },
+    poison(t, b) { // 꿀렁 하는 독
+      for (let i = 0; i < 2; i++) { const f = rnd(160, 260) * b.p; osc(t + i * 0.07, { type: 'sine', f, f1: f * 2.6, release: 0.09, gain: 0.05 * b.g, dests: S }); }
+      noise(t, { filter: { type: 'lowpass', f: 700 }, release: 0.12, gain: 0.03 * b.g, dests: S });
+    },
+    meteor(t, b) { // 휘이익 떨어지는 소리
+      osc(t, { type: 'sine', f: 2200 * b.p, f1: 380 * b.p, glide: 0.35, release: 0.38, gain: 0.03 * b.g, dests: S });
+      noise(t, { filter: { type: 'bandpass', f: 3000, f1: 600, q: 2, time: 0.35 }, release: 0.36, gain: 0.03 * b.g, dests: S });
+    },
+    bell(t, b) { // 맑은 종
+      const f = v(660) * b.p;
+      [1, 2.76, 5.4].forEach((m, i) => osc(t, { type: 'sine', f: f * m, release: 0.9 - i * 0.25, gain: 0.05 / (i + 1) * b.g, dests: S }));
+    },
+    trap(t, b) { // 철컥 놓는 소리
+      osc(t, { type: 'square', f: v(1900) * b.p, release: 0.02, gain: 0.03 * b.g, filter: { type: 'highpass', f: 1200 }, dests: S });
+      osc(t + 0.035, { type: 'square', f: v(1300) * b.p, release: 0.03, gain: 0.03 * b.g, filter: { type: 'highpass', f: 900 }, dests: S });
+    },
+    lance(t, b) { // 위로 차오르는 빛줄기
+      osc(t, { type: 'sawtooth', f: 400 * b.p, f1: 2600 * b.p, glide: 0.12, release: 0.16, gain: 0.03 * b.g, filter: { type: 'lowpass', f: 6000 }, dests: S });
+      osc(t + 0.05, { type: 'sine', f: v(3300) * b.p, release: 0.25, gain: 0.02 * b.g, dests: S });
+    },
+    moth(t, b) { // 파르르 날갯짓
+      for (let i = 0; i < 4; i++) noise(t + i * 0.03, { filter: { type: 'bandpass', f: 2200 * b.p, q: 2.5 }, release: 0.02, gain: 0.035 * b.g, dests: S });
+    },
+    tornado(t, b) { // 바람이 감겨 올라감
+      noise(t, { filter: { type: 'bandpass', f: 300 * b.p, f1: 1500 * b.p, q: 2, time: 0.35 }, attack: 0.08, release: 0.32, gain: 0.12 * b.g, dests: S });
+    },
+    whip(t, b) { // 짝 하고 터지는 채찍
+      noise(t, { filter: { type: 'bandpass', f: 600, f1: 3000, q: 1, time: 0.08 }, attack: 0.04, release: 0.03, gain: 0.07 * b.g, dests: S });
+      noise(t + 0.07, { filter: { type: 'highpass', f: 3500 * b.p }, release: 0.03, gain: 0.12 * b.g, dests: S });
+    },
+    frost(t, b) { // 쨍 하는 얼음
+      osc(t, { type: 'sine', f: v(2900) * b.p, release: 0.18, gain: 0.03 * b.g, dests: S });
+      osc(t, { type: 'sine', f: v(4370) * b.p, release: 0.12, gain: 0.02 * b.g, dests: S });
+      noise(t, { filter: { type: 'highpass', f: 6000 }, release: 0.04, gain: 0.03 * b.g, dests: S });
+    },
+  };
+  const SMALL = { p: 1, g: 1 }, BIG = { p: 0.72, g: 1.45 };
+  Object.keys(WEAPON_SOUNDS).forEach((k) => {
+    SOUNDS['w_' + k] = (t) => WEAPON_SOUNDS[k](t, SMALL);
+    SOUNDS['w_' + k + '_big'] = (t) => WEAPON_SOUNDS[k](t, BIG);
+    GAP['w_' + k] = GAP['w_' + k + '_big'] = k === 'aura' ? 0.3 : 0.06;
+    MINOR['w_' + k] = MINOR['w_' + k + '_big'] = 1;
+  });
+
   G.sfx = {
+    muted: false, // 무기가 자기 발사음을 낼 때 안쪽의 공용 소리를 막는다
     play(name) {
-      if (!unlocked || !ctx || ctx.state !== 'running') return;
+      if (G.sfx.muted || !unlocked || !ctx || ctx.state !== 'running') return;
       const fn = SOUNDS[name];
       if (!fn) return;
       const vol = sfxVolume();

@@ -9,7 +9,7 @@
     {
       id: 'forest', name: '속삭이는 숲', thumb: 'stage_forest',
       desc: '이끼와 달빛의 숲. 등불지기의 첫 밤.',
-      enemies: { basic: 'slime', fast: 'bat', tank: 'golem' },
+      enemies: { basic: 'slime', fast: 'bat', tank: 'golem', ranged: 'sporemage' },
       boss: 'treant',
       ground: 'ground_tile', decals: ['decal_grass_0', 'decal_grass_1', 'decal_stone', 'decal_mushroom', 'decal_flowers', 'decal_roots'],
       hpMul: 1, growth: 1, dmgMul: 1, speedMul: 1, goldMul: 1,
@@ -18,7 +18,7 @@
     {
       id: 'marsh', name: '가라앉은 늪', thumb: 'stage_marsh',
       desc: '안개 낀 늪. 독두꺼비와 도깨비불이 떠돈다.',
-      enemies: { basic: 'toad', fast: 'wisp', tank: 'wraith' },
+      enemies: { basic: 'toad', fast: 'wisp', tank: 'wraith', ranged: 'bogwitch' },
       boss: 'marshqueen',
       // 이 스테이지가 열리면 레벨업에 나오기 시작하는 무기·패시브
       unlocks: ['weapon:poison', 'passive:regen', 'passive:amount', 'passive:armor', 'weapon:trap', 'passive:wick', 'weapon:frost', 'weapon:shield'],
@@ -29,7 +29,7 @@
     {
       id: 'ruins', name: '잿빛 폐허', thumb: 'stage_ruins',
       desc: '무너진 성채. 꺼지지 않은 잿불 사이로 해골이 걷는다.',
-      enemies: { basic: 'skeleton', fast: 'gargoyle', tank: 'armor' },
+      enemies: { basic: 'skeleton', fast: 'gargoyle', tank: 'armor', ranged: 'ashcaster' },
       boss: 'ashknight',
       unlocks: ['weapon:meteor', 'passive:luck', 'weapon:bell', 'weapon:lance', 'passive:keeneye', 'passive:lore'],
       ground: 'ground_ruins', decals: ['decal_ruins_0', 'decal_ruins_1', 'decal_ruins_2', 'decal_ruins_3'],
@@ -39,7 +39,7 @@
     {
       id: 'abyss', name: '달의 심연', thumb: 'stage_abyss',
       desc: '별빛이 가라앉은 심연. 빛을 먹는 것들이 산다.',
-      enemies: { basic: 'voideye', fast: 'wolf', tank: 'stareater' },
+      enemies: { basic: 'voideye', fast: 'wolf', tank: 'stareater', ranged: 'starseer' },
       boss: 'eclipse',
       unlocks: ['weapon:moth', 'weapon:tornado', 'passive:cloak', 'weapon:whip', 'passive:rage'],
       ground: 'ground_abyss', decals: ['decal_abyss_0', 'decal_abyss_1', 'decal_abyss_2', 'decal_abyss_3'],
@@ -57,16 +57,16 @@
   // 난이도: 버틸 시간(초), 적 등장량·체력·피해·속도, 엘리트 간격(곡선 초), 보스 체력, 금화 배율, 깰 때마다 받는 결정
   G.DIFFICULTIES = [
     {
-      id: 'normal', name: '보통', desc: '10분 · 적이 쏟아지는 기본 밤 · 금화 2배',
-      time: 600, spawn: 1, hp: 1, dmg: 1, speed: 1, eliteEvery: 60, bossHp: 1, gold: 2, crystals: 10,
+      id: 'normal', name: '보통', desc: '10분 + 최종 보스 · 금화 3배, 결정 80',
+      time: 600, spawn: 1, hp: 1, dmg: 1, speed: 1, eliteEvery: 60, bossHp: 1, gold: 3, crystals: 80,
     },
     {
-      id: 'hard', name: '어려움', desc: '15분 · 적 1.5배·체력 1.8배·피해 1.3배 · 금화 5배, 결정 40',
-      time: 900, spawn: 1.5, hp: 1.8, dmg: 1.3, speed: 1.06, eliteEvery: 45, bossHp: 1.8, gold: 5, crystals: 40,
+      id: 'hard', name: '어려움', desc: '15분 + 최종 보스 · 적 1.8배·속도 1.12배 · 금화 8배, 결정 250',
+      time: 900, spawn: 1.8, hp: 1.4, dmg: 1.3, speed: 1.12, eliteEvery: 45, bossHp: 1.8, gold: 8, crystals: 250,
     },
     {
-      id: 'max', name: 'MAX', desc: '20분 · 적 2배·체력 3배·피해 1.5배, 엘리트 30초마다 · 금화 10배, 결정 100',
-      time: 1200, spawn: 2, hp: 3, dmg: 1.5, speed: 1.12, eliteEvery: 30, bossHp: 3, gold: 10, crystals: 100,
+      id: 'max', name: 'MAX', desc: '20분 + 최종 보스 · 적 2.6배·속도 1.25배, 엘리트 30초마다 · 금화 20배, 결정 600',
+      time: 1200, spawn: 2.6, hp: 2, dmg: 1.5, speed: 1.25, eliteEvery: 30, bossHp: 3, gold: 20, crystals: 600,
     },
   ];
 

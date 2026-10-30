@@ -1,4 +1,5 @@
-// 중간 보스: 등장, 스테이지별 공격 패턴, 경고 표시, 보스 탄막, 처치 보상(상자)
+// 보스: 등장, 스테이지별 공격 패턴 + 공통 패턴(부채꼴·원형 탄·장판 비·소환), 체력에 따른 단계, 경고 표시, 보스 탄막, 처치 보상
+// index 0·1 = 중간 보스, index 2 = 최종 보스(e.final)
 (function (G) {
   'use strict';
 
@@ -9,22 +10,27 @@
     const pt = G.spawnPoint(game, 40);
     const diff = game.difficulty || G.DIFFICULTIES[0];
     const hp = bt.hp * st.hpMul * diff.bossHp * G.BOSS_HP_SCALE[Math.min(index, G.BOSS_HP_SCALE.length - 1)];
+    const final = index >= 2;
     const e = {
-      id: G.nextEnemyId(), type, boss: true, index, name: bt.name,
-      x: pt.x, y: pt.y, scale: 1, r: bt.r,
+      id: G.nextEnemyId(), type, boss: true, index, final, name: (final ? '최종 보스 · ' : '') + bt.name,
+      x: pt.x, y: pt.y, r: bt.r * (final ? 1.3 : 1),
       hp, maxHp: hp,
-      speed: bt.speed * st.speedMul,
+      speed: bt.speed * st.speedMul * diff.speed * (final ? 1.1 : 1),
+      scale: final ? 1.35 : 1,
       damage: bt.damage * st.dmgMul * diff.dmg * (1 + index * 0.25),
       xp: 0, elite: false,
       flash: 0, kx: 0, ky: 0, slow: 0, stun: 0,
       phase: Math.random() * 10, hitUntil: {}, dead: false,
       ai: { timerA: 3, timerB: 6, mode: 'walk', t: 0 },
+      // 공통 패턴: 중간 보스 1·2개, 최종 보스 4개. 처음 쿨다운은 엇갈리게
+      extras: EXTRA_SETS[Math.min(index, 2)].map((k, i) => ({ k, cd: 2.5 + i * 1.7 })),
+      stage: 0,
     };
     game.enemies.push(e);
     game.boss = e;
     if (silent) return e;
     const hasBatchim = (bt.name.charCodeAt(bt.name.length - 1) - 0xac00) % 28 !== 0;
-    G.announce(game, bt.name + (hasBatchim ? '이' : '가') + ' 나타났습니다!');
+    G.announce(game, final ? bt.name + (hasBatchim ? '이' : '가') + ' 깨어났습니다! 쓰러뜨리면 새벽이 옵니다' : bt.name + (hasBatchim ? '이' : '가') + ' 나타났습니다!');
     G.addShake(game, 10);
     G.screenFlash(game, '200, 40, 50', 0.28, 0.9);
     G.ring(game, e.x, e.y, 20, 260, 0.9, 'rgba(255, 80, 80, 0.9)', 6);
@@ -44,7 +50,7 @@
 
   G.fireEnemyBullet = function (game, x, y, angle, speed, dmg, color) {
     if (game.enemyBullets.length > 300) return;
-    game.enemyBullets.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 6, dmg, life: 5, color: color || 'rgba(255, 90, 90, 0.9)' });
+    game.enemyBullets.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 8, dmg, life: 5, color: color || 'rgba(255, 90, 90, 0.95)' });
   };
 
   function ring(game, e, n, speed, dmg, color, offset) {
@@ -52,7 +58,57 @@
     if (G.sfx) G.sfx.play('bossShot');
   }
 
-  // ---------- 패턴 ----------
+  // ---------- 공통 패턴 (돌려주는 값 = 다음까지 걸리는 초) ----------
+  const EXTRA_SETS = [['aimed'], ['aimed', 'nova'], ['aimed', 'nova', 'rain', 'summon']];
+  const EXTRAS = {
+    // 부채꼴 조준 탄
+    aimed(game, e, p) {
+      const n = e.final ? 7 : 5;
+      const a = Math.atan2(p.y - e.y, p.x - e.x);
+      for (let i = 0; i < n; i++) G.fireEnemyBullet(game, e.x, e.y - 10, a + (i - (n - 1) / 2) * 0.15, 240, e.damage * 0.45, 'rgba(255, 150, 70, 0.95)');
+      if (G.sfx) G.sfx.play('bossShot');
+      return 3.6;
+    },
+    // 사방 원형 탄
+    nova(game, e) {
+      ring(game, e, 16 + e.index * 4, 175, e.damage * 0.45, 'rgba(255, 90, 120, 0.95)', Math.random() * 6);
+      return 6.5;
+    },
+    // 플레이어 주위에 떨어지는 장판
+    rain(game, e, p) {
+      for (let i = 0; i < 5; i++) {
+        const x = p.x + G.rand(-170, 170), y = p.y + G.rand(-170, 170);
+        telegraphCircle(game, x, y, 62, 1.1 + i * 0.12, e.damage * 0.9, () => G.burst(game, x, y, 'rgba(255, 120, 90, 0.9)', 10, 200));
+      }
+      return 8;
+    },
+    // 빠른 부하를 둥글게 부른다
+    summon(game, e) {
+      const kind = game.stage.enemies.fast;
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        G.spawnEnemy(game, kind, e.x + Math.cos(a) * 90, e.y + Math.sin(a) * 90, false);
+      }
+      return 11;
+    },
+  };
+
+  // 체력 단계: 최종 보스는 50%·25%, 중간 보스는 50%에서 빨라진다
+  function bossTempo(game, e) {
+    const k = e.hp / e.maxHp;
+    const stage = k < 0.25 && e.final ? 2 : k < 0.5 ? 1 : 0;
+    if (stage > e.stage) {
+      e.stage = stage;
+      const bt = G.BOSS_TYPES[e.type];
+      G.announce(game, bt.name + (stage === 2 ? '이(가) 마지막 힘을 끌어냅니다!' : '이(가) 분노합니다!'));
+      G.screenFlash(game, '200, 40, 50', 0.25, 0.7);
+      G.addShake(game, 9);
+      if (G.sfx) G.sfx.play('elite');
+    }
+    return [1, 1.35, 1.75][e.stage];
+  }
+
+  // ---------- 스테이지 보스 고유 패턴 ----------
   const PATTERNS = {
     // 고목 수호자: 부하 소환 + 뿌리 내려찍기
     treant(game, e, dt, p) {
@@ -188,9 +244,16 @@
       e.y = pt.y;
       return;
     }
-    const move = e.stun > 0 ? 0 : PATTERNS[G.BOSS_TYPES[e.type].pattern](game, e, dt, p);
+    const tempo = bossTempo(game, e);
+    const move = e.stun > 0 ? 0 : PATTERNS[G.BOSS_TYPES[e.type].pattern](game, e, dt * tempo, p);
+    if (e.stun <= 0 && !e.lift) {
+      for (const x of e.extras || []) {
+        x.cd -= dt * tempo;
+        if (x.cd <= 0) x.cd = EXTRAS[x.k](game, e, p);
+      }
+    }
     if (move > 0) {
-      const sp = e.speed * move * (e.slow > 0 ? 0.8 : 1);
+      const sp = e.speed * move * (e.slow > 0 ? 0.8 : 1) * (1 + (tempo - 1) * 0.5);
       e.x += (dx / d) * sp * dt;
       e.y += (dy / d) * sp * dt;
     }
@@ -233,8 +296,9 @@
 
   G.onBossKilled = function (game, e) {
     if (game.boss === e) game.boss = null;
+    if (e.final) game.finalBossDown = true;
     const st = game.stage;
-    G.dropItem(game, e.x, e.y + 10, 'chest', 'boss');
+    if (!e.final) G.dropItem(game, e.x, e.y + 10, 'chest', 'boss');
     G.dropItem(game, e.x + 30, e.y, 'coin', Math.round(30 * st.goldMul));
     G.dropItem(game, e.x - 30, e.y, 'heal');
     G.dropGem(game, e.x, e.y - 20, 40);
@@ -244,7 +308,7 @@
     G.screenFlash(game, '255, 240, 210', 0.45, 0.6);
     G.ring(game, e.x, e.y, 20, 340, 0.8, 'rgba(255, 220, 150, 0.95)', 8);
     G.ring(game, e.x, e.y, 10, 200, 0.6, 'rgba(255, 255, 240, 0.9)', 4);
-    G.announce(game, e.name + ' 처치! 상자를 떨어뜨렸습니다');
+    G.announce(game, e.final ? '새벽이 밝아옵니다!' : e.name + ' 처치! 상자를 떨어뜨렸습니다');
     if (G.sfx) G.sfx.play('bossDie');
   };
 
@@ -281,19 +345,24 @@
   G.drawEnemyBullets = function (ctx, game) {
     for (const b of game.enemyBullets) {
       if (!G.inView(game, b.x, b.y, 30)) continue;
-      ctx.fillStyle = '#fff3e6';
       ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r * 0.55, 0, Math.PI * 2);
+      ctx.arc(b.x, b.y, b.r + 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#1a0306';
       ctx.fill();
-      ctx.strokeStyle = b.color;
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = b.color;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r * 0.45, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff6ee';
+      ctx.fill();
     }
   };
 
   G.drawEnemyBulletGlow = function (ctx, game) {
     for (const b of game.enemyBullets) {
-      if (G.inView(game, b.x, b.y, 30)) G.drawGlow(ctx, b.color, b.x, b.y, 22, 0.8);
+      if (G.inView(game, b.x, b.y, 30)) G.drawGlow(ctx, b.color, b.x, b.y, 30, 0.9);
     }
   };
 })(window.G);

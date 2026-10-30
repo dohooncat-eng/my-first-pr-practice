@@ -50,6 +50,7 @@
       basic: { frames: 4, w: 42, h: 42, ax: 0.5, ay: 86 / 96 },
       fast: { frames: 4, w: 50, h: 43, ax: 0.5, ay: 0.5 },
       tank: { frames: 4, w: 66, h: 66, ax: 0.5, ay: 118 / 128 },
+      ranged: { frames: 4, w: 44, h: 48, ax: 0.5, ay: 0.9 },
     };
     Object.keys(G.ENEMY_TYPES || {}).forEach((k) => { LIST[k] = ROLE_SPEC[G.ENEMY_TYPES[k].role]; });
     Object.keys(G.BOSS_TYPES || {}).forEach((k) => {

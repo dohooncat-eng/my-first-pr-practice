@@ -12,8 +12,8 @@
     const st = stage(game);
     const minutes = G.curveTime(game) / 60;
     const scale = elite ? 1.8 : 1;
-    // 체력 배율: 5분 4.9배 · 8분 11배 · 10분 18배 · 15분 44배 · 20분 87배 (중반부터 가파르게, 뒤 스테이지는 더)
-    const growth = (0.1 * minutes + 0.11 * minutes * minutes + 0.005 * minutes * minutes * minutes) * st.growth;
+    // 체력 배율: 5분 3.3배 · 10분 11배 · 15분 26배 · 20분 51배 (예전보다 약 40% 낮추고 수·속도로 대신 어렵게)
+    const growth = (0.06 * minutes + 0.065 * minutes * minutes + 0.003 * minutes * minutes * minutes) * st.growth;
     const diff = game.difficulty || G.DIFFICULTIES[0];
     // 난이도 체력 배율은 처음엔 1/4만 걸리고 8분에 걸쳐 끝까지 오른다 (첫 무기로도 시작할 수 있게)
     const diffHp = 1 + (diff.hp - 1) * (0.25 + 0.75 * Math.min(1, minutes / 8));
@@ -22,7 +22,7 @@
       id: nextId++, type, x, y, scale,
       r: t.r * scale,
       hp, maxHp: hp,
-      speed: t.speed * st.speedMul * diff.speed * (1 + Math.min(0.35, minutes * 0.02)) * (elite ? 0.85 : 1),
+      speed: t.speed * st.speedMul * diff.speed * (1 + Math.min(0.6, minutes * 0.03)) * (elite ? 0.85 : 1),
       damage: t.damage * st.dmgMul * diff.dmg * (1 + minutes * 0.09) * (elite ? 1.6 : 1),
       xp: elite ? 25 : t.xp,
       elite: !!elite,
@@ -85,7 +85,7 @@
     G.dropGem(game, e.x, e.y, e.xp * gemScale);
     G.burst(game, e.x, e.y, t.color, e.elite ? 26 : 7, e.elite ? 260 : 150);
     if (game.rings.length < 30) G.ring(game, e.x, e.y, e.r * 0.4, e.r * (e.elite ? 3.2 : 1.9), e.elite ? 0.45 : 0.28, 'rgba(255, 236, 200, 0.7)', e.elite ? 5 : 2.5);
-    if (G.sfx) G.sfx.play('kill');
+    if (G.sfx) G.sfx.play(e.elite || G.ENEMY_TYPES[e.type].role === 'tank' ? 'killBig' : 'kill');
     if (e.elite) {
       G.burst(game, e.x, e.y, 'rgba(255, 150, 70, 0.9)', 16, 220, true);
       if (Math.random() < 0.3) G.dropItem(game, e.x + 14, e.y, 'heal');
@@ -102,6 +102,29 @@
     }
     if (game.onKill) game.onKill(e);
   };
+
+  // 원거리 적: 사거리 밖이면 다가가고, 너무 가까우면 물러난다. 사거리 안에서 0.6초 조준(빨간 선) 뒤 그 방향으로 한 발
+  const AIM = 0.6;
+  function rangedAi(game, e, t, d, dt, setMove) {
+    const p = game.player;
+    setMove(d > t.range + 30 ? 1 : d < t.range - 70 ? -0.8 : 0.15);
+    if (e.shot === undefined) e.shot = G.rand(1, t.cd);
+    e.shot -= dt;
+    if (!e.aiming && d > t.range + 90 && e.shot < AIM) e.shot = AIM; // 사거리 밖에서는 장전만 하고 기다린다
+    if (!e.aiming && e.shot <= AIM) {
+      e.aiming = true;
+      e.aimA = Math.atan2(p.y - e.y, p.x - e.x);
+      if (game.telegraphs.length < 80) game.telegraphs.push({ kind: 'line', x: e.x, y: e.y, angle: e.aimA, len: Math.min(d + 60, t.range + 120), width: 5, life: AIM, max: AIM });
+    }
+    if (e.aiming) {
+      setMove(0);
+      if (e.shot <= 0) {
+        e.aiming = false;
+        e.shot = t.cd * G.rand(0.85, 1.15);
+        G.fireEnemyBullet(game, e.x, e.y - 14, e.aimA, 230, e.damage, t.shot);
+      }
+    }
+  }
 
   G.updateEnemies = function (game, dt) {
     const p = game.player;
@@ -139,6 +162,7 @@
           vx += (-dy / d) * sp * wv;
           vy += (dx / d) * sp * wv;
         }
+        if (t.range) rangedAi(game, e, t, d, dt, (k) => { vx *= k; vy *= k; });
       }
 
       // 서로 겹치지 않게 밀어내기: 화면 근처 적만, 한 마리마다 2프레임에 한 번 계산하고 사이 프레임은 앞의 값을 쓴다

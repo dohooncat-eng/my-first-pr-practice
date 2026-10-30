@@ -3,7 +3,7 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const SCREENS = ['title', 'stage', 'champion', 'shop', 'codex', 'gacha', 'store', 'settings', 'levelup', 'chest', 'pause', 'end'];
+  const SCREENS = ['title', 'stage', 'champion', 'shop', 'codex', 'lore', 'gacha', 'store', 'settings', 'levelup', 'chest', 'pause', 'end'];
 
   let game = null;
   let current = null;        // 지금 보이는 화면 이름
@@ -383,7 +383,42 @@
     if (!pickedStage || !pickedChampion) return;
     sfx('select');
     const d = pickedDiff().id;
-    game.newRun(pickedStage, pickedChampion, diffOpen(pickedStage, d) ? d : 'normal');
+    const go = () => game.newRun(pickedStage, pickedChampion, diffOpen(pickedStage, d) ? d : 'normal');
+    // 스테이지에 처음 들어갈 때 그 땅의 이야기를 한 번
+    if (G.LORE[pickedStage] && !meta().lore[pickedStage]) openLore(pickedStage, go);
+    else go();
+  }
+
+  // ---------- 세계관 설명 ----------
+  let loreDone = null;
+  let loreTimers = [];
+
+  function openLore(key, onDone) {
+    const lore = G.LORE[key];
+    if (!lore) { if (onDone) onDone(); return; }
+    loreDone = onDone || null;
+    meta().lore[key] = true;
+    if (G.saveMeta) G.saveMeta();
+    loreTimers.forEach(clearTimeout); loreTimers = [];
+    const art = $('lore-art');
+    art.src = G.spriteUrl(lore.art);
+    $('lore-title').textContent = lore.title;
+    const box = $('lore-text');
+    box.textContent = '';
+    const paras = lore.paras.map((t) => box.appendChild(el('p', 'lore-para', t)));
+    // 문단이 하나씩 떠오른다(누르면 한꺼번에)
+    paras.forEach((p, i) => loreTimers.push(setTimeout(() => p.classList.add('is-in'), 400 + i * 1100)));
+    show('lore');
+    $('btn-lore').focus({ preventScroll: true });
+  }
+
+  function closeLore() {
+    const hidden = [...$('lore-text').children].filter((p) => !p.classList.contains('is-in'));
+    if (hidden.length) { loreTimers.forEach(clearTimeout); hidden.forEach((p) => p.classList.add('is-in')); return; }
+    sfx('click');
+    const done = loreDone;
+    loreDone = null;
+    if (done) done(); else showTitleScreen();
   }
 
   // ---------- 업그레이드 상점 ----------
@@ -1307,21 +1342,20 @@
     $('chest-result').setAttribute('aria-hidden', 'true');
     $('btn-chest-ok').classList.add('is-waiting');
     $('chest-stage').focus({ preventScroll: true });
-    if (reducedMotion()) { finishChest(); return; }
     const cel = G.celebrate;
     const box = () => cel.centerOf($('chest-stage').querySelector('.chest-box'));
-    // 개수·등급·조합에 따라 4.2~6초. 마지막 카드의 등장까지 포함한다.
-    const total = Math.min(6000, 4200 + (n - 1) * 260 + TIERS.indexOf(tier) * 180 + (upgrade ? 200 : 0) + (result.combo ? 200 : 0));
-    const openAt = total - 1500 - (cards.length - 1) * 170;
-    screen.classList.add('ch-drop');
-    chestLater(550, () => { sfx('impact'); chestSparks(8, 'dust'); cel.shake(screen, false); });
-    chestLater(900, () => {
+    // 건너뛸 수 없는 컷신: 개수·등급·조합에 따라 3.4~4.8초. 마지막 카드의 등장까지 포함한다.
+    const total = Math.min(4800, 3400 + (n - 1) * 200 + TIERS.indexOf(tier) * 200 + (upgrade ? 200 : 0) + (result.combo ? 200 : 0));
+    const openAt = total - 1300 - (cards.length - 1) * 150;
+    screen.classList.add('ch-cine', 'ch-drop');
+    chestLater(650, () => { sfx('impact'); chestSparks(8, 'dust'); cel.shake(screen, false); });
+    chestLater(850, () => {
       screen.classList.add('ch-shake');
       banner.textContent = '틈새로 새어 나오는 빛';
       sfx('pickupChest');
       const c = box(); cel.charge(c.x, c.y, TIER_RGB[start], 1.3, 32);
     });
-    chestLater(1850, () => {
+    chestLater(1500, () => {
       screen.classList.add('ch-awaken');
       banner.textContent = upgrade ? '봉인 너머, 더 깊은 빛' : '잠든 축복이 깨어납니다';
       sfx('gem');
@@ -1344,11 +1378,12 @@
       if (tier === 'gold') { cel.pillar(c.x, TIER_RGB.gold, 85, 1.5); cel.confetti(TIER_BURST.gold, 24); }
       cel.shake(screen, n >= 5);
     });
-    chestLater(openAt + 650, () => {
+    chestLater(openAt + 550, () => {
+      screen.classList.remove('ch-cine');
       screen.classList.add('ch-cards');
       $('chest-result').removeAttribute('aria-hidden');
     });
-    cards.forEach((li, i) => chestLater(openAt + 750 + i * 170, () => {
+    cards.forEach((li, i) => chestLater(openAt + 650 + i * 150, () => {
       li.classList.add('is-in');
       const combo = li.classList.contains('is-combo');
       sfx(combo ? 'evolve' : 'gem');
@@ -1386,7 +1421,7 @@
   }
 
   function closeChest() {
-    if (!chestDone) { finishChest(); return; }
+    if (!chestDone) return; // 컷신은 건너뛸 수 없다
     G.celebrate.clear();
     chestTimers.forEach(clearTimeout); chestTimers = [];
     const h = chestClose;
@@ -1398,7 +1433,7 @@
 
   // ---------- 도감: 뽑기·업그레이드·무기·패시브·조합을 한곳에서 ----------
 
-  const CODEX_TABS = ['gacha', 'upgrade', 'weapon', 'passive', 'combo'];
+  const CODEX_TABS = ['gacha', 'upgrade', 'weapon', 'passive', 'combo', 'world'];
   let codexTab = 'gacha';
 
   // 무기·패시브 한 장. 아직 열리지 않은 것은 이름·설명을 숨긴다
@@ -1468,7 +1503,25 @@
     else if (tab === 'upgrade') { const c = el('div', 'shop-list'); box.appendChild(c); renderShop(c, true); }
     else if (tab === 'weapon') { const c = el('div', 'coll'); box.appendChild(c); renderCodexWeapons(c); }
     else if (tab === 'passive') { const c = el('div', 'coll'); box.appendChild(c); renderCodexPassives(c); }
-    else { const c = el('div', 'combo-book'); box.appendChild(c); renderComboBook(game, c, true); }
+    else if (tab === 'combo') { const c = el('div', 'combo-book'); box.appendChild(c); renderComboBook(game, c, true); }
+    else renderCodexWorld(box);
+  }
+
+  function renderCodexWorld(box) {
+    const ul = el('ul', 'codex-world');
+    Object.keys(G.LORE).forEach((k) => {
+      const seen = !!meta().lore[k];
+      const b = el('button', 'codex-lore' + (seen ? '' : ' is-locked'));
+      b.type = 'button';
+      b.disabled = !seen;
+      b.appendChild(hideOnError(img(G.spriteUrl(G.LORE[k].art), 'codex-lore-art', 0, '')));
+      b.appendChild(el('span', 'codex-lore-title', seen ? G.LORE[k].title : '???'));
+      if (seen) b.addEventListener('click', () => { sfx('click'); openLore(k, openCodex); });
+      const li = el('li');
+      li.appendChild(b);
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
   }
 
   function openCodex() {
@@ -1693,6 +1746,7 @@
         $('btn-store').focus({ preventScroll: true });
         return true;
       case 'settings': closeSettings(); return true;
+      case 'lore': closeLore(); return true;
       case 'pause':
         if (!$('pane-combo').hidden) { setTab('build'); $('tab-build').focus({ preventScroll: true }); return true; }
         if (game && game.resume) game.resume();
@@ -1743,6 +1797,7 @@
       closeChest();
       return;
     }
+    if (current === 'lore' && e.key === 'Enter' && tag !== 'BUTTON') { closeLore(); e.preventDefault(); return; }
     if (current === 'title' && e.key === 'Enter' && tag !== 'BUTTON' && loaded) { $('btn-new').click(); e.preventDefault(); return; }
     if (current === 'champion' && e.key === 'Enter' && tag !== 'BUTTON') { startRun(); e.preventDefault(); return; }
     if (current === 'end' && e.key === 'Enter' && tag !== 'BUTTON') { game.toTitle(); e.preventDefault(); return; }
@@ -1775,6 +1830,8 @@
       $('btn-shop').addEventListener('click', () => { sfx('click'); openShop('title'); });
       $('btn-gacha').addEventListener('click', () => { sfx('click'); openGacha('title'); });
       $('btn-codex').addEventListener('click', () => { sfx('click'); openCodex(); });
+      $('btn-lore').addEventListener('click', (e) => { e.stopPropagation(); closeLore(); });
+      $('screen-lore').addEventListener('click', closeLore);
       CODEX_TABS.forEach((t) => $('codex-tab-' + t).addEventListener('click', () => { sfx('click'); setCodexTab(t); }));
       $('btn-store').addEventListener('click', () => { sfx('click'); openStore('title'); });
       $('tab-altar').addEventListener('click', () => { sfx('click'); setGachaTab('altar'); });
@@ -1798,8 +1855,6 @@
       bindSettings();
 
       $('btn-chest-ok').addEventListener('click', (e) => { e.stopPropagation(); closeChest(); });
-      $('chest-stage').addEventListener('click', (e) => { e.stopPropagation(); if (!chestDone) finishChest(); });
-      $('screen-chest').addEventListener('click', () => { if (!chestDone) finishChest(); });
 
       $('tab-build').addEventListener('click', () => { sfx('click'); setTab('build'); });
       $('tab-combo').addEventListener('click', () => { sfx('click'); setTab('combo'); });
@@ -1846,13 +1901,14 @@
       $('splash-text').textContent = done ? '준비 완료' : '등불을 켜는 중 ' + pct + '%';
       if (done) setTimeout(() => $('splash').classList.add('is-done'), 250);
       $('btn-continue').disabled = !done;
+      if (done && G.LORE.prologue && !meta().lore.prologue) setTimeout(() => openLore('prologue', showTitleScreen), 500);
       if (done) {
         renderTitle();
         if (current === 'title') ($('btn-continue').hidden ? btn : $('btn-continue')).focus({ preventScroll: true });
       }
     },
 
-    showTitle() { showTitleScreen(); focusFirst($('screen-title')); },
+    showTitle() { if (current === 'lore') return; showTitleScreen(); focusFirst($('screen-title')); },
     hideAll() { if (!$('dialog').hidden) closeDialog(); show(null); },
     show(name) { if (name === 'title') showTitleScreen(); else show(name); },
     showStageSelect: openStage,

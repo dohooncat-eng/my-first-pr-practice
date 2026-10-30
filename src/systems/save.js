@@ -2,7 +2,7 @@
 (function (G) {
   'use strict';
 
-  G.RUN_KEY = 'hollowlight.run';
+  G.RUN_KEY = 'hollowlight.run.v2';
   const MAX_SAVED_ENEMIES = 450;
 
   function r1(v) { return Math.round(v * 10) / 10; }

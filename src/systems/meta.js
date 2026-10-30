@@ -2,7 +2,9 @@
 (function (G) {
   'use strict';
 
-  const KEY = 'hollowlight.meta';
+  // v2: 대규모 업데이트에서 진행을 한 번 초기화했다(예전 키는 불러올 때 지운다)
+  const KEY = 'hollowlight.meta.v2';
+  const RESET_KEYS = ['hollowlight.meta', 'hollowlight.run'];
   const OLD_BEST_KEY = 'deungbul.best';
 
   function defaults() {
@@ -23,6 +25,7 @@
       pass: { until: -1, lastClaim: -1 },
       runsSinceAd: 0,
       coupons: {},
+      lore: {}, // 본 세계관 설명 { 키: true }
     };
   }
 
@@ -91,6 +94,7 @@
       if (G.difficultyById && saved.lastDifficulty) m.lastDifficulty = G.difficultyById(saved.lastDifficulty).id;
       m.crystals = Math.min(G.CURRENCY_MAX.crystals, Math.max(0, num(saved.crystals, 0)));
       Object.assign(m.coupons, saved.coupons);
+      Object.assign(m.lore, saved.lore);
       loadGacha(m, saved.gacha);
       Object.assign(m.purchases, saved.purchases);
       m.noAds = !!saved.noAds;
@@ -114,6 +118,7 @@
     G.storage.remove(KEY);
     G.storage.remove(G.RUN_KEY);
     G.storage.remove(OLD_BEST_KEY);
+    RESET_KEYS.forEach((k) => G.storage.remove(k));
     G.loadMeta();
     if (G.game) G.game.settings = G.meta.settings;
   };
@@ -137,25 +142,12 @@
     });
   };
 
-  // 난이도는 스테이지마다 차례로 열린다: 보통 → 어려움 → MAX
-  // (난이도별 기록이 생기기 전의 클리어 기록 cleared[스테이지]는 보통 클리어로 친다)
-  const DIFF_NEEDS = { hard: 'normal', max: 'hard' };
-
-  function clearedOn(stageId, diffId) {
-    const c = G.meta.cleared;
-    return !!(c[stageId + ':' + diffId] || (diffId === 'normal' && c[stageId]));
-  }
-
-  G.isDifficultyUnlocked = function (stageId, diffId) {
-    if (!G.isStageUnlocked(stageId)) return false;
-    const need = DIFF_NEEDS[diffId];
-    return !need || clearedOn(stageId, need);
-  };
+  // 난이도는 처음부터 고를 수 있다(열린 스테이지면)
+  G.isDifficultyUnlocked = function (stageId) { return G.isStageUnlocked(stageId); };
 
   G.difficultyLockText = function (stageId, diffId) {
     if (G.isDifficultyUnlocked(stageId, diffId)) return null;
-    if (!G.isStageUnlocked(stageId)) return '앞 스테이지를 깨면 열립니다';
-    return G.difficultyById(DIFF_NEEDS[diffId]).name + '을 깨면 열립니다';
+    return '앞 스테이지를 깨면 열립니다';
   };
 
   G.championPrice = function (key) { return G.CHAMPIONS[key].price; };
@@ -190,24 +182,19 @@
     const minutes = Math.floor(G.curveTime(game) / 60); // 짧은 난이도도 20분 기준으로 센다
     const diff = game.difficulty || G.DIFFICULTIES[0];
     const goldMul = (game.player && game.player.stats.goldMul) || 1;
-    const bonus = Math.round((minutes * 15 + (win ? 300 : 0)) * st.goldMul * diff.gold * goldMul);
+    const bonus = Math.round((minutes * 15 + (win ? 600 : 0)) * st.goldMul * diff.gold * goldMul);
     const gold = Math.round(game.runGold * diff.gold * goldMul) + bonus;
     G.addCurrency('gold', gold);
     let crystals = 0, firstClear = false;
     let unlockedDifficulty = null;
     if (win) {
       const dKey = st.id + ':' + diff.id;
-      crystals = diff.crystals || 0;
+      crystals = Math.round((diff.crystals || 0) * (1 + G.STAGES.indexOf(st) * 0.5));
       if (!G.meta.cleared[dKey]) {
         G.meta.cleared[dKey] = true;
         firstClear = true;
         crystals += G.GACHA.firstClearCrystals[diff.id] || 0;
-        if (diff.id !== 'normal') newlyUnlocked.push(st.name + ' ' + diff.name + ' 클리어!');
-        const next = G.DIFFICULTIES[G.DIFFICULTIES.indexOf(diff) + 1];
-        if (next) {
-          unlockedDifficulty = next.name;
-          newlyUnlocked.push(st.name + ' ' + next.name + ' 난이도가 열렸습니다');
-        }
+        if (diff.id !== 'normal') newlyUnlocked.push(st.name + ' ' + diff.name + ' 첫 클리어!');
       }
       if (!G.meta.cleared[st.id]) {
         G.meta.cleared[st.id] = true;
