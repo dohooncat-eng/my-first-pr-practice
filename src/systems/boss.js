@@ -259,6 +259,7 @@
     }
     e.x += e.kx * dt;
     e.y += e.ky * dt;
+    if (!e.lift) G.mapConstrain(game, e, e.r * 0.6);
     e.kx -= e.kx * Math.min(1, dt * 9);
     e.ky -= e.ky * Math.min(1, dt * 9);
     // 몸통 판정은 그림보다 조금 작게 (스치기만 해도 맞지 않게)

@@ -1,4 +1,4 @@
-// 스테이지 4개. 앞 스테이지를 깨면 다음이 열린다. 버티는 시간은 난이도마다 다르다(보통 10분 · 어려움 15분 · MAX 20분).
+// 스테이지 10개. 앞 스테이지를 깨면 다음이 열린다. 스테이지마다 맵 모양(map, src/systems/map.js)이 다르다. 버티는 시간은 난이도마다 다르다(보통 10분 · 어려움 15분 · MAX 20분).
 (function (G) {
   'use strict';
 
@@ -14,6 +14,7 @@
       ground: 'ground_tile', decals: ['decal_grass_0', 'decal_grass_1', 'decal_stone', 'decal_mushroom', 'decal_flowers', 'decal_roots'],
       hpMul: 1, growth: 1, dmgMul: 1, speedMul: 1, goldMul: 1,
       dark: [3, 7, 10], groundColor: '#111a17', dust: 'rgba(110, 120, 90, 0.5)',
+      map: { type: 'open' },
     },
     {
       id: 'marsh', name: '가라앉은 늪', thumb: 'stage_marsh',
@@ -25,6 +26,7 @@
       ground: 'ground_marsh', decals: ['decal_marsh_0', 'decal_marsh_1', 'decal_marsh_2', 'decal_marsh_3'],
       hpMul: 1.08, growth: 1.08, dmgMul: 1.08, speedMul: 1.03, goldMul: 1.5,
       dark: [4, 10, 9], groundColor: '#12201a', dust: 'rgba(90, 110, 80, 0.5)',
+      map: { type: 'ponds', cell: 520, r: [90, 170], chance: 0.55, look: { deep: '#050c08', water: '#14261c', shore: '#2f4a32', rim: 'rgba(182, 227, 90, 0.35)' } },
     },
     {
       id: 'ruins', name: '잿빛 폐허', thumb: 'stage_ruins',
@@ -35,6 +37,7 @@
       ground: 'ground_ruins', decals: ['decal_ruins_0', 'decal_ruins_1', 'decal_ruins_2', 'decal_ruins_3'],
       hpMul: 1.15, growth: 1.16, dmgMul: 1.15, speedMul: 1.05, goldMul: 2.2,
       dark: [9, 7, 6], groundColor: '#1a1715', dust: 'rgba(130, 120, 110, 0.5)',
+      map: { type: 'pillars', cell: 300, r: [26, 46], chance: 0.5, look: { top: '#6e6a66', body: '#2a2420', rim: 'rgba(255, 140, 80, 0.35)' } },
     },
     {
       id: 'abyss', name: '달의 심연', thumb: 'stage_abyss',
@@ -45,6 +48,67 @@
       ground: 'ground_abyss', decals: ['decal_abyss_0', 'decal_abyss_1', 'decal_abyss_2', 'decal_abyss_3'],
       hpMul: 1.18, growth: 1.18, dmgMul: 1.15, speedMul: 1.05, goldMul: 3,
       dark: [5, 5, 16], groundColor: '#10121f', dust: 'rgba(120, 110, 170, 0.45)',
+      map: { type: 'arena', r: 1000, shrink: 0.35, look: { wall: 'rgba(4, 3, 14, 0.95)', edge: 'rgba(190, 170, 255, 0.65)' } },
+    },
+    {
+      id: 'frost', name: '서리 고개', thumb: 'stage_frost',
+      desc: '눈보라가 그치지 않는 좁은 협곡. 앞뒤로만 길이 있다.',
+      enemies: { basic: 'snowimp', fast: 'frostwing', tank: 'icegolem', ranged: 'frostcaller' },
+      boss: 'wintermaw',
+      ground: 'ground_frost', decals: ['decal_frost_0', 'decal_frost_1', 'decal_frost_2', 'decal_frost_3'],
+      hpMul: 1.22, growth: 1.22, dmgMul: 1.2, speedMul: 1.06, goldMul: 3.6,
+      dark: [6, 10, 18], groundColor: '#1a2433', dust: 'rgba(200, 230, 255, 0.45)',
+      map: { type: 'corridor', axis: 'x', half: 300, look: { wall: 'rgba(5, 9, 16, 0.95)', edge: 'rgba(200, 235, 255, 0.7)' } },
+    },
+    {
+      id: 'mine', name: '불타는 광산', thumb: 'stage_mine',
+      desc: '쇳물이 흐르는 갱도. 기둥 사이로 길을 찾아야 한다.',
+      enemies: { basic: 'cinderling', fast: 'sparkhound', tank: 'slaggolem', ranged: 'minebomber' },
+      boss: 'forgeheart',
+      ground: 'ground_mine', decals: ['decal_mine_0', 'decal_mine_1', 'decal_mine_2', 'decal_mine_3'],
+      hpMul: 1.26, growth: 1.26, dmgMul: 1.24, speedMul: 1.07, goldMul: 4.2,
+      dark: [12, 6, 4], groundColor: '#1d1410', dust: 'rgba(255, 150, 80, 0.4)',
+      map: { type: 'pillars', cell: 220, r: [30, 52], chance: 0.65, look: { top: '#5a4436', body: '#1e130e', rim: 'rgba(255, 140, 60, 0.5)' } },
+    },
+    {
+      id: 'lake', name: '거울 호수', thumb: 'stage_lake',
+      desc: '달을 비추는 검은 호수. 연못 사이 좁은 땅을 건넌다.',
+      enemies: { basic: 'mirrorling', fast: 'glassfish', tank: 'shellguard', ranged: 'mirrormage' },
+      boss: 'lakemother',
+      ground: 'ground_lake', decals: ['decal_lake_0', 'decal_lake_1', 'decal_lake_2', 'decal_lake_3'],
+      hpMul: 1.3, growth: 1.3, dmgMul: 1.28, speedMul: 1.08, goldMul: 4.8,
+      dark: [4, 8, 16], groundColor: '#111a24', dust: 'rgba(190, 220, 255, 0.4)',
+      map: { type: 'ponds', cell: 480, r: [110, 190], chance: 0.7, look: { deep: '#03060c', water: '#0f1c30', shore: '#33445c', rim: 'rgba(200, 225, 255, 0.45)' } },
+    },
+    {
+      id: 'tower', name: '바람의 탑', thumb: 'stage_tower',
+      desc: '구름까지 닿는 돌탑. 위아래로만 열린 좁은 계단.',
+      enemies: { basic: 'galeimp', fast: 'harpy', tank: 'stoneward', ranged: 'stormarcher' },
+      boss: 'tempestlord',
+      ground: 'ground_tower', decals: ['decal_tower_0', 'decal_tower_1', 'decal_tower_2', 'decal_tower_3'],
+      hpMul: 1.34, growth: 1.34, dmgMul: 1.32, speedMul: 1.1, goldMul: 5.4,
+      dark: [7, 10, 14], groundColor: '#1a2028', dust: 'rgba(210, 240, 255, 0.4)',
+      map: { type: 'corridor', axis: 'y', half: 280, look: { wall: 'rgba(6, 9, 13, 0.95)', edge: 'rgba(210, 240, 255, 0.65)' } },
+    },
+    {
+      id: 'garden', name: '시든 정원', thumb: 'stage_garden',
+      desc: '병든 꽃이 피는 정원. 가시덤불이 길을 막는다.',
+      enemies: { basic: 'rotsprout', fast: 'thornmoth', tank: 'bloomhulk', ranged: 'pollenwitch' },
+      boss: 'witheredqueen',
+      ground: 'ground_garden', decals: ['decal_garden_0', 'decal_garden_1', 'decal_garden_2', 'decal_garden_3'],
+      hpMul: 1.38, growth: 1.38, dmgMul: 1.36, speedMul: 1.1, goldMul: 6,
+      dark: [10, 6, 14], groundColor: '#1a1420', dust: 'rgba(214, 160, 255, 0.4)',
+      map: { type: 'pillars', cell: 260, r: [22, 36], chance: 0.6, look: { top: '#4a3a52', body: '#170f1c', rim: 'rgba(155, 191, 90, 0.5)' } },
+    },
+    {
+      id: 'lighthouse', name: '마지막 등대', thumb: 'stage_lighthouse',
+      desc: '세상의 끝, 꺼져 가는 거대한 등대. 갇힌 바위섬에서 마지막 밤을 버틴다.',
+      enemies: { basic: 'hollowman', fast: 'shadeling', tank: 'nightknight', ranged: 'voidpriest' },
+      boss: 'nightless',
+      ground: 'ground_lighthouse', decals: ['decal_lighthouse_0', 'decal_lighthouse_1', 'decal_lighthouse_2', 'decal_lighthouse_3'],
+      hpMul: 1.45, growth: 1.42, dmgMul: 1.4, speedMul: 1.12, goldMul: 7,
+      dark: [3, 3, 9], groundColor: '#0e0e16', dust: 'rgba(255, 210, 122, 0.35)',
+      map: { type: 'arena', r: 800, shrink: 0.3, look: { wall: 'rgba(1, 1, 5, 0.96)', edge: 'rgba(255, 210, 122, 0.7)' } },
     },
   ];
 

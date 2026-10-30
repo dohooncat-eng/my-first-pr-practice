@@ -30,6 +30,36 @@
     voideye: { name: '공허의 눈', role: 'basic', hp: 16, speed: 62, r: 13, damage: 10, xp: 1, color: '#a98be0' },
     wolf: { name: '그림자 늑대', role: 'fast', hp: 9, speed: 110, r: 12, damage: 7, xp: 1, color: '#5b6fb0' },
     stareater: { name: '별 먹는 자', role: 'tank', hp: 80, speed: 36, r: 23, damage: 15, xp: 3, color: '#cfe6ff' },
+    // 서리 고개
+    snowimp: { name: '눈 도깨비', role: 'basic', hp: 15, speed: 60, r: 13, damage: 9, xp: 1, color: '#cfe9ff' },
+    frostwing: { name: '서리 날개', role: 'fast', hp: 7, speed: 118, r: 11, damage: 6, xp: 1, wobble: true, color: '#9fd0ff' },
+    icegolem: { name: '얼음 거인', role: 'tank', hp: 68, speed: 33, r: 22, damage: 14, xp: 3, color: '#6aa6d6' },
+    frostcaller: { name: '서리 부름꾼', role: 'ranged', hp: 12, speed: 56, r: 12, damage: 10, xp: 2, range: 270, cd: 2.9, shot: 'rgba(170, 225, 255, 0.95)', color: '#8fc6ee' },
+    // 불타는 광산
+    cinderling: { name: '잿불 꼬마', role: 'basic', hp: 16, speed: 64, r: 13, damage: 10, xp: 1, hop: true, color: '#ff8a3d' },
+    sparkhound: { name: '불씨 사냥개', role: 'fast', hp: 8, speed: 126, r: 12, damage: 7, xp: 1, color: '#ffb35a' },
+    slaggolem: { name: '쇳물 골렘', role: 'tank', hp: 75, speed: 32, r: 23, damage: 15, xp: 3, color: '#c8642c' },
+    minebomber: { name: '광산 폭탄꾼', role: 'ranged', hp: 13, speed: 55, r: 12, damage: 11, xp: 2, range: 250, cd: 3.1, shot: 'rgba(255, 150, 60, 0.95)', color: '#e0904a' },
+    // 거울 호수
+    mirrorling: { name: '거울 그림자', role: 'basic', hp: 16, speed: 62, r: 13, damage: 10, xp: 1, color: '#bfe0ff' },
+    glassfish: { name: '유리 물고기', role: 'fast', hp: 8, speed: 120, r: 11, damage: 7, xp: 1, wobble: true, color: '#9fd8ff' },
+    shellguard: { name: '조개 수호병', role: 'tank', hp: 84, speed: 30, r: 23, damage: 15, xp: 3, color: '#6f8fb8' },
+    mirrormage: { name: '반사 술사', role: 'ranged', hp: 13, speed: 58, r: 12, damage: 11, xp: 2, range: 285, cd: 2.7, shot: 'rgba(210, 235, 255, 0.95)', color: '#a8c8f0' },
+    // 바람의 탑
+    galeimp: { name: '바람 꼬마', role: 'basic', hp: 16, speed: 66, r: 13, damage: 10, xp: 1, wobble: true, color: '#d9f2ff' },
+    harpy: { name: '하피', role: 'fast', hp: 9, speed: 128, r: 12, damage: 8, xp: 1, color: '#a8c8d8' },
+    stoneward: { name: '돌 파수꾼', role: 'tank', hp: 86, speed: 32, r: 23, damage: 16, xp: 3, color: '#8fb0c0' },
+    stormarcher: { name: '폭풍 궁수', role: 'ranged', hp: 13, speed: 60, r: 12, damage: 12, xp: 2, range: 300, cd: 2.6, shot: 'rgba(220, 240, 120, 0.95)', color: '#b8d8e8' },
+    // 시든 정원
+    rotsprout: { name: '썩은 새싹', role: 'basic', hp: 17, speed: 58, r: 13, damage: 11, xp: 1, hop: true, color: '#9bbf5a' },
+    thornmoth: { name: '가시 나방', role: 'fast', hp: 9, speed: 122, r: 12, damage: 8, xp: 1, wobble: true, color: '#d6a0ff' },
+    bloomhulk: { name: '꽃 거인', role: 'tank', hp: 90, speed: 30, r: 24, damage: 16, xp: 3, color: '#a07ac0' },
+    pollenwitch: { name: '꽃가루 마녀', role: 'ranged', hp: 14, speed: 56, r: 12, damage: 12, xp: 2, range: 275, cd: 2.5, shot: 'rgba(230, 200, 90, 0.95)', color: '#c8a0e0' },
+    // 마지막 등대
+    hollowman: { name: '텅 빈 자', role: 'basic', hp: 18, speed: 64, r: 13, damage: 12, xp: 1, color: '#6a6680' },
+    shadeling: { name: '그림자 조각', role: 'fast', hp: 10, speed: 130, r: 11, damage: 9, xp: 1, wobble: true, color: '#4a4670' },
+    nightknight: { name: '밤의 기사', role: 'tank', hp: 96, speed: 34, r: 24, damage: 17, xp: 3, color: '#2a2840' },
+    voidpriest: { name: '공허 사제', role: 'ranged', hp: 15, speed: 58, r: 12, damage: 13, xp: 2, range: 290, cd: 2.4, shot: 'rgba(160, 140, 255, 0.95)', color: '#8f84e0' },
     starseer: { name: '별의 눈 사제', role: 'ranged', hp: 13, speed: 58, r: 12, damage: 11, xp: 2, range: 280, cd: 2.6, shot: 'rgba(170, 150, 255, 0.95)', color: '#8f84e0' },
   };
 
@@ -39,6 +69,12 @@
     treant: { name: '고목 수호자', hp: 1400, speed: 40, r: 44, damage: 22, pattern: 'treant', color: '#8fb36a' },
     marshqueen: { name: '늪의 여왕', hp: 1500, speed: 44, r: 44, damage: 24, pattern: 'marshqueen', color: '#b6e35a' },
     ashknight: { name: '잿빛 기사', hp: 1650, speed: 52, r: 40, damage: 26, pattern: 'ashknight', color: '#ff6b3d' },
+    wintermaw: { name: '겨울 아귀', hp: 2000, speed: 46, r: 44, damage: 30, pattern: 'ashknight', color: '#bfe9ff' },
+    forgeheart: { name: '대장간 심장', hp: 2200, speed: 40, r: 46, damage: 32, pattern: 'treant', color: '#ff8a3d' },
+    lakemother: { name: '호수의 어머니', hp: 2400, speed: 44, r: 44, damage: 33, pattern: 'marshqueen', color: '#9fd8ff' },
+    tempestlord: { name: '폭풍의 주인', hp: 2600, speed: 50, r: 42, damage: 34, pattern: 'eclipse', color: '#c9f0ff' },
+    witheredqueen: { name: '시든 여왕', hp: 2800, speed: 42, r: 44, damage: 36, pattern: 'treant', color: '#d6a0ff' },
+    nightless: { name: '끝없는 밤', hp: 3200, speed: 44, r: 46, damage: 38, pattern: 'eclipse', color: '#8f84e0' },
     eclipse: { name: '월식의 군주', hp: 1850, speed: 42, r: 40, damage: 28, pattern: 'eclipse', color: '#cfe6ff' },
   };
   // 곡선 초(20분 기준): 판 시간의 1/3·2/3에 중간 보스, 끝에 최종 보스(index 2). 최종 보스를 쓰러뜨리면 클리어

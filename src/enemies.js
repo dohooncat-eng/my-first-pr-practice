@@ -31,6 +31,7 @@
       hitUntil: {},
       dead: false,
     };
+    G.mapConstrain(game, e, e.r);
     game.enemies.push(e);
     return e;
   };
@@ -41,7 +42,7 @@
   G.spawnPoint = function (game, extra) {
     const a = Math.random() * Math.PI * 2;
     const d = game.viewRadius + 40 + (extra || 0);
-    return { x: game.player.x + Math.cos(a) * d, y: game.player.y + Math.sin(a) * d };
+    return G.mapSpawnPoint(game, { x: game.player.x + Math.cos(a) * d, y: game.player.y + Math.sin(a) * d });
   };
 
   // 피해를 주고, 처치했으면 true. soft: 지속 피해(번쩍임 없음, 작은 숫자)
@@ -131,6 +132,7 @@
     const grid = game.grid;
     const tick = game._sepTick = ((game._sepTick || 0) + 1) & 1;
     const sepRange = game.viewRadius + 80;
+    const mapOn = !!(game.stage.map && game.stage.map.type !== 'open');
     for (const e of game.enemies) {
       if (e.dead) continue;
       e.flash -= dt;
@@ -194,6 +196,7 @@
 
       e.x += (vx + e.kx) * dt;
       e.y += (vy + e.ky) * dt;
+      if (mapOn) G.mapConstrain(game, e, e.r * 0.8);
       const decay = Math.min(1, dt * 9);
       e.kx -= e.kx * decay;
       e.ky -= e.ky * decay;

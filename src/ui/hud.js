@@ -169,17 +169,23 @@
     ctx.fillStyle = '#ffd27a';
     ctx.fillText(String(gold), gx + 20, gy + 14);
 
-    // 무기 6칸 + 패시브 6칸
-    const big = narrow ? 36 : 40, gap = narrow ? 5 : 6;
-    const slotsY = T + 78;
+    // 미니맵: 오른쪽 위, 일시정지 단추 아래
+    const mR = narrow ? 40 : 48;
+    const mX = R - mR, mY = T + 74 + mR;
+    G.drawMinimap(ctx, game, mX, mY, mR);
+
+    // 무기 6칸 + 패시브 6칸 (조합하면 칸이 늘어난다). 미니맵 왼쪽까지만 쓴다
     const wslots = G.weaponSlots(p);
+    const gap = narrow ? 5 : 6;
+    const big = Math.min(narrow ? 36 : 40, Math.floor((mX - mR - 10 - L - gap * (wslots - 1)) / wslots));
+    const slotsY = T + 78;
     for (let i = 0; i < wslots; i++) {
       const wpn = p.weapons[i];
       const def = wpn && G.WEAPONS[wpn.key];
       const combo = def && def.kind !== 'base';
       slot(ctx, L + i * (big + gap), slotsY, big, wpn ? wpn.key : null, wpn ? wpn.level : 0, combo ? 0 : G.WEAPON_MAX, combo);
     }
-    const small = narrow ? 26 : 28;
+    const small = Math.min(narrow ? 26 : 28, Math.floor((mX - mR - 10 - L - 5 * (G.passiveSlots(p) - 1)) / G.passiveSlots(p)));
     const py = slotsY + big + 6;
     const pslots = G.passiveSlots(p);
     const pk = Object.keys(p.passives || {});
@@ -275,7 +281,7 @@
       ctx.font = '600 12px ' + FONT_BODY;
       ctx.textAlign = 'right';
       ctx.fillStyle = '#a3aea7';
-      ctx.fillText(Math.round(game.fps || 0) + ' FPS', R, T + 86);
+      ctx.fillText(Math.round(game.fps || 0) + ' FPS', R, mY + mR + 16);
     }
 
     // 터치 조이스틱

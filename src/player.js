@@ -64,6 +64,7 @@
     const speed = p.baseSpeed * p.stats.speed;
     p.x += mv.x * speed * dt;
     p.y += mv.y * speed * dt;
+    G.mapConstrain(game, p, p.r);
     const m = Math.hypot(mv.x, mv.y);
     p.moving = m > 0.05;
     if (p.moving) {

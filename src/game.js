@@ -329,6 +329,7 @@
         G.drawSprite(ctx, spr, cx * DECAL_CELL + ox, cy * DECAL_CELL + oy, sc, h < 0.2, 0);
       }
     }
+    G.drawMap(ctx, game, x0, y0, x1, y1);
   }
 
   function toScreen(x, y, sx, sy) {
