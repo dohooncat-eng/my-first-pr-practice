@@ -12,6 +12,15 @@
 - [ ] 안드로이드 포장(TWA 또는 Capacitor), 아이콘, 오프라인 실행, 뒤로가기 버튼, 개인정보처리방침.
 - [ ] 실기기 확인: 터치가 눌린 채로 남는지, 화면 회전 뒤 조이스틱, 적이 많을 때 저사양 폰 프레임.
 
+## 2026-10-30 (5) · 로컬 Claude Code · `claude/play-fixes-fx` · 대규모 업데이트 2~5단계
+- Codex 권한: `game factory/.claude/settings.local.json`에 `Bash(codex exec --dangerously-bypass-approvals-and-sandbox *)` 허용(사용자 요청). 실행: `codex exec --dangerously-bypass-approvals-and-sandbox -C <저장소> -m gpt-6-astra -c model_reasoning_effort="xhigh" "<지시>" < /dev/null`. 그림 지시서는 `docs/art-style.md` 4차.
+- 2단계: 스테이지 10개(`src/data/stages.js`, 새 적 24·보스 6·세계관·음악), 맵 5종(`src/systems/map.js`: open·corridor·arena·pillars·ponds, `G.mapConstrain`·`G.mapSpawnPoint`·`G.drawMap`), 미니맵(`G.drawMinimap`, HUD 오른쪽 위).
+- 4단계: 무기 Lv 10, Lv 5·10 갈래(`src/data/branches.js`, 로직 `src/systems/branches.js`). 갈래 = mul/add/fx. 조합 70개(`G.XCOMBOS`, 키 `x_메인_갈래_상대`): 메인 Lv 10(두 갈래) + 상대 Lv 5 → 상자 열기 전에 고름(`G.comboChoiceOptions`). 메인 동작 + 상대 힘(`G.COMBO_SIG`) + 피해 +60%. 맞힐 때 효과 `G.curFx` → `G.applyHitFx`, 화상·중독은 `G.updateDots`. 표: `docs/weapon-tree.md`(자동 생성).
+- 방어막 패시브(`barrier`), 선택창 조합 안내(`G.xcomboHint`)와 선택창 안 조합 도감(`G.xcomboBook`).
+- 3단계: 영웅 12명(`src/data/champions.js`), 영웅 소환·조각·강화(`src/systems/heroes.js`), 빌드 궁합(affinity·globalFx·frozenBonus·burnBonus·comboDmg, `G.curWeaponKey`로 지금 맞히는 무기를 안다).
+- 그림(Codex): 원거리 적 4종 완료·커밋. 새 스테이지 6개(각 26장)와 영웅 8명(32장) 진행 중 — 끝나면 확인 후 커밋.
+- 남은 것: 새 보스 6종의 고유 패턴(지금은 기존 패턴 재사용), 상자 컷신 그림 다듬기(Codex), 밸런스(실제 플레이), 출시 전 할 일.
+
 ## 2026-10-30 (4) · 로컬 Claude Code · `claude/play-fixes-fx` · 대규모 업데이트 1단계
 - 계획: `docs/overhaul-plan.md`(5단계). 확인 없이 단계를 이어서 진행.
 - 진행 초기화: 저장 키 `hollowlight.meta.v2`·`hollowlight.run.v2`, 예전 키는 불러올 때 지움.
