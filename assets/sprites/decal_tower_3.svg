@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<!-- 바람의 탑 장식 · 바람풀과 하피 깃털 -->
+<defs>
+<linearGradient id="decal-tower3-stone" x1="0" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#546771"/><stop offset="0.5" stop-color="#344752"/><stop offset="1" stop-color="#24333f"/></linearGradient>
+<linearGradient id="decal-tower3-cloth" x1="0" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#657e8a"/><stop offset="0.5" stop-color="#425d6c"/><stop offset="1" stop-color="#293d4c"/></linearGradient>
+<linearGradient id="decal-tower3-metal" x1="0" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#77745e"/><stop offset="0.5" stop-color="#53584f"/><stop offset="1" stop-color="#2d393b"/></linearGradient>
+</defs>
+<path d="M8 49 L20 44 L34 48 L47 44 L57 50 L49 55 L17 54Z" fill="url(#decal-tower3-stone)" stroke="#0a1110" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 49 Q20 33 28 23 Q25 37 28 45 Q32 27 42 21 Q34 34 33 48 Q41 35 52 34 Q42 42 38 50Z" fill="#334d54" stroke="#0a1110" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M28 46 Q29 32 36 27 M35 49 L45 38" fill="none" stroke="#68868a" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/><path d="M12 47 Q13 32 24 22 Q30 31 24 39 L19 40 L22 42Z" fill="url(#decal-tower3-cloth)" stroke="#0a1110" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 49 L24 26" fill="none" stroke="#9aacae" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity=".65"/><path d="M16 41 L16 35 M20 35 L21 30" fill="none" stroke="#344e5d" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/><path d="M42 51 Q46 45 55 45 L52 49 L56 50 Q49 53 42 51Z" fill="#566b75" stroke="#0a1110" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
