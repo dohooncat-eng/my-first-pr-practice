@@ -430,16 +430,75 @@
   // ---------- 업그레이드 상점 ----------
 
   // readOnly: 도감에서 쓰는 보기 전용(단추 없이 상태만)
+  // 영웅 효과만 미리 계산한다. 실제 플레이어·저장 데이터에는 적용하지 않는다.
+  function heroPreview(ch, lv) {
+    const before = G.baseStats(), after = G.baseStats(), base = G.baseStats();
+    ch.apply(before, lv);
+    ch.apply(after, Math.min(lv + 1, G.ABILITY_MAX));
+    const rows = el('div', 'shop-preview');
+    rows.appendChild(el('small', '', '영웅 효과 · 현재 → 다음'));
+    const labels = { magnet: '흡수 범위', xpMul: '경험치', armor: '받는 피해 감소', cooldown: '공격 대기 시간', speed: '이동 속도', crit: '치명타 확률', critMult: '치명타 피해', duration: '지속 시간', amount: '투사체', area: '범위', barrier: '보호막', barrierRegen: '보호막 회복', frozenBonus: '얼린 적 피해', burnBonus: '화상 피해', comboDmg: '조합 피해', choices: '선택지', rerolls: '다시 뽑기', extraWeapon: '시작 무기 추가', chestBonus: '상자 강화 추가', retaliate: '피격 반격' };
+    const counts = ['amount', 'barrier', 'barrierRegen', 'choices', 'rerolls', 'extraWeapon', 'chestBonus'];
+    const num = (v) => String(Math.round(v * 100) / 100);
+    function value(k, v) {
+      if (k === 'retaliate') return v ? '있음' : '없음';
+      if (counts.indexOf(k) >= 0) return num(v);
+      if (k === 'magnet') return '+' + num((v / base.magnet - 1) * 100) + '%';
+      if (k === 'critMult') return '×' + num(v);
+      const pct = (v - (base[k] === 1 ? 1 : 0)) * 100;
+      return (pct > 0 ? '+' : '') + num(pct) + '%';
+    }
+    function line(label, a, b) {
+      const row = el('p');
+      row.append(el('span', '', label), el('span', 'shop-before', a), el('span', 'shop-arrow', '→'), el('strong', '', b));
+      rows.appendChild(row);
+    }
+    Object.keys(labels).forEach((k) => { if (before[k] !== after[k]) line(labels[k], value(k, before[k]), value(k, after[k])); });
+    const groups = {};
+    Object.keys(after.affinity).forEach((k) => {
+      const a = before.affinity[k] || 1, b = after.affinity[k];
+      if (a === b) return;
+      const id = a + ':' + b;
+      if (!groups[id]) groups[id] = { a, b, names: [] };
+      groups[id].names.push(G.WEAPONS[k].name);
+    });
+    Object.keys(groups).forEach((k) => { const g = groups[k]; line(g.names.join('·') + ' 피해', '×' + num(g.a), '×' + num(g.b)); });
+    Object.keys(after.globalFx).forEach((k) => {
+      const a = before.globalFx[k] || 0, b = after.globalFx[k];
+      if (a === b) return;
+      const percent = ['execute', 'lifesteal', 'burn', 'poison'].indexOf(k) >= 0;
+      const format = (v) => !v ? '없음' : percent ? num(v * 100) + '%' : k === 'knock' ? num(v) : '적용';
+      line('모든 무기 ' + G.fxText({ [k]: b }), format(a), format(b));
+    });
+    return rows;
+  }
+
   function renderShop(target, readOnly) {
     const list = target || $('shop-list');
     list.textContent = '';
     refreshGold();
     const m = meta();
     const max = G.ABILITY_MAX || 10;
-    G.CHAMPION_ORDER.forEach((key) => {
+    const locked = el('div', 'shop-locked-list');
+    locked.hidden = true;
+    const order = G.CHAMPION_ORDER.slice().sort((a, b) => Number(!!m.unlocked[b]) - Number(!!m.unlocked[a]));
+    order.forEach((key) => {
       const ch = G.CHAMPIONS[key];
       const unlocked = !!(m.unlocked && m.unlocked[key]);
       const lv = (m.champLv && m.champLv[key]) || 0;
+      if (!unlocked) {
+        const row = el('div', 'shop-locked-row star-' + ch.star);
+        row.append(img(G.spriteUrl(ch.sprite + '_0'), '', 44, ''), el('span', '', '★'.repeat(ch.star) + ' ' + ch.name));
+        const go = el('button', 'btn btn-small btn-ghost', readOnly ? '미보유' : '소환');
+        go.type = 'button';
+        go.id = 'shop-buy-' + key;
+        go.disabled = !!readOnly;
+        go.setAttribute('aria-label', ch.name + ' 영웅 소환에서 얻기');
+        go.addEventListener('click', () => { sfx('click'); openGacha('shop'); });
+        row.appendChild(go);
+        locked.appendChild(row);
+        return;
+      }
       const row = el('div', 'shop-row star-' + ch.star + ' ' + (unlocked ? '' : ' is-locked') + (lv >= max ? ' is-max' : ''));
       const portrait = el('span', 'shop-portrait');
       portrait.appendChild(img(G.spriteUrl(ch.sprite + '_0'), '', 0, ch.name));
@@ -453,7 +512,8 @@
       lvRow.appendChild(pips(lv, max));
       lvRow.appendChild(el('span', 'shop-lv-text', 'Lv ' + lv + ' / ' + max));
       body.appendChild(lvRow);
-      body.appendChild(el('p', 'shop-per', (ch.build ? '빌드: ' + ch.build + ' · ' : '') + 'Lv마다 ' + ch.ability.perLevel));
+      if (lv < max) body.appendChild(heroPreview(ch, lv));
+      else body.appendChild(el('p', 'shop-per', ch.build || ch.ability.perLevel));
       [[5, ch.ability.awaken], [10, ch.ability.awaken2]].forEach(([at, txt]) => {
         if (!txt) return;
         const awaken = el('p', 'shop-awaken' + (lv >= at ? ' is-on' : ''));
@@ -461,24 +521,20 @@
         awaken.appendChild(el('span', '', txt));
         body.appendChild(awaken);
       });
-      if (unlocked) body.appendChild(el('p', 'shop-per', '조각 ' + fmtNum((m.shards && m.shards[key]) || 0) + '개'));
       row.appendChild(body);
 
       const act = el('div', 'shop-act');
       if (readOnly) {
         act.appendChild(el('span', 'shop-max', !unlocked ? '잠김' : lv >= max ? '각성 완료' : 'Lv ' + lv));
-      } else if (!unlocked) {
-        // 영웅은 소환으로만 얻는다
-        const go = el('button', 'btn btn-ghost btn-small');
-        go.type = 'button';
-        go.id = 'shop-buy-' + key;
-        go.textContent = '영웅 소환에서 얻기';
-        go.addEventListener('click', () => { sfx('click'); openGacha('shop'); });
-        act.appendChild(go);
       } else if (lv >= max) {
         act.appendChild(el('span', 'shop-max', '각성 완료'));
       } else {
         const cost = G.abilityCost(key);
+        const shards = (m.shards && m.shards[key]) || 0;
+        const missing = Math.max(0, cost.shards - shards), goldMissing = Math.max(0, cost.gold - m.gold);
+        const need = el('p', 'shop-need' + (missing || goldMissing ? ' is-short' : ''), '조각 ' + fmtNum(shards) + ' / ' + cost.shards + (missing ? ' · ' + missing + '개 부족' : ' · 준비 완료'));
+        if (goldMissing) need.appendChild(el('span', '', '금화 ' + fmtNum(goldMissing) + ' 부족'));
+        act.appendChild(need);
         const up = el('button', 'btn btn-primary btn-small');
         up.type = 'button';
         up.id = 'shop-up-' + key;
@@ -498,6 +554,19 @@
       row.appendChild(act);
       list.appendChild(row);
     });
+    if (locked.children.length) {
+      const group = el('section', 'shop-locked');
+      const toggle = el('button', 'evo-end-toggle', '미보유 영웅 ' + locked.children.length + '명 보기');
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.addEventListener('click', () => {
+        locked.hidden = !locked.hidden;
+        toggle.setAttribute('aria-expanded', String(!locked.hidden));
+        toggle.textContent = '미보유 영웅 ' + locked.children.length + '명 ' + (locked.hidden ? '보기' : '접기');
+      });
+      group.append(toggle, locked);
+      list.appendChild(group);
+    }
   }
 
   function focusShop(key) {
@@ -550,7 +619,7 @@
 
   function renderAltar() {
     refreshGold();
-    $('gacha-pity').textContent = G.gachaPityLeft();
+    $('gacha-pity').textContent = gachaTab === 'heroes' ? G.heroPityLeft() : G.gachaPityLeft();
     $('hero-pity').textContent = '★★★까지 ' + G.heroPityLeft() + '회';
     document.querySelectorAll('#pane-altar .pull-btn').forEach((b) => {
       const n = Number(b.dataset.n), cur = b.dataset.cur;
@@ -563,6 +632,12 @@
       const ok = canPull(n, cur);
       b.classList.toggle('is-short', !ok);
       b.setAttribute('aria-disabled', String(!ok));
+      if (cost) {
+        let need = b.querySelector('.pull-need');
+        if (!need) { need = el('span', 'pull-need'); b.querySelector('.btn-stack').appendChild(need); }
+        const missing = Math.max(0, pullCost(n, cur) - (isGoldCur(cur) ? meta().gold : meta().crystals));
+        need.textContent = ok ? '뽑기 가능' : fmtNum(missing) + (isGoldCur(cur) ? ' 금화 부족' : ' 결정 부족');
+      }
     });
     const t = (G.meta.gacha && G.meta.gacha.tickets2) || 0;
     $('pull-ticket').hidden = t <= 0;
@@ -1222,13 +1297,14 @@
     toggleLvBook(false);
     if (choices[0] && choices[0].kind === 'branch') {
       $('lv-title').textContent = choices[0].tier === 5 ? '갈래 선택' : '끝 형태 선택';
-      $('lv-sub').textContent = choices[0].tier === 5 ? '갈래를 고르면 열리는 조합 짝이 달라져요' : '끝 형태를 고르고, 짝 Lv 5와 상자에서 조합하세요';
+      $('lv-sub').textContent = choices[0].tier === 5 ? '갈래 선택 → Lv 10 → 짝과 조합' : '끝 형태 + 짝 Lv 5 → 상자에서 조합';
     }
     const tipBox = $('lv-tip');
     tipBox.textContent = '';
     const tip = G.evolution.lesson(g, choices);
     tipBox.hidden = !tip;
-    if (tip) tipBox.appendChild(tip);
+    if (tip && !(choices[0] && choices[0].kind === 'branch')) tipBox.appendChild(tip);
+    else tipBox.hidden = true;
     lvOnPick = onPick;
     renderCards(choices, 350);
     sfx('levelup');
@@ -1249,9 +1325,10 @@
       btn.appendChild(el('span', 'card-key', String(i + 1)));
       const ic = el('span', 'card-icon');
       ic.appendChild(img(choiceIcon(c, d), '', 56, ''));
+      if (c.kind === 'branch') ic.appendChild(G.evolution.branchMark(game.player, c, i));
       btn.appendChild(ic);
       const body = el('span', 'card-body');
-      body.appendChild(el('span', 'card-tag', d.tag));
+      body.appendChild(el('span', 'card-tag', c.kind === 'passive' && c.level === 1 ? '새 패시브' : d.tag));
       body.appendChild(el('span', 'card-title', d.title));
       G.evolution.choice(game.player, c, d, body);
       if (d.max) {
@@ -1540,6 +1617,7 @@
 
   const CODEX_TABS = ['gacha', 'upgrade', 'weapon', 'passive', 'combo', 'world'];
   let codexTab = 'gacha';
+  let codexDetailBack = null;
 
   // 무기·패시브 한 장. 아직 열리지 않은 것은 이름·설명을 숨긴다
   function codexCard(key, name, desc, extra, locked) {
@@ -1570,22 +1648,37 @@
   }
 
   function renderCodexWeapons(box) {
-    const cards = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k)).map((k) => {
-      const w = G.WEAPONS[k];
-      const extra = ['최대 Lv ' + G.WEAPON_MAX];
-      const br = G.BRANCHES[k];
-      if (br) extra.push('Lv 5 갈래: ' + br.b5.map((x) => x.name).join(' / '));
-      if (br) br.b5.forEach((x) => extra.push(x.name + ' → Lv 10: ' + (br.b10[x.id] || []).map((y) => y.name).join(' / ') + ' · 조합: ' + (x.subs || []).map((s) => G.COMBO_SIG[s].adj + ' ' + x.name).join(', ')));
-      G.COMBOS.forEach((c) => {
-        if (c.type === 'evolve' && c.weapon === k) extra.push('진화: ' + G.WEAPONS[c.result].name + ' (+ ' + G.PASSIVES[c.passive].name + ')');
-        if (c.type === 'union' && c.weapons.indexOf(k) !== -1) {
-          const other = c.weapons.find((o) => o !== k);
-          extra.push('조합: ' + G.WEAPONS[c.result].name + ' (+ ' + G.WEAPONS[other].name + ')');
-        }
+    const scroll = $('screen-codex').querySelector('.menu-content');
+    let scrollTop = 0;
+    function list(focusKey) {
+      codexDetailBack = null;
+      box.textContent = '';
+      const cards = Object.keys(G.WEAPONS).filter((k) => G.isBaseWeapon(k)).map((k) => {
+        const w = G.WEAPONS[k], locked = !G.isItemUnlocked('weapon', k);
+        const li = el('li', 'weapon-entry' + (locked ? ' is-locked' : ''));
+        const b = el('button', 'weapon-link');
+        b.type = 'button'; b.dataset.weapon = k; b.disabled = locked;
+        if (!locked) b.appendChild(img(iconUrl(k), '', 44, ''));
+        else b.appendChild(el('span', 'weapon-unknown', '?'));
+        const body = el('span', 'weapon-copy');
+        body.append(el('strong', '', locked ? '???' : w.name), el('span', '', locked ? '다음 스테이지에서 열립니다' : G.evolution.role(k)));
+        b.append(body, el('span', 'weapon-open', locked ? '잠김' : '경로 ›'));
+        b.addEventListener('click', () => { scrollTop = scroll.scrollTop; detail(k); });
+        li.appendChild(b); return li;
       });
-      return codexCard(k, w.name, w.desc, extra, !G.isItemUnlocked('weapon', k));
-    });
-    codexGrid(box, '무기', cards);
+      codexGrid(box, '무기', cards);
+      box.querySelector('.coll-grid').classList.add('weapon-list');
+      if (focusKey) { scroll.scrollTop = scrollTop; box.querySelector('[data-weapon="' + focusKey + '"]').focus({ preventScroll: true }); }
+    }
+    function detail(key) {
+      codexDetailBack = () => list(key);
+      box.textContent = '';
+      const back = el('button', 'btn btn-small evo-back', '‹ 무기 목록');
+      back.type = 'button'; back.addEventListener('click', () => list(key));
+      box.append(back, G.evolution.path(null, key, true));
+      scroll.scrollTop = 0; back.focus({ preventScroll: true });
+    }
+    list();
   }
 
   function renderCodexPassives(box) {
@@ -1602,6 +1695,7 @@
   }
 
   function setCodexTab(tab) {
+    codexDetailBack = null;
     codexTab = tab;
     $('screen-codex').querySelector('.menu-content').scrollTop = 0;
     CODEX_TABS.forEach((t) => $('codex-tab-' + t).setAttribute('aria-selected', String(t === tab)));
@@ -1652,12 +1746,13 @@
     $('codex-tab-' + codexTab).focus({ preventScroll: true });
   }
 
-  function buildItem(key, name, levelText, cls) {
+  function buildItem(key, name, levelText, cls, effect) {
     const li = el('li', 'build-item' + (cls ? ' ' + cls : ''));
     li.appendChild(img(iconUrl(key), '', 36, ''));
     const body = el('span', 'build-body');
     body.appendChild(el('span', 'build-name', name));
     body.appendChild(el('span', 'build-lv', levelText));
+    if (effect) body.appendChild(el('span', 'build-effect', effect));
     li.appendChild(body);
     return li;
   }
@@ -1672,18 +1767,28 @@
       const def = G.WEAPONS[w.key];
       const combo = def.kind !== 'base';
       const brName = [w.b5 && G.branchById(w.key, 5, w.b5), w.b10 && G.branchById(w.key, 10, w.b10, w.b5)].filter(Boolean).map((x) => x.name).join(' → ');
-      wl.appendChild(buildItem(w.key, def.name, combo ? (def.kind === 'evolved' ? '진화' : '무기 조합') : 'Lv ' + w.level + (w.level >= G.WEAPON_MAX ? ' MAX' : '') + (brName ? ' · ' + brName : ''), combo ? 'is-combo' : ''));
+      wl.appendChild(buildItem(w.key, def.name, combo ? (def.kind === 'evolved' ? '진화' : '무기 조합') : 'Lv ' + w.level + (w.level >= G.WEAPON_MAX ? ' MAX' : '') + (brName ? ' · ' + brName : ''), combo ? 'is-combo' : '', G.evolution.role(w.key)));
     });
-    for (let i = p.weapons.length; i < G.weaponSlots(p); i++) wl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
-    (p.fusions || []).forEach((f) => pl.appendChild(buildItem(f, G.FUSIONS[f].name, '패시브 조합', 'is-combo')));
+    emptySlots(wl, G.weaponSlots(p) - p.weapons.length);
+    (p.fusions || []).forEach((f) => pl.appendChild(buildItem(f, G.FUSIONS[f].name, '패시브 조합', 'is-combo', G.FUSIONS[f].desc)));
     Object.keys(p.passives).forEach((k) => {
       const lv = p.passives[k];
-      pl.appendChild(buildItem(k, G.PASSIVES[k].name, 'Lv ' + lv + (lv >= G.PASSIVE_MAX ? ' MAX' : ''), ''));
+      pl.appendChild(buildItem(k, G.PASSIVES[k].name, 'Lv ' + lv + (lv >= G.PASSIVE_MAX ? ' MAX' : ''), '', G.evolution.passiveEffect(k, lv)));
     });
     const used = Object.keys(p.passives).length + (p.fusions || []).length;
-    for (let i = used; i < G.passiveSlots(p); i++) pl.appendChild(el('li', 'build-item is-empty', '빈 칸'));
+    emptySlots(pl, G.passiveSlots(p) - used);
     $('build-wcount').textContent = p.weapons.length + ' / ' + G.weaponSlots(p);
     $('build-pcount').textContent = used + ' / ' + G.passiveSlots(p);
+  }
+
+  function emptySlots(list, count) {
+    if (count <= 0) return;
+    const row = el('li', 'build-empty');
+    const slots = el('span', 'build-empty-slots');
+    slots.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < count; i++) slots.appendChild(el('i'));
+    row.append(slots, el('span', '', '빈 칸 ' + count));
+    list.appendChild(row);
   }
 
   // catalog: 도감에서 쓰는 목록(진행도 없이 조합법만)
@@ -1868,6 +1973,7 @@
         $('btn-gacha').focus({ preventScroll: true });
         return true;
       case 'codex':
+        if (codexDetailBack) { codexDetailBack(); return true; }
         showTitleScreen();
         $('btn-codex').focus({ preventScroll: true });
         return true;

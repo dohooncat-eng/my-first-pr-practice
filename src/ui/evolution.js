@@ -34,6 +34,34 @@
     return wrap;
   }
   function own(p, key) { return p && p.weapons.find((w) => w.key === key); }
+  // 목록과 일시정지에 쓰는 역할 한 줄. 수치·판정은 원래 데이터에서 읽는다.
+  const ROLES = { bolt: '가까운 적에게 불씨 발사', sword: '근접 베기 · 밀쳐내기', orb: '주위를 도는 반딧불 · 밀쳐내기', aura: '주변 지속 피해 · 둔화', chain: '근처 적에게 이어지는 번개', scythe: '왕복하는 낫 · 두 번 베기', poison: '독 웅덩이 설치 · 중독', meteor: '적 위로 떨어지는 광역 폭발', bell: '퍼져 나가는 파동 · 밀쳐내기', trap: '밟으면 폭발하는 덫 설치', lance: '일직선의 모든 적 관통', moth: '적을 쫓아가는 나방', tornado: '적을 끌어당기는 회오리', whip: '좌우를 번갈아 긴 공격', frost: '얼음 방울 · 둔화와 빙결', shield: '회전 방패 · 적 탄환 방어' };
+  function role(key) { return ROLES[key] || (G.WEAPONS[key] || {}).desc || ''; }
+  function passiveEffect(key, level) {
+    const before = G.baseStats(), after = G.baseStats();
+    G.PASSIVES[key].apply(after, level);
+    const labels = { maxHp: '최대 체력', barrier: '보호막', barrierRegen: '보호막 회복/초', speed: '이동 속도', damage: '모든 피해', cooldown: '공격 대기', magnet: '흡수 범위', regen: '체력 회복/초', armor: '받는 피해', area: '범위', amount: '투사체', crit: '치명타 확률', luck: '행운', duration: '지속', critMult: '치명타 피해', xpMul: '경험치', dodge: '회피 확률', rage: '체력 절반 아래 피해' };
+    const count = ['maxHp', 'barrier', 'barrierRegen', 'regen', 'amount'];
+    return Object.keys(labels).filter((k) => before[k] !== after[k]).map((k) => {
+      const scalar = count.indexOf(k) >= 0;
+      let v = k === 'magnet' ? (after[k] / before[k] - 1) * 100 : (after[k] - before[k]) * (scalar ? 1 : 100);
+      if (k === 'armor') v = -v;
+      v = Math.round(v * 100) / 100;
+      return labels[k] + ' ' + (v > 0 ? '+' : '') + v + (scalar ? '' : '%');
+    }).join(' · ');
+  }
+  function disclosure(label, content) {
+    const wrap = el('div', 'evo-disclosure');
+    const toggle = button('evo-end-toggle', label + ' 보기', () => {
+      content.hidden = !content.hidden;
+      toggle.setAttribute('aria-expanded', String(!content.hidden));
+      toggle.textContent = label + (content.hidden ? ' 보기' : ' 접기');
+    });
+    toggle.setAttribute('aria-expanded', 'false');
+    content.hidden = true;
+    wrap.append(toggle, content);
+    return wrap;
+  }
   function combos(p, key, b5) {
     return G.xcomboBook(p || { weapons: [] }, true).filter((x) => x.c.main === key && (!b5 || x.c.b5 === b5));
   }
@@ -42,10 +70,12 @@
     const m = own(p, key), s = own(p, sub);
     if (!m) return '메인: ' + name(key) + ' 먼저 획득';
     if (m.b5 && m.b5 !== b5) return '다른 갈래의 조합 · 이번 판에는 선택할 수 없음';
-    if (!m.b5) return '다음: Lv 5에서 갈래 선택 — 지금 Lv ' + m.level;
-    if (m.level < 10) return '메인: Lv 10 필요 — 지금 Lv ' + m.level;
-    if (!m.b10) return '다음: Lv 10 끝 형태 선택';
-    if (!s || s.level < 5) return '짝: ' + name(sub) + ' Lv 5 필요 — ' + (s ? '지금 Lv ' + s.level : '미보유');
+    const missing = [];
+    if (!m.b5) missing.push('Lv 5 갈래 선택');
+    if (m.level < 10) missing.push('메인 Lv ' + m.level + ' → 10');
+    if (!m.b10 && m.level >= 10) missing.push('Lv 10 끝 형태 선택');
+    if (!s || s.level < 5) missing.push(name(sub) + (s ? ' Lv ' + s.level + ' → 5' : ' 미보유 → Lv 5'));
+    if (missing.length) return missing.join(' · ');
     return '준비 완료 · 다음 상자에서 조합 선택';
   }
   function formula(c) {
@@ -109,15 +139,18 @@
     title.appendChild(el('h3', 'evo-path-title', name(weaponKey)));
     head.appendChild(title);
     head.appendChild(el('span', 'evo-badge', complete ? '완성' : ready ? '조합 가능' : w ? 'Lv ' + w.level : catalog ? '경로 도감' : '미보유'));
-    card.append(head, steps(key, w, ready, complete));
+    card.appendChild(head);
+    if (catalog) card.appendChild(el('p', 'evo-branch-desc', def.desc));
+    const route = el('div', 'evo-full-route');
+    route.appendChild(steps(key, w, ready, complete));
     const note = el('p', 'evo-next');
-    card.appendChild(note);
+    route.appendChild(note);
     const label = el('p', 'evo-section-label', '② Lv 5 · 갈래를 눌러 경로 보기');
-    card.appendChild(label);
+    route.appendChild(label);
     const tabs = el('div', 'evo-branches');
-    card.appendChild(tabs);
+    route.appendChild(tabs);
     const detail = el('div', 'evo-route');
-    card.appendChild(detail);
+    route.appendChild(detail);
     let selected = w && w.b5 || brs.b5[0].id;
     const buttons = [];
     function render() {
@@ -179,6 +212,32 @@
       buttons.push(b);
     });
     render();
+    if (!catalog && w) {
+      if (complete) card.appendChild(el('p', 'evo-next', '조합 완료 · 무기 칸 +1'));
+      else {
+        const needs = el('div', 'evo-needs');
+        combos(p, key, w.b5).forEach((x) => {
+          const item = el('div', 'evo-need' + (x.ready ? ' is-ready' : ''));
+          item.appendChild(icon(x.c.sub));
+          const text = el('div');
+          text.appendChild(el('strong', '', requirement(p, key, x.c.b5, x.c.sub, false)));
+          text.appendChild(el('small', '', (w.b5 ? '' : G.branchById(key, 5, x.c.b5).name + ' · ') + name(x.c.sub) + ' → ' + name(x.c.key)));
+          item.appendChild(text); needs.appendChild(item);
+        });
+        card.appendChild(needs);
+      }
+      const done = complete ? 4 : w.b10 ? 3 : w.b5 ? 2 : 1;
+      card.appendChild(disclosure('완료 ' + done + '단계 · 전체 경로', route));
+    } else card.appendChild(route);
+    if (catalog) {
+      const legacy = el('div', 'evo-legacy-paths');
+      G.COMBOS.filter((c) => c.weapon === key || c.weapons && c.weapons.indexOf(key) >= 0).forEach((c) => {
+        const parts = c.type === 'evolve' ? [[key, '무기', 'Lv ' + G.WEAPON_MAX], [c.passive, '패시브', '보유']] : c.weapons.map((k) => [k, '무기', 'Lv ' + G.WEAPON_MAX]);
+        parts.push([c.result, '결과', c.type === 'evolve' ? '진화' : '무기 조합']);
+        legacy.appendChild(formula({ parts }));
+      });
+      if (legacy.children.length) card.appendChild(disclosure('패시브 진화·기존 조합', legacy));
+    }
     return card;
   }
 
@@ -188,18 +247,25 @@
     const root = el('div', 'evo-library');
     box.appendChild(root);
     const intro = el('div', 'evo-intro');
-    intro.append(el('strong', '', 'Lv 10 + 짝 Lv 5 → 상자에서 조합'), el('span', '', '메인·Lv 5 갈래마다 다른 결과 · 합치면 빈 칸 +1'));
+    intro.appendChild(el('span', '', 'Lv 10 + 짝 Lv 5 → 상자에서 조합 · 빈 칸 +1'));
+    const ready = catalog ? [] : G.xcomboOptions(p);
+    if (!catalog) {
+      const old = G.comboStatus(p).filter((x) => x.ready);
+      const sec = el('section', 'evo-ready' + (!ready.length && !old.length ? ' is-empty' : ''));
+      sec.appendChild(el('h3', '', '지금 가능한 조합 · ' + (ready.length + old.length)));
+      ready.forEach((c) => sec.appendChild(formula(c)));
+      old.forEach((s) => {
+        const parts = s.parts.map((x) => [x.key, x.kind === 'weapon' ? '무기' : '패시브', x.need > 1 ? 'Lv ' + x.need : '보유']);
+        parts.push([s.result.key, '결과', '상자에서 조합']);
+        sec.appendChild(formula({ parts }));
+      });
+      if (!ready.length && !old.length) sec.appendChild(el('p', '', '부족한 짝과 레벨을 아래에서 확인하세요.'));
+      root.appendChild(sec);
+    }
     root.appendChild(intro);
     const body = el('div', 'evo-library-body');
     root.appendChild(body);
-    const ready = catalog ? [] : G.xcomboOptions(p);
     if (!all) {
-      if (ready.length) {
-        const sec = el('section', 'evo-ready');
-        sec.appendChild(el('h3', '', '상자에서 조합 가능 · ' + ready.length));
-        ready.forEach((c) => sec.appendChild(formula(c)));
-        body.appendChild(sec);
-      }
       const owned = p.weapons.slice().sort((a, b) => Number(ready.some((c) => c.main === b.key)) - Number(ready.some((c) => c.main === a.key)));
       if (!owned.length) body.appendChild(el('p', 'evo-empty', '아직 무기가 없어요. 전체 탭에서 경로를 살펴보세요.'));
       owned.forEach((w) => body.appendChild(path(p, w.key, false)));
@@ -234,6 +300,36 @@
   }
 
   // 선택 카드의 큰 행동 문구와 작은 상세를 분리한다. 게임 선택 데이터는 그대로 둔다.
+  const MOD_NAMES = { dmg: '피해', speed: '발사 속도', cd: '공격 대기', tick: '피해 간격', range: '사거리', radius: '범위', size: '크기', width: '폭', length: '길이', count: '개수', targets: '대상', jumps: '튀는 횟수', pierce: '관통', duration: '지속', life: '지속', spin: '회전 속도', knock: '밀쳐냄', hits: '타격 횟수', pull: '끌어당김', freeze: '빙결 시간', freezeAt: '빙결 필요 중첩', arc: '베는 각도' };
+  function branchEffects(br) {
+    const gain = [], loss = [];
+    ['mul', 'add'].forEach((type) => {
+      Object.keys(br[type] || {}).forEach((k) => {
+        const v = type === 'mul' ? Math.round((br[type][k] - 1) * 100) : br[type][k];
+        const good = ['cd', 'tick', 'freezeAt'].indexOf(k) >= 0 ? v < 0 : v > 0;
+        const text = (MOD_NAMES[k] || k) + ' ' + (v > 0 ? '+' : '') + v + (type === 'mul' ? '%' : k === 'arc' ? 'rad' : '');
+        (good ? gain : loss).push(text);
+      });
+    });
+    Object.keys(br.fx || {}).forEach((k) => {
+      const v = br.fx[k];
+      const percent = ['burn', 'poison', 'lifesteal', 'execute'].indexOf(k) >= 0;
+      gain.push(G.fxText({ [k]: v }) + ' ' + (percent ? Math.round(v * 1000) / 10 + '%' : v + (k === 'stun' ? '초' : '')));
+    });
+    return { gain: gain.join(' · ') || br.desc, loss: loss.join(' · ') || '없음' };
+  }
+  function branchMark(p, c, index) {
+    const w = own(p, c.key), br = G.branchById(c.key, c.tier, c.id, w && w.b5);
+    const fx = br.fx || {}, mul = br.mul || {}, add = br.add || {};
+    const mode = fx.explode ? 'blast' : fx.lifesteal || fx.chill || fx.stun ? 'ward' : fx.burn || fx.poison || fx.execute ? 'effect' : add.count || add.targets || add.jumps ? 'multi' : mul.cd < 1 || mul.tick < 1 || mul.speed > 1 || mul.spin > 1 ? 'speed' : 'reach';
+    const mark = el('span', 'branch-mark');
+    const i = el('img'); i.src = G.spriteUrl('ui_branch_' + mode); i.alt = ''; i.width = i.height = 28;
+    i.addEventListener('error', () => { i.hidden = true; });
+    mark.append(i, el('b', '', String.fromCharCode(65 + index)));
+    mark.setAttribute('aria-hidden', 'true');
+    return mark;
+  }
+
   function choice(p, c, d, body) {
     let action = d.tag, detail = d.text, hint = d.comboHint;
     if (c.kind === 'weapon') {
@@ -260,7 +356,9 @@
     else if (c.kind === 'heal') action = '체력 25 회복';
     else if (c.kind === 'gold') action = '금화 25 획득';
     else if (c.kind === 'oldcombo') action = '상자에서 ' + d.tag;
-    body.appendChild(el('strong', 'card-action', action));
+    const effectFirst = ['weapon', 'passive', 'heal', 'gold'].indexOf(c.kind) >= 0;
+    if (effectFirst) body.appendChild(el('strong', 'card-action', detail));
+    else if (c.kind !== 'branch') body.appendChild(el('strong', 'card-action', action));
     if (c.kind === 'xcombo') body.appendChild(formula(c));
     if (c.kind === 'oldcombo') {
       const status = G.comboStatus(p).find((x) => x.combo.result === c.combo.result);
@@ -270,9 +368,16 @@
         body.appendChild(formula({ parts }));
       }
     }
-    body.appendChild(el('span', 'card-text', detail));
+    if (!effectFirst && c.kind !== 'branch') body.appendChild(el('span', 'card-text', detail));
     if (c.kind === 'branch') {
-      const w = own(p, c.key), br = G.branchById(c.key, 5, c.tier === 5 ? c.id : w.b5);
+      const w = own(p, c.key), selected = G.branchById(c.key, c.tier, c.id, w && w.b5);
+      const br = G.branchById(c.key, 5, c.tier === 5 ? c.id : w.b5);
+      const effects = branchEffects(selected), compare = el('span', 'branch-compare');
+      const gain = el('span', 'branch-gain'), loss = el('span', 'branch-loss');
+      gain.append(el('small', '', '이득'), el('strong', '', effects.gain));
+      loss.append(el('small', '', '손실'), el('span', '', effects.loss));
+      compare.append(gain, loss); body.appendChild(compare);
+      hint = '';
       const partners = el('span', 'card-partners');
       partners.appendChild(el('small', '', '열리는 짝'));
       (br.subs || []).forEach((key) => {
@@ -308,5 +413,5 @@
     return tip;
   }
 
-  G.evolution = { path, library, choice, lesson };
+  G.evolution = { path, library, choice, lesson, role, branchMark, passiveEffect };
 })(window.G);

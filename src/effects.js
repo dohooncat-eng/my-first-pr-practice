@@ -216,6 +216,19 @@
 
   G.drawNumbers = function (ctx, game) {
     if (!atlas || (!atlasFont && ++fontPoll % 60 === 0 && document.fonts.check(FONT_CHECK))) buildAtlas();
+    // 흔들림·줌과 무관한 화면 좌표로 HUD 위의 피해 숫자를 잘라 낸다.
+    ctx.save();
+    const transform = ctx.getTransform(), dpr = game.dpr || 1;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const top = G.hudNumberTop ? G.hudNumberTop(game) : (game.safe ? game.safe.t : 0) + 84;
+    ctx.beginPath(); ctx.rect(0, top * dpr, ctx.canvas.width, Math.max(0, ctx.canvas.height - top * dpr)); ctx.clip();
+    // 발밑 체력·위험 표시도 숫자에 덮이지 않게 작은 공간을 남긴다.
+    const p = game.player, scale = transform.a / game.zoom;
+    const hx = transform.a * p.x + transform.e, hy = transform.d * (p.y + 25) + transform.f;
+    ctx.beginPath(); ctx.rect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.rect(hx - 32 * scale, hy - 9 * scale, 64 * scale, (p.hp / p.maxHp <= 0.3 ? 40 : 24) * scale);
+    ctx.clip('evenodd');
+    ctx.setTransform(transform);
     const img = atlas.canvas;
     for (const d of game.numbers) {
       const t = d.life / d.max;
@@ -241,5 +254,6 @@
       }
     }
     ctx.globalAlpha = 1;
+    ctx.restore();
   };
 })(window.G);

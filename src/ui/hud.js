@@ -34,7 +34,7 @@
   }
   function plate(ctx, x, y, w, h, color) {
     G.roundRect(ctx, x, y, w, h, 4);
-    ctx.fillStyle = '#10251eec'; ctx.fill();
+    ctx.fillStyle = '#10251e'; ctx.fill();
     ctx.strokeStyle = color || '#aa915c'; ctx.lineWidth = 1; ctx.stroke();
     ctx.fillStyle = '#d8c68c22'; ctx.fillRect(x + 4, y + 2, w - 8, 1);
   }
@@ -56,7 +56,12 @@
     }
     if (special) diamond(ctx, x + size - 4, y + 4, 3, '#ffe6a4');
   }
-  function compact(n) { return n >= 10000 ? (Math.floor(n / 1000) / 10).toFixed(1) + '만' : String(n); }
+  function compact(n) {
+    const unit = n >= 1e12 ? 1e12 : n >= 1e8 ? 1e8 : n >= 1e4 ? 1e4 : 1;
+    if (unit === 1) return String(n);
+    const value = n / unit;
+    return (value >= 100 ? Math.floor(value) : Math.floor(value * 10) / 10) + (unit === 1e12 ? '조' : unit === 1e8 ? '억' : '만');
+  }
   // 딜량 표: 무기별 누적 피해, 초당 피해, 비율 (오른쪽, 많이 준 순서로 최대 6개)
   const dpsRows = [];
   function drawDps(ctx, game, R, y, narrow, flat) {
@@ -69,33 +74,52 @@
     if (!total) return;
     dpsRows.sort((a, b) => stats[b] - stats[a]);
     const n = Math.min(narrow ? 4 : 6, dpsRows.length);
-    const bw = (narrow ? 128 : 168) + (mode === 'both' ? (narrow ? 26 : 34) : 0), rowH = narrow ? 20 : 24, x = R - bw;
+    const bw = narrow ? Math.min(174, Math.floor(game.w / 2) - 44) : 214, rowH = 34, x = R - bw;
     const secs = Math.max(1, game.time);
-    plate(ctx, x, y, bw, 20 + n * rowH + 4, '#7f7650');
-    ctx.font = '600 9px ' + BODY; ctx.textAlign = 'left'; ctx.fillStyle = '#c7b47e';
-    ctx.fillText('딜량', x + 8, y + 14);
-    ctx.textAlign = 'right'; ctx.fillStyle = '#9fae92';
-    ctx.fillText('총 ' + compact(Math.round(total)) + ' · 초당 ' + compact(Math.round(total / secs)), x + bw - 8, y + 14);
+    plate(ctx, x, y, bw, 39 + n * rowH, '#7f7650');
+    ctx.font = '600 11px ' + BODY; ctx.textAlign = 'left'; ctx.fillStyle = '#e1ce98';
+    ctx.fillText('딜량 · 총 ' + compact(Math.round(total)), x + 8, y + 15);
+    ctx.fillStyle = '#b9c8ad';
+    ctx.fillText('초당 ' + compact(Math.round(total / secs)), x + 8, y + 30);
     for (let i = 0; i < n; i++) {
-      const k = dpsRows[i], v = stats[k], ry = y + 20 + i * rowH;
+      const k = dpsRows[i], v = stats[k], ry = y + 37 + i * rowH;
       const share = v / total;
-      const isz = rowH - 6;
+      const isz = 18;
       const im = k !== 'etc' && icon(k);
       if (im) ctx.drawImage(im, x + 6, ry + 2, isz, isz);
       else { ctx.fillStyle = '#3a4a3c'; ctx.fillRect(x + 6, ry + 2, isz, isz); }
       const tx = x + 10 + isz, barW = bw - (tx - x) - 8;
-      ctx.fillStyle = '#06120e'; ctx.fillRect(tx, ry + rowH - 8, barW, 4);
-      ctx.fillStyle = i === 0 ? '#e9b45c' : '#8fb39a'; ctx.fillRect(tx, ry + rowH - 8, barW * share, 4);
+      ctx.fillStyle = '#06120e'; ctx.fillRect(tx, ry + 29, barW, 2);
+      ctx.fillStyle = i === 0 ? '#e9b45c' : '#8fb39a'; ctx.fillRect(tx, ry + 29, barW * share, 2);
       const def = G.WEAPONS[k];
-      const name = k === 'etc' ? '기타' : (def && def.name) || k;
-      ctx.font = '600 ' + (narrow ? 9 : 10) + 'px ' + BODY; ctx.textAlign = 'left'; ctx.fillStyle = '#e8dcb6';
-      ctx.fillText(name, tx, ry + rowH - 11, barW * 0.55);
+      let name = k === 'etc' ? '기타' : (def && def.name) || k;
+      ctx.font = '600 11px ' + BODY; ctx.textAlign = 'left'; ctx.fillStyle = '#e8dcb6';
+      const nameW = barW - 32;
+      if (ctx.measureText(name).width > nameW) {
+        while (name.length && ctx.measureText(name + '…').width > nameW) name = name.slice(0, -1);
+        name += '…';
+      }
+      ctx.fillText(name, tx, ry + 11);
       ctx.textAlign = 'right'; ctx.fillStyle = '#f1d49a';
+      ctx.fillText(Math.round(share * 100) + '%', x + bw - 8, ry + 11);
       const rate = compact(Math.round(v / secs)) + '/초', sum = compact(Math.round(v));
       const val = mode === 'rate' ? rate : mode === 'total' ? sum : sum + ' · ' + rate;
-      ctx.fillText(val + ' · ' + Math.round(share * 100) + '%', x + bw - 8, ry + rowH - 11);
+      ctx.fillText(val, x + bw - 8, ry + 26);
     }
   }
+
+  // 피해 숫자의 화면 위쪽 경계. 칸·미니맵·보스 이름까지 HUD 공간으로 남긴다.
+  G.hudNumberTop = function (game) {
+    const p = game.player, s = game.safe || SAFE;
+    if (game.h < 500) return s.t + 140;
+    const narrow = game.w < 840, cols = narrow ? 6 : 10;
+    const L = Math.max(12, s.l + 10), R = game.w - Math.max(12, s.r + 10);
+    const mapR = narrow ? 33 : 42;
+    const available = narrow ? R - L - mapR * 2 - 14 : Math.min(400, game.w * 0.38);
+    const size = Math.max(20, Math.min(34, Math.floor((available - 4 * (cols - 1)) / cols)));
+    const end = 87 + Math.ceil(G.weaponSlots(p) / cols) * (size + 4) + Math.ceil(G.passiveSlots(p) / cols) * 29;
+    return s.t + Math.max(end, 75 + mapR * 2) + (game.boss && !game.boss.dead ? 58 : game.banner ? 34 : 8);
+  };
 
   G.drawHUD = function (ctx, game) {
     const p = game.player; if (!p) return;
@@ -120,7 +144,7 @@
     }
     // 레벨 인장과 시간판은 서로 독립된 폭을 갖는다.
     plate(ctx, L, T + 20, 44, 43, '#c5a86d');
-    ctx.fillStyle = '#c7b47e'; ctx.font = '600 8px ' + BODY; ctx.textAlign = 'center'; ctx.fillText('레벨', L + 22, T + 32);
+    ctx.fillStyle = '#e0c68b'; ctx.font = '600 11px ' + BODY; ctx.textAlign = 'center'; ctx.fillText('레벨', L + 22, T + 33);
     ctx.font = (p.level > 99 ? 18 : 23) + 'px ' + DISPLAY; ctx.fillStyle = '#f4e6ba'; ctx.fillText(String(p.level), L + 22, T + 56);
     diamond(ctx, L + 22, T + 20, 3, '#e9c888');
     if (game.fx && game.fx.level > 0) {
@@ -129,15 +153,16 @@
       G.roundRect(ctx, L - 2, T + 18, 48, 47, 5); ctx.stroke(); ctx.globalAlpha = 1;
     }
     const win = G.runTime(game);
-    plate(ctx, w / 2 - 58, T + 19, 116, 43, '#8d9867');
+    plate(ctx, w / 2 - 72, T + 19, 144, 62, '#8d9867');
     ctx.textAlign = 'center'; ctx.fillStyle = game.time >= win - 60 ? '#f5ca83' : '#f0e8cd';
     ctx.font = '28px ' + DISPLAY; ctx.fillText(G.formatTime(game.time), w / 2, T + 51);
-    ctx.font = '600 9px ' + BODY; ctx.fillStyle = '#a5b79b';
-    ctx.fillText('/ ' + G.formatTime(win) + '  ·  처치 ' + compact(game.kills), w / 2, T + 75);
+    ctx.font = '600 11px ' + BODY; ctx.fillStyle = '#c2d1b7';
+    ctx.fillText('/ ' + G.formatTime(win) + '  ·  처치 ' + compact(game.kills), w / 2, T + 72);
     const speed = G.speedMul();
-    if (speed > 1) { ctx.fillStyle = '#e4c17a'; ctx.font = '11px ' + DISPLAY; ctx.fillText('×' + speed, w / 2 + 72, T + 46); }
+    if (speed > 1) { plate(ctx, w / 2 + 76, T + 29, 28, 23); ctx.fillStyle = '#e4c17a'; ctx.font = '11px ' + DISPLAY; ctx.fillText('×' + speed, w / 2 + 90, T + 46); }
     const gold = Math.floor(game.runGold || 0), coin = G.art && G.art.get('coin');
     const gx = L + 1, gy = T + 70;
+    plate(ctx, L - 1, T + 64, Math.min(w / 2 - 78 - L, 84), 18, '#526344');
     if (coin) ctx.drawImage(coin.img, gx, gy - 9, 14, 14); else diamond(ctx, gx + 7, gy - 2, 6, '#e4b65c');
     ctx.font = '11px ' + DISPLAY; ctx.textAlign = 'left'; ctx.fillStyle = '#dfc180'; ctx.fillText(compact(gold), gx + 18, gy + 2);
     // 작은 화면에서도 조합으로 늘어난 칸이 겹치지 않도록 여러 줄로 놓는다.

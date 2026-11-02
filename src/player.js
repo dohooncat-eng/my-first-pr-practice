@@ -200,23 +200,36 @@
   // 발밑 체력 막대 (어둠 위에 그려서 항상 보이게)
   G.drawPlayerBar = function (ctx, game) {
     const p = game.player;
-    const w = 40, h = 5, x = p.x - w / 2, y = p.y + 22;
-    const ratio = Math.max(0, p.hp / p.maxHp);
-    ctx.fillStyle = 'rgba(8, 12, 11, 0.85)';
-    ctx.fillRect(x - 1.5, y - 1.5, w + 3, h + 3);
-    ctx.fillStyle = '#4a1822';
+    // 작은 화면의 줌에서도 52×8px를 유지한다. 위험 표시는 색과 글자를 함께 쓴다.
+    ctx.save();
+    ctx.translate(p.x, p.y + 25);
+    ctx.scale(1 / game.zoom, 1 / game.zoom);
+    const w = 52, h = 8, x = -w / 2, y = 0;
+    const ratio = Math.max(0, Math.min(1, p.hp / p.maxHp)), low = ratio <= 0.3;
+    ctx.fillStyle = '#07110e';
+    ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+    ctx.strokeStyle = low ? '#ffe1bc' : '#d4bc87'; ctx.lineWidth = 1;
+    ctx.strokeRect(x - 1.5, y - 1.5, w + 3, h + 3);
+    ctx.fillStyle = '#421b25';
     ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = ratio < 0.3 ? '#ff5a5a' : '#e0445a';
+    ctx.fillStyle = low ? '#ff755f' : '#f06475';
     ctx.fillRect(x, y, w * ratio, h);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.fillRect(x, y, w * ratio, 1.5);
+    ctx.fillStyle = '#ffddbf';
+    ctx.fillRect(x, y, w * ratio, 2);
+    for (let i = 1; i < 4; i++) { ctx.fillStyle = '#07110e99'; ctx.fillRect(x + w * i / 4, y, 1, h); }
+    if (low) {
+      ctx.fillStyle = '#321915'; ctx.fillRect(-19, h + 4, 38, 17);
+      ctx.fillStyle = '#ffe1bc'; ctx.font = '600 11px "IBM Plex Sans KR", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+      ctx.fillText('위험', 0, h + 16);
+    }
     // 방어막: 체력 막대 위 하늘색 막대
     if (p.stats.barrier > 0) {
       const sr = Math.max(0, (p.shield || 0) / p.stats.barrier);
       ctx.fillStyle = 'rgba(8, 12, 11, 0.85)';
-      ctx.fillRect(x - 1.5, y - 5.5, w + 3, 4.5);
+      ctx.fillRect(x - 1.5, y - 8, w + 3, 5);
       ctx.fillStyle = '#7fd4ff';
-      ctx.fillRect(x, y - 4.5, w * sr, 2.5);
+      ctx.fillRect(x, y - 7, w * sr, 3);
     }
+    ctx.restore();
   };
 })(window.G);
