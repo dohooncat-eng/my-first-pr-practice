@@ -175,9 +175,10 @@
 
   G.CHAMPION_ORDER = ['keeper', 'knight', 'witch', 'hunter', 'tinker', 'frostseer', 'pyro', 'bard', 'warden', 'reaper', 'alchemist', 'starchild'];
 
-  // 영웅 소환: 결정으로 싸게. 중복은 조각
+  // 영웅 소환: 결정으로 싸게, 금화로도 가능. 중복은 조각
   G.HERO_GACHA = {
     cost: { one: 30, ten: 270 },
+    goldCost: { one: 800, ten: 7200 },
     rates: { 3: 0.08, 2: 0.3, 1: 0.62 },
     pity: 60, // ★★★ 없이 60번째는 ★★★
     dupShards: { 1: 5, 2: 12, 3: 30 },

@@ -43,7 +43,9 @@
   // 데이터 파일(적·스테이지·무기)은 이 파일보다 늦게 불러오므로, 목록은 불러오기 직전에 채운다
   function addDataSprites() {
     // 챔피언 (오른쪽을 보는 걷기 4프레임)
-    ['player', 'knight', 'witch', 'hunter'].forEach((k) => {
+    // 모든 영웅의 그림 (새 영웅이 추가되면 자동으로 들어간다)
+    const heroSprites = ['player'].concat((G.CHAMPION_ORDER || []).map((k) => G.CHAMPIONS[k].sprite));
+    heroSprites.filter((k, i, a) => a.indexOf(k) === i).forEach((k) => {
       LIST[k] = { frames: 4, w: 60, h: 60, ax: 0.5, ay: 116 / 128 };
     });
     // 적: 역할별 규격

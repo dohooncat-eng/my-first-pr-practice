@@ -49,9 +49,10 @@
     if (G.sfx) G.sfx.play('warn');
   }
 
-  G.fireEnemyBullet = function (game, x, y, angle, speed, dmg, color) {
+  // reach: 이 거리만큼 날아가면 사라진다 (없으면 5초 동안)
+  G.fireEnemyBullet = function (game, x, y, angle, speed, dmg, color, reach) {
     if (game.enemyBullets.length > 300) return;
-    game.enemyBullets.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 8, dmg, life: 5, color: color || 'rgba(255, 90, 90, 0.95)' });
+    game.enemyBullets.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: 8, dmg, life: reach ? reach / speed : 5, color: color || 'rgba(255, 90, 90, 0.95)' });
   };
 
   function ring(game, e, n, speed, dmg, color, offset) {

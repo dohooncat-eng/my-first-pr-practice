@@ -36,6 +36,15 @@
       const k = 260 / (d || 1);
       G.damageEnemy(game, e, dmg, dx * k, dy * k);
     }
+    // 근접 공격은 베는 범위 안의 적 탄도 지운다
+    for (const b of game.enemyBullets) {
+      if (b.dead) continue;
+      const dx = b.x - p.x, dy = b.y - p.y;
+      if (dx * dx + dy * dy > (range + b.r) * (range + b.r)) continue;
+      if (arc < 6.28 && Math.abs(G.angleDiff(Math.atan2(dy, dx), angle)) > arc / 2) continue;
+      b.dead = true;
+      if (game.particles.length < 250) G.burst(game, b.x, b.y, 'rgba(235, 240, 255, 0.9)', 4, 130, true);
+    }
   };
 
   G.defineWeapon('sword', {

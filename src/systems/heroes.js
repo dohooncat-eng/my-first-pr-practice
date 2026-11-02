@@ -5,8 +5,14 @@
   function hg() { return G.meta.heroGacha; }
 
   // ---------- 소환 ----------
-  G.heroCost = function (n) { return n >= 10 ? G.HERO_GACHA.cost.ten : G.HERO_GACHA.cost.one; };
-  G.heroCanAfford = function (n) { return G.meta.crystals >= G.heroCost(n); };
+  // cur: 'crystal'(기본) | 'gold'
+  G.heroCost = function (n, cur) {
+    const c = cur === 'gold' ? G.HERO_GACHA.goldCost : G.HERO_GACHA.cost;
+    return n >= 10 ? c.ten : c.one;
+  };
+  G.heroCanAfford = function (n, cur) {
+    return (cur === 'gold' ? G.meta.gold : G.meta.crystals) >= G.heroCost(n, cur);
+  };
   G.heroPityLeft = function () { return G.HERO_GACHA.pity - hg().pity; };
 
   function rollStar() {
@@ -33,10 +39,11 @@
     return { key, star, name: ch.name, icon: ch.sprite + '_0', isNew: false, shards: sh, hero: true, refund: null };
   }
 
-  G.heroPull = function (n) {
+  G.heroPull = function (n, cur) {
     n = n >= 10 ? 10 : 1;
-    if (!G.heroCanAfford(n)) return { ok: false, reason: 'crystals', results: [], best: 0 };
-    G.meta.crystals -= G.heroCost(n);
+    if (!G.heroCanAfford(n, cur)) return { ok: false, reason: cur === 'gold' ? 'gold' : 'crystals', results: [], best: 0 };
+    if (cur === 'gold') G.meta.gold -= G.heroCost(n, 'gold');
+    else G.meta.crystals -= G.heroCost(n);
     const results = [];
     let hasTwo = false;
     for (let i = 0; i < n; i++) {

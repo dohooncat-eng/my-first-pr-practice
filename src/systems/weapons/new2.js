@@ -379,6 +379,14 @@
       if (Math.abs(e.y - y) > width / 2 + e.r * 0.6) continue;
       G.damageEnemy(game, e, s.dmg, dir * 220, 0);
     }
+    // 채찍이 지나간 자리의 적 탄을 지운다
+    for (const b of game.enemyBullets) {
+      if (b.dead) continue;
+      const along = (b.x - x0) * dir;
+      if (along < -b.r || along > len + b.r || Math.abs(b.y - y) > width / 2 + b.r) continue;
+      b.dead = true;
+      if (game.particles.length < 250) G.burst(game, b.x, b.y, 'rgba(255, 190, 120, 0.9)', 4, 130, true);
+    }
     push(G.fxList(w, 'lashes'), { x: x0, y, dir, len, width, life: 0.2, max: 0.2 }, 6);
     if (s.flame) {
       const flames = G.fxList(w, 'flames');

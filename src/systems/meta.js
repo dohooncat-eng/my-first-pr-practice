@@ -51,7 +51,16 @@
     const key = String(code || '').trim().toUpperCase();
     const c = G.COUPONS[key];
     if (!c) return { ok: false, reason: 'invalid' };
-    if (G.meta.coupons[key]) return { ok: false, reason: 'used' };
+    if (G.meta.coupons[key]) {
+      // 이미 쓴 쿠폰이라도 나중에 더해진 배속은 받을 수 있게
+      if (c.speedMode && !G.meta.speedMode) {
+        G.meta.speedMode = true;
+        if (!G.meta.settings.speed || G.meta.settings.speed === 1) G.meta.settings.speed = 2;
+        G.saveMeta();
+        return { ok: true, granted: { gold: 0, crystals: 0, speedMode: true }, gold: G.meta.gold, crystals: G.meta.crystals };
+      }
+      return { ok: false, reason: 'used' };
+    }
     const granted = { gold: 0, crystals: 0 };
     if (c.fill) {
       granted.gold = G.CURRENCY_MAX.gold - G.meta.gold;
@@ -108,6 +117,8 @@
       Object.assign(m.purchases, saved.purchases);
       m.noAds = !!saved.noAds;
       m.speedMode = !!saved.speedMode;
+      // 배속이 더해지기 전에 쿠폰을 쓴 저장 데이터도 배속을 받는다
+      Object.keys(m.coupons).forEach((k) => { if (m.coupons[k] && G.COUPONS[k] && G.COUPONS[k].speedMode) m.speedMode = true; });
       if (saved.pass) m.pass = { until: num(saved.pass.until, -1), lastClaim: num(saved.pass.lastClaim, -1) };
       m.runsSinceAd = Math.max(0, num(saved.runsSinceAd, 0));
     } else {

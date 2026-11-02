@@ -168,10 +168,17 @@
           </div>
         </div>
         <div class="pull-group pull-group-hero">
-          <p class="pull-label"><span class="crystal" aria-hidden="true"></span>영웅 소환 <small id="hero-pity"></small></p>
+          <p class="pull-label"><span class="crystal" aria-hidden="true"></span>별빛 결정으로 영웅 소환 <small id="hero-pity"></small></p>
           <div class="pull-btns">
             <button id="pull-hero-1" class="btn btn-ghost pull-btn" type="button" data-n="1" data-cur="hero"><span class="btn-stack"><span>1회</span><span class="btn-sub js-cost"></span></span></button>
             <button id="pull-hero-10" class="btn btn-primary pull-btn" type="button" data-n="10" data-cur="hero"><span class="btn-stack"><span>10회</span><span class="btn-sub js-cost"></span></span></button>
+          </div>
+        </div>
+        <div class="pull-group pull-group-hero pull-group-herogold">
+          <p class="pull-label"><span class="coin" aria-hidden="true"></span>금화로 영웅 소환</p>
+          <div class="pull-btns">
+            <button id="pull-herogold-1" class="btn btn-ghost pull-btn" type="button" data-n="1" data-cur="herogold"><span class="btn-stack"><span>1회</span><span class="btn-sub js-cost"></span></span></button>
+            <button id="pull-herogold-10" class="btn btn-primary pull-btn" type="button" data-n="10" data-cur="herogold"><span class="btn-stack"><span>10회</span><span class="btn-sub js-cost"></span></span></button>
           </div>
         </div>
         <div class="pull-group pull-group-crystal">
@@ -330,6 +337,15 @@
         <div id="set-fx-quality" class="seg" role="radiogroup" aria-labelledby="set-fx-quality-label">
           <button class="seg-btn" type="button" role="radio" data-q="high">높음</button>
           <button class="seg-btn" type="button" role="radio" data-q="low">낮음</button>
+        </div>
+      </div>
+      <div class="set-row set-quality">
+        <span id="set-dps-label">딜량 표시</span>
+        <div id="set-dps" class="seg" role="radiogroup" aria-labelledby="set-dps-label">
+          <button class="seg-btn" type="button" role="radio" data-q="both">둘 다</button>
+          <button class="seg-btn" type="button" role="radio" data-q="rate">초당</button>
+          <button class="seg-btn" type="button" role="radio" data-q="total">누적</button>
+          <button class="seg-btn" type="button" role="radio" data-q="off">끄기</button>
         </div>
       </div>
       <div class="set-row">

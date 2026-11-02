@@ -47,6 +47,7 @@
   G.COUPONS = {
     SBR: { fill: true, speedMode: true, desc: '금화·별빛 결정을 한도까지 + 배속' },
     SPEED: { speedMode: true, desc: '배속(2배·3배) 열기' },
+    RAEA: { speedMode: true, desc: '배속(2배·3배) 열기' },
   };
 
   G.storeProduct = function (id) { return G.STORE.products.find((p) => p.id === id) || null; };

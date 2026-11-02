@@ -526,9 +526,15 @@
 
   function stars(n) { return '★'.repeat(n); }
 
+  // 영웅 소환: 'hero'(결정) · 'herogold'(금화)
+  const isHero = (cur) => cur === 'hero' || cur === 'herogold';
+  const heroCur = (cur) => (cur === 'herogold' ? 'gold' : 'crystal');
+  const isGoldCur = (cur) => cur === 'gold' || cur === 'herogold';
+  function pullCost(n, cur) { return isHero(cur) ? G.heroCost(n, heroCur(cur)) : G.gachaCost(n, cur); }
+  function canPull(n, cur) { return isHero(cur) ? G.heroCanAfford(n, heroCur(cur)) : G.gachaCanAfford(n, cur); }
+
   function costLabel(n, cur) {
-    if (cur === 'hero') return fmtNum(G.heroCost(n)) + ' 결정';
-    return fmtNum(G.gachaCost(n, cur)) + (cur === 'gold' ? ' 금화' : ' 결정');
+    return fmtNum(pullCost(n, cur)) + (isGoldCur(cur) ? ' 금화' : ' 결정');
   }
 
   function gachaMsg(text, storeLink) {
@@ -551,10 +557,10 @@
       const cost = b.querySelector('.js-cost');
       if (cost) {
         cost.textContent = '';
-        cost.appendChild(el('span', cur === 'gold' ? 'coin' : 'crystal', ''));
+        cost.appendChild(el('span', isGoldCur(cur) ? 'coin' : 'crystal', ''));
         cost.appendChild(el('span', '', costLabel(n, cur)));
       }
-      const ok = cur === 'hero' ? G.heroCanAfford(n) : G.gachaCanAfford(n, cur);
+      const ok = canPull(n, cur);
       b.classList.toggle('is-short', !ok);
       b.setAttribute('aria-disabled', String(!ok));
     });
@@ -571,19 +577,20 @@
     if (cur === 'crystal') return '별빛 결정이 ' + fmtNum(G.gachaCost(n, 'crystal') - meta().crystals) + ' 모자랍니다. 스테이지·난이도를 처음 깨면 결정을 받습니다.';
     if (cur === 'ticket2') return '★★ 확정권이 없습니다.';
     if (cur === 'hero') return '별빛 결정이 ' + fmtNum(G.heroCost(n) - meta().crystals) + ' 모자랍니다. 판을 깨면 결정을 받습니다.';
+    if (cur === 'herogold') return '금화가 ' + fmtNum(G.heroCost(n, 'gold') - meta().gold) + ' 모자랍니다. 판을 돌아 금화를 모으세요.';
     return '오늘 무료 뽑기는 이미 썼습니다.';
   }
 
   function doPull(n, cur) {
     if (pullBusy || pullPhase) return;
-    const can = cur === 'hero' ? G.heroCanAfford(n) : G.gachaCanAfford(n, cur);
+    const can = canPull(n, cur);
     if (!can) {
       sfx('click');
-      gachaMsg(shortMsg(n, cur), cur === 'gold' || cur === 'crystal' || cur === 'hero');
+      gachaMsg(shortMsg(n, cur), cur === 'gold' || cur === 'crystal' || isHero(cur));
       return;
     }
     const go = () => {
-      const res = cur === 'hero' ? G.heroPull(n) : G.gachaPull(n, cur);
+      const res = isHero(cur) ? G.heroPull(n, heroCur(cur)) : G.gachaPull(n, cur);
       if (!res.ok) { gachaMsg(shortMsg(n, cur)); return; }
       lastPull = { n, cur };
       gachaMsg('');
@@ -663,7 +670,7 @@
     res.results.forEach((r, i) => ul.appendChild(pullCard(r, i)));
     $('pull-eyebrow').textContent = ten ? '열 개의 빛 · 하나씩 깨어나는 축복' : '숲이 간직한 빛';
     $('pull-title').textContent = res.best === 3 ? '★★★ 밤을 가르는 전설' : res.best === 2 ? '★★ 달빛에 새겨진 축복' : '★ 등불에 깃든 축복';
-    $('pull-note').textContent = '★★★까지 ' + (lastPull.cur === 'hero' ? G.heroPityLeft() : res.pityLeft) + '회';
+    $('pull-note').textContent = '★★★까지 ' + (isHero(lastPull.cur) ? G.heroPityLeft() : res.pityLeft) + '회';
     $('pull-whisper').textContent = '숲의 기억이 등불에 모입니다';
     pullPhase = 'charge';
     if (reducedMotion()) { finishPull(); return; }
@@ -727,14 +734,14 @@
     [...$('pull-cards').children].forEach((li) => { li.classList.add('is-flipped'); li.removeAttribute('aria-hidden'); });
     pullPhase = 'done';
     const again = $('pull-again');
-    const canAgain = lastPull && lastPull.cur !== 'free' && (lastPull.cur === 'hero' ? G.heroCanAfford(lastPull.n) : G.gachaCanAfford(lastPull.n, lastPull.cur));
+    const canAgain = lastPull && lastPull.cur !== 'free' && canPull(lastPull.n, lastPull.cur);
     again.hidden = !canAgain;
     if (canAgain) {
       again.textContent = '';
       again.appendChild(el('span', '', (lastPull.n === 10 ? '10회 더' : '한 번 더')));
-      if (lastPull.cur === 'gold' || lastPull.cur === 'crystal' || lastPull.cur === 'hero') {
-        again.appendChild(el('span', lastPull.cur === 'gold' ? 'coin' : 'crystal', ''));
-        again.appendChild(el('span', 'again-cost', fmtNum(lastPull.cur === 'hero' ? G.heroCost(lastPull.n) : G.gachaCost(lastPull.n, lastPull.cur))));
+      if (lastPull.cur === 'gold' || lastPull.cur === 'crystal' || isHero(lastPull.cur)) {
+        again.appendChild(el('span', isGoldCur(lastPull.cur) ? 'coin' : 'crystal', ''));
+        again.appendChild(el('span', 'again-cost', fmtNum(pullCost(lastPull.n, lastPull.cur))));
       }
     }
     pullLater(60, () => { if (pullPhase === 'done') $('pull-ok').focus({ preventScroll: true }); });
@@ -849,7 +856,7 @@
     const body = $('odds-body');
     body.textContent = '';
     const c = G.GACHA.costs;
-    body.appendChild(el('p', 'odds-cost', hero ? '별빛 결정 · 1회 ' + fmtNum(G.heroCost(1)) + ' / 10회 ' + fmtNum(G.heroCost(10)) : '가격: 금화 1회 ' + fmtNum(c.gold.one) + ' · 10회 ' + fmtNum(c.gold.ten) +
+    body.appendChild(el('p', 'odds-cost', hero ? '가격: 별빛 결정 1회 ' + fmtNum(G.heroCost(1)) + ' · 10회 ' + fmtNum(G.heroCost(10)) + ' / 금화 1회 ' + fmtNum(G.heroCost(1, 'gold')) + ' · 10회 ' + fmtNum(G.heroCost(10, 'gold')) : '가격: 금화 1회 ' + fmtNum(c.gold.one) + ' · 10회 ' + fmtNum(c.gold.ten) +
       ' / 별빛 결정 1회 ' + fmtNum(c.crystal.one) + ' · 10회 ' + fmtNum(c.crystal.ten)));
     o.groups.forEach((g) => {
       const sec = el('section', 'odds-group star-' + g.star);
@@ -910,7 +917,7 @@
       if (r.ok) {
         sfx('coin');
         renderStore();
-        infoDialog('구매 완료' + (r.debug ? ' (시험 지급)' : ''), grantText(r.granted || {}));
+        infoDialog('구매 완료' + (r.beta ? ' (베타 무료)' : r.debug ? ' (시험 지급)' : ''), grantText(r.granted || {}));
       } else if (r.reason === 'unavailable') {
         infoDialog('구글 플레이 앱에서 구매할 수 있습니다', '웹 버전에서는 결제를 할 수 없습니다. 구글 플레이에서 HOLLOWLIGHT 앱을 받으면 같은 상품을 살 수 있습니다.');
       } else if (r.reason === 'limit') {
@@ -986,6 +993,7 @@
     refreshGold();
     const body = $('store-body');
     body.textContent = '';
+    if (G.billing.beta) body.appendChild(el('p', 'store-web', '베타 버전: 모든 상품을 결제 없이 무료로 받을 수 있습니다.'));
     if (!G.billing.available()) {
       body.appendChild(el('p', 'store-web', '웹에서는 결제할 수 없습니다. 상품은 구글 플레이 앱에서 구매할 수 있습니다.'));
     }
@@ -1051,6 +1059,7 @@
     if (typeof s.fps !== 'boolean') s.fps = false;
     if (['auto', 'high', 'medium', 'low'].indexOf(s.quality) === -1) s.quality = 'auto';
     if (s.fxQuality !== 'low') s.fxQuality = 'high';
+    if (['both', 'rate', 'total', 'off'].indexOf(s.dps) === -1) s.dps = 'both';
     return s;
   }
 
@@ -1058,6 +1067,11 @@
     const q = settingsObj().quality;
     document.querySelectorAll('#set-quality .seg-btn').forEach((b) => {
       const on = b.dataset.q === q;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-checked', String(on));
+    });
+    document.querySelectorAll('#set-dps .seg-btn').forEach((b) => {
+      const on = b.dataset.q === settingsObj().dps;
       b.classList.toggle('is-on', on);
       b.setAttribute('aria-checked', String(on));
     });
@@ -1132,6 +1146,10 @@
       sfx('click');
       renderQuality();
     }));
+    document.querySelectorAll('#set-dps .seg-btn').forEach((b) => b.addEventListener('click', () => {
+      s().dps = b.dataset.q;
+      saveSettings(); sfx('click'); renderQuality();
+    }));
     document.querySelectorAll('#set-fx-quality .seg-btn').forEach((b) => b.addEventListener('click', () => {
       s().fxQuality = b.dataset.q;
       saveSettings(); sfx('click'); renderQuality();
@@ -1156,7 +1174,9 @@
       const r = G.redeemCoupon ? G.redeemCoupon(code) : { ok: false, reason: 'invalid' };
       if (r.ok) {
         sfx('coin');
-        msg.textContent = '금화 ' + Number(r.gold).toLocaleString('ko-KR') + ' · 별빛 결정 ' + Number(r.crystals).toLocaleString('ko-KR') + '가 되었습니다' + (r.granted.speedMode ? ' · 배속이 열렸습니다(일시정지 화면에서 바꿉니다)' : '');
+        const onlySpeed = r.granted.speedMode && !r.granted.gold && !r.granted.crystals;
+        msg.textContent = onlySpeed ? '배속이 열렸습니다(일시정지 화면에서 바꿉니다)'
+          : '금화 ' + Number(r.gold).toLocaleString('ko-KR') + ' · 별빛 결정 ' + Number(r.crystals).toLocaleString('ko-KR') + '가 되었습니다' + (r.granted.speedMode ? ' · 배속이 열렸습니다(일시정지 화면에서 바꿉니다)' : '');
         msg.dataset.state = 'ok';
         couponInput.value = '';
         refreshGold();

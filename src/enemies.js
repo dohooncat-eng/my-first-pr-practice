@@ -55,6 +55,10 @@
     const crit = !soft && Math.random() < s.crit;
     if (crit) dmg *= s.critMult;
     dmg = Math.max(1, Math.round(dmg));
+    // 딜량 기록 (무기별, 판마다 새로). 남은 체력보다 많이 준 피해는 넘친 만큼 빼고 센다
+    if (game._dmgOwner !== game.player) { game._dmgOwner = game.player; game.dmgStats = {}; }
+    const dk = G.curWeaponKey || 'etc';
+    game.dmgStats[dk] = (game.dmgStats[dk] || 0) + Math.min(dmg, Math.max(0, e.hp));
     e.hp -= dmg;
     if (!soft) e.flash = 0.1;
     const resist = e.boss ? 0.05 : e.elite ? 0.2 : G.ENEMY_TYPES[e.type] && G.ENEMY_TYPES[e.type].role === 'tank' ? 0.45 : 1;
@@ -116,7 +120,10 @@
   };
 
   // 원거리 적: 사거리 밖이면 다가가고, 너무 가까우면 물러난다. 사거리 안에서 0.6초 조준(빨간 선) 뒤 그 방향으로 한 발
+  // 탄은 조준선이 보여 준 거리(사거리의 1.2배)까지만 날아가고 사라진다
   const AIM = 0.6;
+  const REACH = 1.2;
+  const SHOT_SPEED = 230;
   function rangedAi(game, e, t, d, dt, setMove) {
     const p = game.player;
     setMove(d > t.range + 30 ? 1 : d < t.range - 70 ? -0.8 : 0.15);
@@ -126,14 +133,14 @@
     if (!e.aiming && e.shot <= AIM) {
       e.aiming = true;
       e.aimA = Math.atan2(p.y - e.y, p.x - e.x);
-      if (game.telegraphs.length < 80) game.telegraphs.push({ kind: 'line', x: e.x, y: e.y, angle: e.aimA, len: 64, width: 5, life: AIM, max: AIM });
+      if (game.telegraphs.length < 80) game.telegraphs.push({ kind: 'line', x: e.x, y: e.y - 14, angle: e.aimA, len: t.range * REACH, width: 5, life: AIM, max: AIM });
     }
     if (e.aiming) {
       setMove(0);
       if (e.shot <= 0) {
         e.aiming = false;
         e.shot = t.cd * G.rand(0.85, 1.15);
-        G.fireEnemyBullet(game, e.x, e.y - 14, e.aimA, 230, e.damage, t.shot);
+        G.fireEnemyBullet(game, e.x, e.y - 14, e.aimA, SHOT_SPEED, e.damage, t.shot, t.range * REACH);
       }
     }
   }

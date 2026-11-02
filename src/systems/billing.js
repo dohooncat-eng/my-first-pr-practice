@@ -6,6 +6,8 @@
   'use strict';
 
   const DEBUG = /[?&]debug\b/.test(location.search);
+  // 베타: 결제 없이 모든 상품을 무료로 지급한다. 구글 플레이 출시 빌드에서는 반드시 false로
+  const BETA_FREE = true;
   const INTERSTITIAL_EVERY = 3;
 
   function native() { return window.HollowlightNative || null; }
@@ -43,8 +45,9 @@
   G.billing = {
     available() {
       const n = native();
-      return !!(n && n.purchase) || DEBUG;
+      return !!(n && n.purchase) || DEBUG || BETA_FREE;
     },
+    beta: BETA_FREE,
     purchase(id) {
       const product = G.storeProduct(id);
       if (!product) return Promise.resolve({ ok: false, reason: 'unknown' });
@@ -56,8 +59,8 @@
           () => ({ ok: false, reason: 'cancelled' }),
         );
       }
-      if (!DEBUG) return Promise.resolve({ ok: false, reason: 'unavailable' });
-      return Promise.resolve({ ok: true, granted: grant(product), debug: true });
+      if (!DEBUG && !BETA_FREE) return Promise.resolve({ ok: false, reason: 'unavailable' });
+      return Promise.resolve({ ok: true, granted: grant(product), debug: true, beta: BETA_FREE });
     },
   };
 

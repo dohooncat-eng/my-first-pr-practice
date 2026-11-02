@@ -57,6 +57,46 @@
     if (special) diamond(ctx, x + size - 4, y + 4, 3, '#ffe6a4');
   }
   function compact(n) { return n >= 10000 ? (Math.floor(n / 1000) / 10).toFixed(1) + '만' : String(n); }
+  // 딜량 표: 무기별 누적 피해, 초당 피해, 비율 (오른쪽, 많이 준 순서로 최대 6개)
+  const dpsRows = [];
+  function drawDps(ctx, game, R, y, narrow, flat) {
+    const stats = game._dmgOwner === game.player && game.dmgStats;
+    const mode = (game.settings && game.settings.dps) || 'both'; // both | rate | total | off
+    if (!stats || flat || mode === 'off') return;
+    dpsRows.length = 0;
+    let total = 0;
+    for (const k in stats) { total += stats[k]; dpsRows.push(k); }
+    if (!total) return;
+    dpsRows.sort((a, b) => stats[b] - stats[a]);
+    const n = Math.min(narrow ? 4 : 6, dpsRows.length);
+    const bw = (narrow ? 128 : 168) + (mode === 'both' ? (narrow ? 26 : 34) : 0), rowH = narrow ? 20 : 24, x = R - bw;
+    const secs = Math.max(1, game.time);
+    plate(ctx, x, y, bw, 20 + n * rowH + 4, '#7f7650');
+    ctx.font = '600 9px ' + BODY; ctx.textAlign = 'left'; ctx.fillStyle = '#c7b47e';
+    ctx.fillText('딜량', x + 8, y + 14);
+    ctx.textAlign = 'right'; ctx.fillStyle = '#9fae92';
+    ctx.fillText('총 ' + compact(Math.round(total)) + ' · 초당 ' + compact(Math.round(total / secs)), x + bw - 8, y + 14);
+    for (let i = 0; i < n; i++) {
+      const k = dpsRows[i], v = stats[k], ry = y + 20 + i * rowH;
+      const share = v / total;
+      const isz = rowH - 6;
+      const im = k !== 'etc' && icon(k);
+      if (im) ctx.drawImage(im, x + 6, ry + 2, isz, isz);
+      else { ctx.fillStyle = '#3a4a3c'; ctx.fillRect(x + 6, ry + 2, isz, isz); }
+      const tx = x + 10 + isz, barW = bw - (tx - x) - 8;
+      ctx.fillStyle = '#06120e'; ctx.fillRect(tx, ry + rowH - 8, barW, 4);
+      ctx.fillStyle = i === 0 ? '#e9b45c' : '#8fb39a'; ctx.fillRect(tx, ry + rowH - 8, barW * share, 4);
+      const def = G.WEAPONS[k];
+      const name = k === 'etc' ? '기타' : (def && def.name) || k;
+      ctx.font = '600 ' + (narrow ? 9 : 10) + 'px ' + BODY; ctx.textAlign = 'left'; ctx.fillStyle = '#e8dcb6';
+      ctx.fillText(name, tx, ry + rowH - 11, barW * 0.55);
+      ctx.textAlign = 'right'; ctx.fillStyle = '#f1d49a';
+      const rate = compact(Math.round(v / secs)) + '/초', sum = compact(Math.round(v));
+      const val = mode === 'rate' ? rate : mode === 'total' ? sum : sum + ' · ' + rate;
+      ctx.fillText(val + ' · ' + Math.round(share * 100) + '%', x + bw - 8, ry + rowH - 11);
+    }
+  }
+
   G.drawHUD = function (ctx, game) {
     const p = game.player; if (!p) return;
     const w = game.w, s = game.safe || SAFE, T = s.t;
@@ -179,6 +219,7 @@
     if (game.settings && game.settings.fps) {
       ctx.font = '600 10px ' + BODY; ctx.textAlign = 'right'; ctx.fillStyle = '#afbf9a'; ctx.fillText(Math.round(game.fps || 0) + ' FPS', R, mapY + mapR + 16);
     }
+    drawDps(ctx, game, R, Math.max(mapY + mapR + 24, narrow ? bannerY + 18 : 0), narrow, flat);
     const st = G.input && G.input.stick;
     if (st && st.active && game.state === 'playing') {
       const radius = G.input.STICK_RADIUS;

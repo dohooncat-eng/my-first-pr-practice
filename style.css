@@ -247,7 +247,7 @@ ul { padding:0; list-style:none; }
 .pull-btn { min-height:62px; }
 .pull-btn.is-short { opacity:.58; }
 [data-mode="gear"] .pull-group-hero,[data-mode="hero"] .pull-group:not(.pull-group-hero),[data-mode="hero"] .pull-extra { display:none; }
-[data-mode="hero"] .pull-grid { grid-template-columns:1fr; max-width:620px; width:100%; align-self:center; }
+[data-mode="hero"] .pull-grid { grid-template-columns:repeat(2,minmax(0,1fr)); max-width:900px; width:100%; align-self:center; }
 .pull-extra { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
 .pull-extra .pull-btn { min-height:44px; }
 .btn-ad::before { content:"AD"; font:9px var(--font-body); border:1px solid #afcfb7; padding:3px; color:#c5dfc7; }
@@ -1405,6 +1405,7 @@ html.reduce-motion .ch-drop .chest-drop, html.reduce-motion .ch-shake .chest-sha
   [data-mode="hero"] .altar-heroes { inset:18% 3% 22%; }
   [data-mode="hero"] .altar-heroes img { width:32%; margin:0; }
   .pull-grid { grid-template-columns:1fr; gap:10px; }
+  [data-mode="hero"] .pull-grid { grid-template-columns:1fr; }
   .pull-group { padding:10px; gap:8px; }
   .pull-label { font-size:11px; }
   .pull-btn { min-height:58px; }
