@@ -12,8 +12,8 @@
     const st = stage(game);
     const minutes = G.curveTime(game) / 60;
     const scale = elite ? 1.8 : 1;
-    // 체력 배율: 5분 4.9배 · 8분 11배 · 10분 18배 · 15분 44배 · 20분 87배 (예전 곡선으로 되돌림)
-    const growth = (0.1 * minutes + 0.11 * minutes * minutes + 0.005 * minutes * minutes * minutes) * st.growth;
+    // 체력 배율: 5분 4.1배 · 10분 14배 · 15분 33배 · 20분 64배 (후반에 너무 단단하지 않게)
+    const growth = (0.07 * minutes + 0.095 * minutes * minutes + 0.003 * minutes * minutes * minutes) * st.growth;
     const diff = game.difficulty || G.DIFFICULTIES[0];
     // 난이도 체력 배율은 처음엔 1/4만 걸리고 8분에 걸쳐 끝까지 오른다 (첫 무기로도 시작할 수 있게)
     const diffHp = 1 + (diff.hp - 1) * (0.25 + 0.75 * Math.min(1, minutes / 8));
@@ -23,7 +23,8 @@
       r: t.r * scale,
       hp, maxHp: hp,
       speed: t.speed * st.speedMul * diff.speed * (1 + Math.min(0.6, minutes * 0.03)) * (elite ? 0.85 : 1),
-      damage: t.damage * st.dmgMul * diff.dmg * (1 + minutes * 0.09) * (elite ? 1.6 : 1),
+      // 첫 5분(곡선)은 피해를 조금 낮춰 강화가 없는 첫 판도 버틸 수 있게 한다
+      damage: t.damage * st.dmgMul * diff.dmg * (1 + minutes * 0.09) * (0.8 + 0.2 * Math.min(1, minutes / 5)) * (elite ? 1.6 : 1),
       xp: elite ? 25 : t.xp,
       elite: !!elite,
       flash: 0, kx: 0, ky: 0, slow: 0, stun: 0,
@@ -106,8 +107,9 @@
       G.burst(game, e.x, e.y, 'rgba(255, 150, 70, 0.9)', 16, 220, true);
       if (Math.random() < 0.3) G.dropItem(game, e.x + 14, e.y, 'heal');
       G.dropItem(game, e.x - 14, e.y, 'coin', 5);
-      // 엘리트는 항상 상자를 떨어뜨린다
-      G.dropItem(game, e.x, e.y + 16, 'chest', 'elite');
+      // 상자는 엘리트 두 마리에 하나 (첫 엘리트는 준다)
+      game.director.eliteKills = (game.director.eliteKills || 0) + 1;
+      if (game.director.eliteKills % 2 === 1) G.dropItem(game, e.x, e.y + 16, 'chest', 'elite');
       G.addShake(game, 8);
     } else {
       const r = Math.random();
@@ -174,11 +176,11 @@
       } else {
         if (e.slow <= 0) e.slowMul = 0;
         let sp = e.speed * (e.slow > 0 ? (e.slowMul || 0.55) : 1);
-        if (t.hop) sp *= 0.55 + Math.max(0, Math.sin(game.time * 5 + e.phase)) * 1.1;
+        if (t.hop) sp *= 0.55 + Math.max(0, Math.sin(game.clock * 5 + e.phase)) * 1.1;
         vx = (dx / d) * sp;
         vy = (dy / d) * sp;
         if (t.wobble) {
-          const wv = Math.sin(game.time * 5 + e.phase) * 0.7;
+          const wv = Math.sin(game.clock * 5 + e.phase) * 0.7;
           vx += (-dy / d) * sp * wv;
           vy += (dx / d) * sp * wv;
         }

@@ -50,6 +50,7 @@
     game.runGold = 0;
     game.pendingLevelUps = 0;
     game.chestQueue = []; // 주운 상자의 출처 'elite' | 'boss'
+    game.bossDeath = null;
     game.currentChoices = null;
     game.lastSettle = null;
     game.shake = 0;
@@ -265,7 +266,8 @@
     // 배속: 판 시간과 적 등장만 빨라지고, 움직임·공격은 그대로
     // 히트스톱·감속에도 판 시계와 등장 일정은 실제 간격을 따른다.
     const tdt = realDt * G.speedMul();
-    game.time += tdt;
+    // 보스와 싸우는 동안(죽는 연출까지)은 판 시계가 멈춘다. 전투 타이머는 game.clock을 쓴다.
+    if (!game.boss && !game.bossDeath) game.time += tdt;
     const p = game.player;
     if (dt > 0) {
       G.updatePlayer(game, dt);
@@ -312,8 +314,9 @@
     // 판 시간이 다 되면 시간은 멈추고 최종 보스가 나온다. 쓰러뜨리면 클리어(시간 제한 없음)
     if (game.time >= G.runTime(game)) {
       game.time = G.runTime(game);
-      if (game.finalBossDown) { endRun(true); return; }
+      if (game.finalBossDown && !game.bossDeath) { endRun(true); return; }
     }
+    if (game.bossDeath) return; // 죽는 연출은 상자·레벨업 창으로 끊지 않는다
     if (game.chestQueue.length) openChest();
     else if (game.pendingLevelUps > 0) openLevelUp();
   }
@@ -405,6 +408,7 @@
     G.drawRings(ctx, game);
     G.fx.drawGhosts(ctx, game);
     G.drawEnemies(ctx, game);
+    G.drawBossDeath(ctx, game);
     const dying = game.state === 'dying' || game.state === 'end';
     if (!dying) G.drawPlayer(ctx, game);
     G.drawProjectiles(ctx, game);

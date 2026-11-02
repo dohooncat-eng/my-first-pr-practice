@@ -201,7 +201,7 @@
       e.slowMul = Math.min(e.slowMul || 1, 0.6);
       if (!e.boss) {
         e.chillN = (e.chillN || 0) + fx.chill;
-        if (e.chillN >= 4) { e.chillN = 0; e.stun = Math.max(e.stun || 0, 1); e.frozenUntil = game.time + 1; }
+        if (e.chillN >= 4) { e.chillN = 0; e.stun = Math.max(e.stun || 0, 1); e.frozenUntil = game.clock + 1; }
       }
     }
     if (fx.stun && !e.boss && Math.random() < 0.5) e.stun = Math.max(e.stun || 0, fx.stun);
@@ -212,7 +212,7 @@
       e.ky += (dy / d) * fx.knock * res;
     }
     if (fx.lifesteal && p.hp > 0) {
-      const now = game.time;
+      const now = game.clock;
       if (game.lsSec !== Math.floor(now)) { game.lsSec = Math.floor(now); game.lsLeft = 6; } // 1초에 최대 6 회복
       const h = Math.min(game.lsLeft, dmg * fx.lifesteal);
       if (h > 0) { p.hp = Math.min(p.maxHp, p.hp + h); game.lsLeft -= h; }
@@ -265,7 +265,7 @@
   G.drawDotGlow = function (ctx, game) {
     for (const e of game.enemies) {
       if (e.dead) continue;
-      const col = e.frozenUntil > game.time ? 'rgba(150, 225, 255, 0.7)' : e.burnT > 0 ? 'rgba(255, 140, 60, 0.6)' : e.poisonT > 0 ? 'rgba(150, 230, 90, 0.55)' : null;
+      const col = e.frozenUntil > game.clock ? 'rgba(150, 225, 255, 0.7)' : e.burnT > 0 ? 'rgba(255, 140, 60, 0.6)' : e.poisonT > 0 ? 'rgba(150, 230, 90, 0.55)' : null;
       if (col && G.inView(game, e.x, e.y, 30)) G.drawGlow(ctx, col, e.x, e.y, e.r * 1.6, 0.5);
     }
   };

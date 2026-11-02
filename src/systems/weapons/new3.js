@@ -16,11 +16,11 @@
     if (e.frost < s.freezeAt) return;
     e.frost = 0;
     e.stun = Math.max(e.stun || 0, s.freeze);
-    if (!(e.frozenUntil > game.time)) {
+    if (!(e.frozenUntil > game.clock)) {
       const list = G.fxList(w, 'frozen');
       if (list.length < 120) list.push(e);
     }
-    e.frozenUntil = game.time + s.freeze;
+    e.frozenUntil = game.clock + s.freeze;
     if (game.particles.length < 250) G.burst(game, e.x, e.y, 'rgba(190, 240, 255, 0.9)', 6, 120, true);
   }
 
@@ -64,7 +64,7 @@
     if (frozen && frozen.length) {
       for (let i = frozen.length - 1; i >= 0; i--) {
         const e = frozen[i];
-        if (e.dead || !(e.frozenUntil > game.time)) frozen.splice(i, 1);
+        if (e.dead || !(e.frozenUntil > game.clock)) frozen.splice(i, 1);
       }
     }
   }

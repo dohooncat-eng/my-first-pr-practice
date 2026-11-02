@@ -14,12 +14,15 @@
     return d;
   };
 
-  function pickRole(m) {
+  // 한 번에 살아 있는 원거리 적 상한 (후반에 탄이 화면을 덮지 않게)
+  const MAX_RANGED = 12;
+
+  function pickRole(m, noRanged) {
     const w = {
-      basic: 1,
+      basic: 1.2,
       fast: m >= 1 ? 0.45 + m * 0.05 : 0,
       tank: m >= 3 ? 0.12 + m * 0.035 : 0,
-      ranged: m >= 2 ? 0.2 + m * 0.012 : 0,
+      ranged: m >= 3 && !noRanged ? 0.08 + m * 0.004 : 0,
     };
     let r = Math.random() * (w.basic + w.fast + w.tank + w.ranged);
     if ((r -= w.basic) < 0) return 'basic';
@@ -29,6 +32,8 @@
   }
 
   G.updateSpawner = function (game, dt) {
+    // 보스전은 보스가 주인공: 끝날 때까지 잡몹·엘리트·떼가 나오지 않는다
+    if (game.boss || game.bossDeath) return;
     const d = game.director;
     const roster = game.stage.enemies;
     const t = G.curveTime(game), m = t / 60; // 20분 곡선 위의 위치
@@ -37,14 +42,20 @@
     // 0분 0.5 → 2분 1.9 → 4분 4.6 → 6분 8.3 → 8분 13 → 10분 18 → 15분 31 → 20분 43마리(× crowd), 마지막 2분은 더 몰려온다
     // 짧은 판은 곡선을 빨리 지나가므로 1초에 그만큼 더 내보내, 한 판에 만나는 적 수를 20분 판과 맞춘다. 그 위에 1.4배.
     const diff = game.difficulty;
-    // 최종 보스와 싸우는 동안은 절반만
-    const crowd = 2.6 * G.WIN_TIME / G.runTime(game) * (game.boss && game.boss.final ? 0.5 : 1);
+    // 처음 8분(곡선)은 절반에서 시작해 차츰 늘어난다 (첫 판이 너무 어렵지 않게)
+    const crowd = 3 * G.WIN_TIME / G.runTime(game) * (0.5 + 0.5 * Math.min(1, m / 8));
     const rate = (0.5 + m * 0.3 + m * m * 0.2 - m * m * m * 0.0055 + (m >= 18 ? 3 : 0)) * diff.spawn * crowd;
     if (game.enemies.length < G.MAX_ENEMIES) d.acc += rate * dt;
-    while (d.acc >= 1) {
-      d.acc -= 1;
-      const pt = G.spawnPoint(game);
-      G.spawnEnemy(game, roster[pickRole(m)], pt.x, pt.y, false);
+    if (d.acc >= 1) {
+      let ranged = 0;
+      for (const e of game.enemies) if (!e.dead && e.type === roster.ranged) ranged++;
+      while (d.acc >= 1) {
+        d.acc -= 1;
+        const pt = G.spawnPoint(game);
+        const role = pickRole(m, ranged >= MAX_RANGED);
+        if (role === 'ranged') ranged++;
+        G.spawnEnemy(game, roster[role], pt.x, pt.y, false);
+      }
     }
 
     if (t >= d.nextElite) {

@@ -3,6 +3,18 @@
 (function (G) {
   'use strict';
 
+  // 전장을 비운다: 잡몹은 보상 없이 흩어지고, 적 탄과 경고도 사라진다
+  function clearField(game) {
+    let shown = 0;
+    for (const m of game.enemies) {
+      if (m.dead || m.boss) continue;
+      m.dead = true;
+      if (shown++ < 30 && G.inView(game, m.x, m.y, 40)) G.burst(game, m.x, m.y, G.ENEMY_TYPES[m.type].color, 3, 110);
+    }
+    game.enemyBullets.length = 0;
+    game.telegraphs.length = 0;
+  }
+
   G.spawnBoss = function (game, index, silent) {
     const st = game.stage;
     const type = st.boss;
@@ -11,12 +23,13 @@
     const diff = game.difficulty || G.DIFFICULTIES[0];
     const hp = bt.hp * st.hpMul * diff.bossHp * G.BOSS_HP_SCALE[Math.min(index, G.BOSS_HP_SCALE.length - 1)];
     const final = index >= 2;
+    if (!silent) clearField(game);
     const e = {
       id: G.nextEnemyId(), type, boss: true, index, final, name: (final ? '최종 보스 · ' : '') + bt.name,
-      x: pt.x, y: pt.y, r: bt.r * (final ? 1.3 : 1),
+      x: pt.x, y: pt.y, r: bt.r * (final ? 1.5 : 1.15),
       hp, maxHp: hp,
       speed: bt.speed * st.speedMul * diff.speed * (final ? 1.1 : 1),
-      scale: final ? 1.35 : 1,
+      scale: final ? 1.6 : 1.25,
       damage: bt.damage * st.dmgMul * diff.dmg * (1 + index * 0.25),
       xp: 0, elite: false,
       flash: 0, kx: 0, ky: 0, slow: 0, stun: 0,
@@ -268,7 +281,7 @@
         ai.t -= dt;
         e.x += Math.cos(ai.angle) * 620 * dt;
         e.y += Math.sin(ai.angle) * 620 * dt;
-        if (game.time % 0.1 < dt) G.burst(game, e.x, e.y, 'rgba(255, 120, 60, 0.8)', 2, 60, true);
+        if (game.clock % 0.1 < dt) G.burst(game, e.x, e.y, 'rgba(255, 120, 60, 0.8)', 2, 60, true);
         if (ai.t <= 0) { ai.mode = 'recover'; ai.t = 0.9; }
         return 0;
       }
@@ -362,6 +375,7 @@
 
   G.updateBossFx = function (game, dt) {
     const p = game.player;
+    if (game.bossDeath) updateBossDeath(game, dt);
     for (const t of game.telegraphs) {
       t.life -= dt;
       if (t.life <= 0) {
@@ -389,9 +403,40 @@
     G.compact(game.enemyBullets);
   };
 
+  // 보스 쓰러짐: 몸을 떨며 곳곳이 터지고, 마지막에 크게 터지며 보상을 떨어뜨린다
+  // shortcut: 연출 도중 앱을 끄면 중간 보스 상자가 사라진다. 저장 형식을 늘릴 만큼 잦지 않아 그대로 둔다.
   G.onBossKilled = function (game, e) {
     if (game.boss === e) game.boss = null;
-    if (e.final) game.finalBossDown = true;
+    if (e.final) game.finalBossDown = true; // 저장돼도 이어하면 바로 클리어로 끝나게 먼저 표시한다
+    clearField(game);
+    const sp = G.BOSS_SPRITE;
+    game.bossDeath = { e, t: 0, max: e.final ? 3 : 2, next: 0, feet: sp.feet * e.scale, frame: Math.floor(game.fx.anim * sp.fps + e.phase) % 4, flip: game.player.x < e.x };
+    G.screenFlash(game, '255, 240, 210', 0.35, 0.4);
+    G.addShake(game, 8);
+    if (G.sfx) G.sfx.play('elite');
+  };
+
+  function updateBossDeath(game, dt) {
+    const d = game.bossDeath, e = d.e;
+    d.t += dt;
+    d.next -= dt;
+    if (d.next <= 0 && d.t < d.max) {
+      const k = d.t / d.max;
+      d.next = 0.26 - k * 0.16; // 끝으로 갈수록 빠르게
+      const x = e.x + G.rand(-e.r, e.r), y = e.y + G.rand(-e.r * 1.4, e.r * 0.4);
+      G.burst(game, x, y, G.BOSS_TYPES[e.type].color, 8, 200);
+      G.burst(game, x, y, 'rgba(255, 215, 130, 0.95)', 6, 170, true);
+      G.ring(game, x, y, 6, 50 + k * 50, 0.3, 'rgba(255, 225, 160, 0.9)', 3);
+      G.addShake(game, 2 + k * 3);
+      if (G.sfx) G.sfx.play('killBig');
+    }
+    if (d.t >= d.max) {
+      game.bossDeath = null;
+      finishBoss(game, e);
+    }
+  }
+
+  function finishBoss(game, e) {
     const st = game.stage;
     if (!e.final) G.dropItem(game, e.x, e.y + 10, 'chest', 'boss');
     G.dropItem(game, e.x + 30, e.y, 'coin', Math.round(30 * st.goldMul));
@@ -405,6 +450,21 @@
     G.ring(game, e.x, e.y, 10, 200, 0.6, 'rgba(255, 255, 240, 0.9)', 4);
     G.announce(game, e.final ? '새벽이 밝아옵니다!' : e.name + ' 처치! 상자를 떨어뜨렸습니다');
     if (G.sfx) G.sfx.play('bossDie');
+  }
+
+  G.drawBossDeath = function (ctx, game) {
+    const d = game.bossDeath;
+    if (!d) return;
+    const e = d.e, k = d.t / d.max;
+    const spr = G.art.get('boss_' + e.type, d.frame);
+    if (!spr) return;
+    const shake = game.fx.quiet ? 0 : 2 + k * 7;
+    const a = ctx.globalAlpha;
+    ctx.globalAlpha = k < 0.8 ? 1 : (1 - k) / 0.2;
+    // 조금 부풀면서 점점 하얗게 타오른다
+    G.drawSprite(ctx, G.unitSprite(spr, G.BOSS_SPRITE), e.x + G.rand(-shake, shake), e.y + d.feet + G.rand(-shake, shake),
+      e.scale * (1 + k * 0.14), d.flip, Math.min(1, k * 1.15 + Math.max(0, Math.sin(d.t * 22)) * 0.2));
+    ctx.globalAlpha = a;
   };
 
   // ---------- 그리기 ----------

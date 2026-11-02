@@ -102,7 +102,7 @@
       }
       mul *= a;
     }
-    if (s.frozenBonus && e.frozenUntil > game.time) mul *= 1 + s.frozenBonus;
+    if (s.frozenBonus && e.frozenUntil > game.clock) mul *= 1 + s.frozenBonus;
     return mul;
   };
   G.hasGlobalFx = function (s) {

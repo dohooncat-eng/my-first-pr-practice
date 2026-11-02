@@ -84,8 +84,8 @@
     let count = 0;
     for (const e of hitList) {
       if (o.cdKey) {
-        if ((e.hitUntil[o.cdKey] || 0) > game.time) continue;
-        e.hitUntil[o.cdKey] = game.time + (o.cd || 0.4);
+        if ((e.hitUntil[o.cdKey] || 0) > game.clock) continue;
+        e.hitUntil[o.cdKey] = game.clock + (o.cd || 0.4);
       }
       let kx = 0, ky = 0;
       if (o.knock) {
