@@ -121,15 +121,15 @@
   // 난이도: 버틸 시간(초), 적 등장량·체력·피해·속도, 엘리트 간격(곡선 초), 보스 체력, 금화 배율, 깰 때마다 받는 결정
   G.DIFFICULTIES = [
     {
-      id: 'normal', name: '보통', desc: '10분 + 최종 보스 · 금화 3배, 결정 80',
+      id: 'normal', name: '보통', desc: '10분 + 최종 보스 · 금화 1배, 결정 80',
       time: 600, spawn: 1, hp: 1, dmg: 1, speed: 1, eliteEvery: 60, bossHp: 1, gold: 1, crystals: 80,
     },
     {
-      id: 'hard', name: '어려움', desc: '15분 + 최종 보스 · 적 1.8배·속도 1.12배 · 금화 8배, 결정 250',
+      id: 'hard', name: '어려움', desc: '15분 + 최종 보스 · 적 1.8배·속도 1.12배 · 금화 2배, 결정 250',
       time: 900, spawn: 1.8, hp: 1.4, dmg: 1.3, speed: 1.12, eliteEvery: 45, bossHp: 1.8, gold: 2, crystals: 250,
     },
     {
-      id: 'max', name: 'MAX', desc: '20분 + 최종 보스 · 적 2.6배·속도 1.25배, 엘리트 30초마다 · 금화 20배, 결정 600',
+      id: 'max', name: 'MAX', desc: '20분 + 최종 보스 · 적 2.6배·속도 1.25배, 엘리트 30초마다 · 금화 4배, 결정 600',
       time: 1200, spawn: 2.6, hp: 2, dmg: 1.5, speed: 1.25, eliteEvery: 30, bossHp: 3, gold: 4, crystals: 600,
     },
   ];
