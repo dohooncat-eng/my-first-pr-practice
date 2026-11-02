@@ -103,7 +103,7 @@ ul { padding:0; list-style:none; }
 .lobby-hero { position:absolute; bottom:16%; left:50%; width:min(72%,350px); height:72%; transform:translateX(-50%); z-index:1; }
 .lobby-hero img { width:100%; height:100%; animation:hero-breathe 5s ease-in-out infinite; }
 .lobby-plinth { position:absolute; left:50%; bottom:-7%; width:min(80%,420px); aspect-ratio:1; transform:translateX(-50%) rotateX(62deg); background:url('assets/sprites/ui_sigil.svg') center/contain no-repeat; }
-.lobby-hero-name { position:absolute; bottom:4%; text-align:center; color:#e5d1a1; font:18px/1.2 var(--font-display); }
+.lobby-hero-name { position:absolute; z-index:2; bottom:4%; text-align:center; color:#e5d1a1; font:18px/1.2 var(--font-display); text-shadow:0 2px 3px #000,0 0 6px #000; }
 .lobby-hero-name::before { content:"◆"; display:block; color:#c5a166; font-size:11px; margin-bottom:5px; }
 .lobby-hero-name small { display:block; font:11px var(--font-body); letter-spacing:.2em; margin-top:4px; color:#9da78e; }
 .lobby-departure { grid-column:2; grid-row:2; align-self:center; display:flex; flex-direction:column; gap:12px; min-width:0; }
@@ -2024,4 +2024,129 @@ html.reduce-motion .ph-burst .pull-lantern { opacity:0; }
   .ch-open .cp-lid,.ch-open .cp-lock { opacity:0; }
   .ch-open .cp-lidopen,.ch-open .cp-beam { opacity:1; transform:none; }
   .ph-burst .pull-lantern { opacity:0; }
+}
+
+/* 밤의 주인: 전장·도감·로비를 잇는 보스 무대. 진행은 게임 연출 시계로 제어한다. */
+.boss-intro { --boss-color:#b1ce83; --boss-reveal:0; --boss-progress:0; --boss-leave:1; position:fixed; inset:0; z-index:9; overflow:hidden; isolation:isolate; background:#070f10; opacity:var(--boss-leave); touch-action:manipulation; }
+.boss-intro-land,.boss-intro-shade { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.boss-intro-land { object-fit:cover; opacity:.27; }
+.boss-intro-shade { background:linear-gradient(0deg,#070e10 1%,#070e1066 50%,#070e10d9),radial-gradient(ellipse at 50% 43%,transparent 10%,#070e10 78%); }
+.boss-intro::after { content:""; position:absolute; inset:10px; border:1px solid #bca46c4d; pointer-events:none; }
+.boss-intro-head { position:absolute; top:max(22px,env(safe-area-inset-top)); left:max(26px,env(safe-area-inset-left)); right:max(26px,env(safe-area-inset-right)); display:flex; justify-content:space-between; align-items:center; color:#d3c6aa; font-size:13px; }
+.boss-intro-pause { width:44px; height:44px; border:1px solid #b3a17666; border-radius:4px; color:#dcc69a; background:#0c1717; font:20px var(--font-display); }
+.boss-intro-band { position:absolute; left:0; right:0; top:15%; min-height:38px; display:grid; place-items:center; border-block:1px solid var(--boss-color); background:#111a18e6; color:var(--boss-color); font:600 13px var(--font-body); letter-spacing:.14em; }
+.boss-intro-stage { position:absolute; width:min(94vw,520px); height:min(94vw,520px); top:45%; left:50%; transform:translate(-50%,-50%); }
+.boss-intro-seal { position:absolute; inset:0; width:100%; height:100%; opacity:.6; transform:rotate(calc((1 - var(--boss-reveal)) * -16deg)); }
+.boss-intro-art { position:absolute; inset:3%; width:94%; height:94%; opacity:calc(.12 + var(--boss-reveal) * .88); transform:translateY(calc((1 - var(--boss-reveal)) * 35px)) scale(calc(.94 + var(--boss-reveal) * .06)); }
+.boss-intro-fallback { position:absolute; inset:27%; border:1px solid var(--boss-color); transform:rotate(45deg); opacity:.15; }
+.boss-intro-copy { position:absolute; top:68%; left:max(24px,env(safe-area-inset-left)); right:max(24px,env(safe-area-inset-right)); text-align:center; opacity:calc(.2 + var(--boss-reveal) * .8); transform:translateY(calc((1 - var(--boss-reveal)) * 12px)); }
+.boss-intro-copy h2 { font:clamp(30px,8.6vw,56px)/1.15 var(--font-display); color:#f5e8cd; text-wrap:balance; }
+#boss-intro-title { color:var(--boss-color); font:600 14px/1.5 var(--font-body); margin-top:12px; }
+.boss-intro-omen { color:#bac2b7; font:13px/1.7 var(--font-body); margin-top:20px; }
+.boss-intro-foot { position:absolute; bottom:max(25px,env(safe-area-inset-bottom)); left:max(28px,env(safe-area-inset-left)); right:max(28px,env(safe-area-inset-right)); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:9px; }
+.boss-intro-foot>span { font-size:11px; color:#a7b5a9; }
+.boss-intro-skip { background:transparent; border:0; color:#f1d99f; font:600 14px var(--font-body); min-height:48px; padding:0 8px; }
+.boss-intro-skip>span { font-size:24px; margin-left:16px; }
+.boss-intro-time { width:100%; height:2px; background:#b0a07833; }
+.boss-intro-time i { display:block; height:100%; background:var(--boss-color); transform-origin:left; transform:scaleX(calc(1 - var(--boss-progress))); }
+.boss-intro.is-final .boss-intro-stage { width:min(108vw,620px); height:min(108vw,620px); top:44%; }
+.boss-intro.is-final .boss-intro-band { color:#ffdfa4; border-color:#d5b575; background:#2a2118eb; }
+.boss-intro.is-final .boss-intro-copy h2 { font-size:clamp(34px,9.2vw,60px); }
+.boss-intro.is-quiet .boss-intro-art,.boss-intro.is-quiet .boss-intro-copy { opacity:1; transform:none; }
+.boss-intro.is-quiet .boss-intro-seal { transform:none; }
+.lobby-boss { position:absolute; right:0; top:1%; width:76%; height:90%; opacity:.64; }
+.lobby-boss>img { width:100%; height:100%; }
+.lobby-boss-name { position:absolute; left:1%; top:4%; z-index:2; max-width:70%; }
+.lobby-boss-name strong { display:block; font:clamp(23px,3vw,38px)/1.2 var(--font-display); color:#e9dfc4; }
+.lobby-boss-name span { display:block; font-size:12px; color:var(--boss-color); margin-top:7px; }
+.lobby-story { display:none; }
+.lobby-hero { left:29%; width:43%; height:59%; bottom:8%; }
+.lobby-hero-name { left:8%; bottom:1%; width:42%; z-index:2; }
+.lobby-plinth { left:29%; width:55%; }
+.stage-thumb .stage-boss-art { position:absolute; width:225px; height:225px; object-fit:contain; right:-8px; top:-14px; opacity:.92; }
+.stage-boss-name { display:flex; flex-direction:column; gap:3px; margin:10px 0 2px; }
+.stage-boss-name>strong { color:var(--boss-color); font:18px/1.25 var(--font-display); }
+.stage-boss-name>span { color:#d6cdb3; font-size:11px; }
+.stage-card,.stage-card:only-child { min-height:360px; }
+.stage-body { padding-top:130px; }
+.stage-desc { max-width:36ch; }
+.codex-tabs { grid-template-columns:repeat(7,minmax(0,1fr)); }
+.boss-codex-note { font-size:13px; line-height:1.65; color:#b7c9b6; margin-bottom:12px; }
+.boss-codex-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 26px; }
+.boss-codex-entry { display:grid; grid-template-columns:128px minmax(0,1fr); align-items:center; gap:14px; padding:14px 0 20px; border-bottom:1px solid #aa93565c; }
+.boss-codex-art { width:128px; height:148px; background:url('assets/sprites/ui_boss_seal.svg') center/contain no-repeat; }
+.boss-codex-art>img { width:100%; height:100%; }
+.boss-codex-copy h3 { font:23px/1.25 var(--font-display); color:#efe3c7; }
+.boss-codex-title { font-size:12px; color:var(--boss-color); margin-top:6px; }
+.boss-codex-pattern { font-size:13px; color:#c9d4bd; margin-top:12px; line-height:1.65; }
+.boss-codex-stage { font-size:11px; color:#b8aa85; margin-top:9px; }
+.end-bosses { display:flex; align-items:center; justify-content:center; gap:15px; padding:10px 0; border-block:1px solid #b6a36d66; text-align:left; }
+.end-bosses>img { width:92px; height:92px; }
+.end-bosses>div { min-width:0; }
+.end-bosses strong,.end-bosses span,.end-bosses small { display:block; }
+.end-bosses strong { color:#f1dfb9; font:20px/1.3 var(--font-display); }
+.end-bosses span { color:var(--boss-color); font-size:12px; margin-top:5px; }
+.end-bosses small { color:#b9c8af; font-size:12px; margin-top:7px; }
+.end-panel:has(.end-bosses:not([hidden]))>.end-emblem { height:68px; width:68px; }
+@media (max-width:600px) {
+  .boss-codex-list { grid-template-columns:1fr; gap:0; }
+  .boss-codex-entry { grid-template-columns:116px minmax(0,1fr); gap:10px; }
+  .boss-codex-art { width:116px; height:144px; }
+  .boss-codex-copy h3 { font-size:21px; }
+  .codex-tabs { display:flex; overflow-x:auto; flex:none; scrollbar-width:thin; }
+  .codex-tabs .tab { flex:1 0 44px; min-width:44px; min-height:46px; padding-inline:4px; font-size:12px; }
+  .stage-card,.stage-card:only-child { min-height:350px; }
+  .stage-thumb .stage-boss-art { width:210px; height:210px; }
+  .stage-body { padding-top:135px; }
+  .end-bosses { gap:10px; }
+  .end-bosses strong { font-size:18px; }
+}
+@media (max-width:600px) and (min-height:501px) {
+  .stage-card:only-child { min-height:min(600px,calc(100dvh - 218px)); }
+  .stage-card:only-child .stage-boss-art { width:90%; height:min(82vw,340px); right:-2%; top:14px; }
+  .lobby-boss { right:-3%; top:4%; width:90%; height:87%; }
+  .lobby-boss-name { top:1%; left:3%; max-width:96%; }
+  .lobby-boss-name strong { font-size:25px; }
+  .lobby-boss-name span { font-size:11px; margin-top:5px; }
+  .lobby-hero { left:24%; top:auto; bottom:4%; width:44%; height:58%; }
+  .lobby-hero-name { left:0; width:48%; bottom:-1px; }
+  .lobby-plinth { left:24%; width:180px; bottom:-42px; }
+}
+@media (max-height:760px) and (max-width:600px) {
+  .boss-intro-band { top:12%; }
+  .boss-intro-stage { top:43%; width:82vw; height:82vw; }
+  .boss-intro.is-final .boss-intro-stage { width:96vw; height:96vw; }
+  .boss-intro-copy { top:66%; }
+  .boss-intro-omen { margin-top:12px; }
+  .lobby-boss { width:80%; right:-6%; top:9%; }
+  .lobby-boss-name strong { font-size:21px; }
+}
+@media (max-height:500px) and (min-width:601px) {
+  .boss-intro-head { top:max(14px,env(safe-area-inset-top)); }
+  .boss-intro-band { top:74px; left:52%; right:24px; width:auto; font-size:12px; min-height:30px; }
+  .boss-intro-stage,.boss-intro.is-final .boss-intro-stage { width:270px; height:270px; left:26%; top:55%; }
+  .boss-intro.is-final .boss-intro-stage { width:310px; height:310px; }
+  .boss-intro-copy { left:50%; right:25px; top:34%; }
+  .boss-intro-copy h2,.boss-intro.is-final .boss-intro-copy h2 { font-size:34px; }
+  #boss-intro-title { font-size:12px; margin-top:10px; }
+  .boss-intro-omen { margin-top:14px; font-size:12px; }
+  .boss-intro-foot { left:52%; bottom:max(20px,env(safe-area-inset-bottom)); right:24px; gap:1px; }
+  .boss-intro-foot>span { font-size:11px; }
+  .boss-intro-skip { font-size:12px; }
+  .lobby-boss-name strong { font-size:20px; }
+  .lobby-boss-name span { font-size:11px; }
+  .lobby-boss { width:84%; right:-9%; }
+  .lobby-hero { width:43%; height:60%; left:25%; bottom:7%; }
+  .lobby-hero-name { left:0; width:46%; }
+  .stage-card,.stage-card:only-child { min-height:300px; }
+  .stage-body { padding-top:90px; }
+  .stage-thumb .stage-boss-art { width:180px; height:180px; }
+  .end-panel>.end-bosses { grid-column:1/-1; padding:5px 0; }
+  .end-bosses>img { width:64px; height:64px; }
+  .end-panel:has(.end-bosses:not([hidden]))>.end-emblem { grid-row:1/4; }
+  .end-panel:has(.end-bosses:not([hidden])) { gap:6px 12px; padding:12px 18px; }
+  .end-panel:has(.end-bosses:not([hidden]))>.stats { padding:6px 0; }
+  .end-panel:has(.end-bosses:not([hidden]))>.end-bosses { padding:2px 0; }
+  .end-panel:has(.end-bosses:not([hidden]))>.end-bosses>img { width:54px; height:54px; }
+  .end-panel:has(.end-bosses:not([hidden])) .end-bosses small { margin-top:3px; }
 }

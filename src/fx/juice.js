@@ -171,8 +171,12 @@
   FX.camera = function (game, dt) {
     const p = game.player, s = game.fx, k = 1 - Math.exp(-dt * 9);
     const lead = s.motion && p.moving ? 22 : 0;
-    game.cam.x += (p.x + p.face.x * lead - game.cam.x) * k;
-    game.cam.y += (p.y + p.face.y * lead - game.cam.y) * k;
+    const boss = game.boss || (game.bossDeath && game.bossDeath.e);
+    const bx = boss ? G.clamp((boss.x - p.x) * 0.32, -game.viewW * 0.18, game.viewW * 0.18) : 0;
+    const by = boss ? G.clamp((boss.y - p.y) * 0.25, -game.viewH * 0.13, game.viewH * 0.13) : 0;
+    const hudLift = boss ? game.viewH * (game.h < 500 ? 0.12 : 0.06) : 0;
+    game.cam.x += (p.x + p.face.x * lead + bx - game.cam.x) * k;
+    game.cam.y += (p.y + p.face.y * lead + by - hudLift - game.cam.y) * k;
   };
   FX.shake = function (game, amount, dx, dy) {
     if (!FX.motion(game)) return;
@@ -206,6 +210,8 @@
   };
   FX.death = function (game, e) {
     const s = game.fx; if (!s || !G.inView(game, e.x, e.y, 140)) return;
+    // 보스의 잔상·폭발은 전용 죽는 연출이 담당한다.
+    if (e.boss) { FX.slow(game, 0.3); FX.shake(game, 12, e.x - game.player.x, e.y - game.player.y); return; }
     const important = e.boss || e.elite;
     const f = e.fxFamily === undefined ? 4 : e.fxFamily;
     if (!s.low || important) {
@@ -277,17 +283,18 @@
     ctx.strokeStyle = COLORS[f]; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(it.x, it.y + 3, 20, 7, 0, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
   };
   FX.drawAtmosphere = function (ctx, game, lx, ly, dying) {
-    const key = game.stage.id + ':' + game.w + ':' + game.h + ':' + game.fx.low;
+    const boss = game.boss || (game.bossDeath && game.bossDeath.e);
+    const key = game.stage.id + ':' + game.w + ':' + game.h + ':' + game.fx.low + ':' + !!boss;
     const w = game.w, h = game.h, pad = 96;
     if (key !== atmosphereKey) {
       atmosphereKey = key;
       const scale = Math.min(0.5, 640 / Math.max(w + pad * 2, h + pad * 2));
       atmosphere = canvas(Math.ceil((w + pad * 2) * scale), Math.ceil((h + pad * 2) * scale));
       const c = atmosphere.getContext('2d'); c.scale(scale, scale);
-      c.fillStyle = (GRADE[game.stage.id] || GRADE.forest) + (game.fx.low ? '0a' : '12'); c.fillRect(0, 0, w + pad * 2, h + pad * 2);
+      c.fillStyle = (GRADE[game.stage.id] || GRADE.forest) + (boss ? '29' : game.fx.low ? '0a' : '12'); c.fillRect(0, 0, w + pad * 2, h + pad * 2);
       const g = c.createRadialGradient(w / 2 + pad, h / 2 + pad, Math.min(w, h) * 0.12, w / 2 + pad, h / 2 + pad, Math.hypot(w, h) * 0.64);
       const dark = game.stage.dark.join(',');
-      g.addColorStop(0, 'rgba(' + dark + ',0)'); g.addColorStop(0.45, 'rgba(' + dark + ',0.2)'); g.addColorStop(1, 'rgba(' + dark + ',0.79)');
+      g.addColorStop(0, 'rgba(' + dark + ',0)'); g.addColorStop(0.45, 'rgba(' + dark + ',' + (boss ? '0.32' : '0.2') + ')'); g.addColorStop(1, 'rgba(' + dark + ',' + (boss ? '0.95' : '0.79') + ')');
       c.fillStyle = g; c.fillRect(0, 0, w + pad * 2, h + pad * 2);
     }
     ctx.globalAlpha = dying ? 1 : 0.92;

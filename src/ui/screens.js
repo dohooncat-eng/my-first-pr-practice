@@ -95,6 +95,7 @@
     SCREENS.forEach((s) => { $('screen-' + s).hidden = s !== name; });
     if (changed && name) { const scroll = $('screen-' + name).querySelector('.menu-content'); if (scroll) scroll.scrollTop = 0; }
     $('pause-btn').hidden = !(name === null && game && game.state === 'playing');
+    if (G.syncBossIntro && game) G.syncBossIntro(game);
     if (name === null && game && game.state === 'playing') {
       const tip = G.evolution.lesson(game);
       if (tip) {
@@ -159,6 +160,12 @@
     game.pickedDifficulty = diff.id;
     $('lobby-stage-name').textContent = st.name;
     $('lobby-stage-thumb').src = G.spriteUrl(st.thumb);
+    const bossInfo = G.bossPresentation(st.boss);
+    $('lobby-boss-art').src = G.spriteUrl('boss_' + st.boss + '_0');
+    $('lobby-boss-name').textContent = G.BOSS_TYPES[st.boss].name;
+    $('lobby-boss-title').textContent = bossInfo.title;
+    $('screen-title').style.setProperty('--boss-color', bossInfo.color);
+    $('screen-title').querySelector('.title-art').src = G.spriteUrl(st.thumb);
     $('lobby-rewards').textContent = '금화 ×' + diff.gold + '  ·  클리어 결정 ' + Math.round(diff.crystals * (1 + G.STAGES.indexOf(st) * 0.5));
     const hero = G.CHAMPIONS[pickedChampion || 'keeper'];
     $('lobby-hero-art').src = G.spriteUrl(hero.sprite + '_0');
@@ -268,6 +275,7 @@
       btn.disabled = !unlocked;
       const thumb = el('span', 'stage-thumb');
       thumb.appendChild(img(G.spriteUrl(st.thumb), '', 0, ''));
+      thumb.appendChild(hideOnError(img(G.spriteUrl('boss_' + st.boss + '_0'), 'stage-boss-art', 0, '')));
       btn.appendChild(thumb);
       const body = el('span', 'stage-body');
       const top = el('span', 'stage-top');
@@ -279,6 +287,10 @@
       body.appendChild(top);
       body.appendChild(el('span', 'stage-name', st.name));
       body.appendChild(el('span', 'stage-desc', st.desc));
+      const bossLine = el('span', 'stage-boss-name');
+      bossLine.append(el('strong', '', G.BOSS_TYPES[st.boss].name), el('span', '', G.bossPresentation(st.boss).title));
+      body.appendChild(bossLine);
+      btn.style.setProperty('--boss-color', G.bossPresentation(st.boss).color);
       const best = m.best && (m.best[st.id + ':' + diff.id] || (diff.id === 'normal' && m.best[st.id] && !m.best[st.id].difficulty ? m.best[st.id] : null));
       if (diffLocked) {
         const lock = el('span', 'stage-lock stage-lock-diff');
@@ -1615,7 +1627,7 @@
 
   // ---------- 도감: 뽑기·업그레이드·무기·패시브·조합을 한곳에서 ----------
 
-  const CODEX_TABS = ['gacha', 'upgrade', 'weapon', 'passive', 'combo', 'world'];
+  const CODEX_TABS = ['gacha', 'upgrade', 'weapon', 'passive', 'combo', 'boss', 'world'];
   let codexTab = 'gacha';
   let codexDetailBack = null;
 
@@ -1720,7 +1732,23 @@
       box.append(more, c);
       renderComboBook(game, c, true);
     }
+    else if (tab === 'boss') renderCodexBosses(box);
     else renderCodexWorld(box);
+  }
+
+  function renderCodexBosses(box) {
+    const list = el('ul', 'boss-codex-list');
+    G.STAGES.forEach((st) => {
+      const info = G.bossPresentation(st.boss), def = G.BOSS_TYPES[st.boss];
+      const entry = el('li', 'boss-codex-entry');
+      entry.style.setProperty('--boss-color', info.color);
+      const art = el('div', 'boss-codex-art');
+      art.appendChild(hideOnError(img(G.spriteUrl('boss_' + st.boss + '_0'), '', 0, '')));
+      const copy = el('div', 'boss-codex-copy');
+      copy.append(el('h3', '', def.name), el('p', 'boss-codex-title', info.title), el('p', 'boss-codex-pattern', info.pattern), el('p', 'boss-codex-stage', st.name));
+      entry.append(art, copy); list.appendChild(entry);
+    });
+    box.append(el('p', 'boss-codex-note', '매 여정 세 번의 조우. 마지막 보스를 쓰러뜨리면 새벽이 옵니다.'), list);
   }
 
   function renderCodexWorld(box) {
@@ -1901,6 +1929,16 @@
     const dName = r.difficultyId && r.difficultyId !== 'normal' && G.difficultyById ? ' ' + G.difficultyById(r.difficultyId).name : '';
     $('end-eyebrow').textContent = st.name + dName + ' · ' + (r.win ? G.formatTime(r.time) + ' 생존' : G.formatTime(r.time) + '에 쓰러짐');
     $('end-title').textContent = r.win ? '새벽이 밝았습니다' : '등불이 꺼졌습니다';
+    const trophies = $('end-bosses'), fallen = g.defeatedBosses || [];
+    trophies.textContent = ''; trophies.hidden = !fallen.length;
+    if (fallen.length) {
+      const last = fallen[fallen.length - 1], info = G.bossPresentation(last.type);
+      trophies.style.setProperty('--boss-color', info.color);
+      trophies.appendChild(hideOnError(img(G.spriteUrl('boss_' + last.type + '_0'), '', 0, '')));
+      const copy = el('div');
+      copy.append(el('strong', '', G.BOSS_TYPES[last.type].name + ' 처치'), el('span', '', info.title), el('small', '', '보스 격파 ' + fallen.length + ' / 3' + (last.final ? ' · 최종 보스 토벌' : '')));
+      trophies.appendChild(copy);
+    }
     $('end-time').textContent = G.formatTime(r.time);
     $('end-level').textContent = r.level;
     $('end-kills').textContent = fmtNum(r.kills);

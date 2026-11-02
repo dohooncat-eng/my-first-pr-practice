@@ -30,6 +30,8 @@
   <div class="lobby-backdrop" aria-hidden="true"><img class="title-art" src="assets/sprites/stage_forest.svg" alt=""></div>
   <div class="title-shade" aria-hidden="true"></div>
   <div class="lobby-scene">
+    <div class="lobby-boss" aria-hidden="true"><img id="lobby-boss-art" src="assets/sprites/boss_treant_0.svg" alt=""></div>
+    <div class="lobby-boss-name"><strong id="lobby-boss-name"></strong><span id="lobby-boss-title"></span></div>
     <div class="lobby-story"><p class="eyebrow">밤의 숲 · 꺼지지 않는 약속</p><p>어둠 속, 하나의 등불</p></div>
     <div class="lobby-hero" aria-hidden="true"><img id="lobby-hero-art" src="assets/sprites/player_0.svg" alt=""></div>
     <div class="lobby-plinth" aria-hidden="true"></div>
@@ -268,6 +270,7 @@
       <button id="codex-tab-weapon" class="tab" type="button" role="tab" aria-selected="false">무기</button>
       <button id="codex-tab-passive" class="tab" type="button" role="tab" aria-selected="false">패시브</button>
       <button id="codex-tab-combo" class="tab" type="button" role="tab" aria-selected="false">조합</button>
+      <button id="codex-tab-boss" class="tab" type="button" role="tab" aria-selected="false">보스</button>
       <button id="codex-tab-world" class="tab" type="button" role="tab" aria-selected="false">세계</button>
     </div>
     <div class="menu-content">
@@ -482,6 +485,7 @@
     <img class="end-emblem" src="assets/sprites/ui_crest.svg" alt="">
     <p id="end-eyebrow" class="eyebrow"></p>
     <h2 id="end-title" class="end-title"></h2>
+    <div id="end-bosses" class="end-bosses" hidden></div>
     <dl class="stats">
       <div><dt>버틴 시간</dt><dd id="end-time"></dd></div>
       <div><dt>레벨</dt><dd id="end-level"></dd></div>
@@ -587,6 +591,7 @@
 <script src="src/systems/save.js"></script>
 <script src="src/fx/juice.js"></script>
 <script src="src/ui/hud.js"></script>
+<script src="src/ui/boss-show.js"></script>
 <script src="src/ui/celebrate.js"></script>
 <script src="src/ui/evolution.js"></script>
 <script src="src/ui/screens.js"></script>

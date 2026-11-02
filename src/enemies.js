@@ -226,8 +226,9 @@
   };
 
   function inView(game, e) {
-    return Math.abs(e.x - game.cam.x) < game.viewW / 2 + 120 &&
-      Math.abs(e.y - game.cam.y) < game.viewH / 2 + 120;
+    const margin = e.boss ? G.BOSS_SPRITE.h * e.scale : 120;
+    return Math.abs(e.x - game.cam.x) < game.viewW / 2 + margin &&
+      Math.abs(e.y - game.cam.y) < game.viewH / 2 + margin;
   }
 
   function spec(e) {
@@ -246,7 +247,7 @@
 
     for (const e of vis) {
       const sp = spec(e);
-      if (e.elite || e.boss) {
+      if (e.elite && !e.boss) {
         const pulse = game.fx.quiet ? 0.75 : 0.7 + Math.sin(game.fx.anim * 4 + e.phase) * 0.15;
         ctx.strokeStyle = e.boss ? 'rgba(255, 70, 90, ' + pulse + ')' : 'rgba(255, 107, 61, ' + pulse + ')';
         ctx.lineWidth = e.boss ? 3.5 : 2.5;
@@ -264,9 +265,10 @@
         const hit = Math.max(0, 1 - age / 0.15), squash = game.fx.quiet ? 0 : hit * (e.boss ? 0.045 : 0.12);
         const recoil = game.fx.quiet ? 0 : Math.sin(Math.min(1, age / 0.15) * Math.PI) * (e.boss ? 1.5 : 4);
         const flash = age < 0.065 ? (1 - age / 0.065) * (game.fx.quiet ? 0.35 : 0.92) : 0;
+        const cue = e.boss && e.cueLife > 0 && !game.fx.quiet ? Math.sin(Math.min(1, e.cueLife / 0.55) * Math.PI) * 0.04 : 0;
         G.drawSprite(ctx, spr, e.x + stunWobble + (e.fxDX || 0) * recoil,
           e.y + sp.feet * e.scale + bob - (e.lift || 0) + (e.fxDY || 0) * recoil,
-          e.scale, p.x < e.x, flash, 1 + squash, 1 - squash);
+          e.scale, p.x < e.x, flash, 1 + squash - cue, 1 - squash + cue);
       } else {
         const t = e.boss ? G.BOSS_TYPES[e.type] : G.ENEMY_TYPES[e.type];
         if (!game.fx.low || e.elite || e.boss) G.fx.shadow(ctx, e.x, e.y + sp.feet * e.scale, sp.shadow * e.scale);
@@ -293,7 +295,10 @@
   G.drawEnemyGlow = function (ctx, game) {
     for (const e of game._visEnemies || []) {
       if (e.dead) continue;
-      if (e.boss) G.drawGlow(ctx, 'rgba(255, 80, 90, 0.45)', e.x, e.y, e.r * 2.6, 0.6);
+      if (e.boss) {
+        const color = G.bossPresentation(e.type).color;
+        G.fx.disc(ctx, 'boss-light-' + e.type, e.x, e.y - e.r * 0.6, e.r * 2.8, 0.45, color + '4d', color + '08', false);
+      }
       else if (e.elite) G.drawGlow(ctx, 'rgba(255, 90, 50, 0.5)', e.x, e.y, e.r * 2.4, 0.7);
       else if (!game.fx.low && G.ENEMY_TYPES[e.type].role === 'tank' && (e.id & 1) === 0) G.drawGlow(ctx, 'rgba(255, 140, 60, 0.3)', e.x, e.y - 4, e.r * 1.2, 0.3);
     }

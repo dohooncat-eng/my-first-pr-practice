@@ -64,7 +64,7 @@
   };
 
   // 보스: 같은 보스가 중간 보스로 두 번, 판 끝에 최종 보스로 나온다(갈수록 패턴이 늘어난다)
-  G.BOSS_SPRITE = { w: 120, h: 120, ay: 180 / 192, feet: 40, shadow: 46, fps: 5 };
+  G.BOSS_SPRITE = { w: 174, h: 174, ay: 180 / 192, feet: 40, shadow: 58, fps: 5 };
   G.BOSS_TYPES = {
     treant: { name: '고목 수호자', hp: 1400, speed: 40, r: 44, damage: 22, pattern: 'treant', color: '#8fb36a' },
     marshqueen: { name: '늪의 여왕', hp: 1500, speed: 44, r: 44, damage: 24, pattern: 'marshqueen', color: '#b6e35a' },

@@ -299,6 +299,44 @@
         osc(t + 0.3 + i * 0.07, { type: 'sine', f: f * 2.01, release: 0.8, gain: 0.012, dests: S });
       });
     },
+    // 낮은 북·금속 경보·불협화음. 등장과 패턴마다 짧게 합성한다.
+    bossArrival(t) {
+      osc(t, { type: 'sine', f: 62, f1: 31, glide: 1.6, attack: 0.04, release: 1.9, gain: 0.16, dests: S });
+      osc(t, { type: 'sawtooth', f: 82.4, f1: 55, glide: 1.2, attack: 0.12, release: 1.8, gain: 0.07, filter: { type: 'lowpass', f: 650, f1: 150, time: 1.5 }, dests: S });
+      noise(t, { filter: { type: 'lowpass', f: 900, f1: 100, time: 1.4 }, attack: 0.06, release: 1.5, gain: 0.09, dests: S });
+      for (let i = 0; i < 2; i++) {
+        osc(t + 0.16 + i * 0.36, { type: 'triangle', f: 220, f1: 196, release: 0.44, gain: 0.055, dests: S });
+        osc(t + 0.16 + i * 0.36, { type: 'sine', f: 311, release: 0.6, gain: 0.025, dests: S });
+      }
+    },
+    bossFinalArrival(t) {
+      SOUNDS.bossArrival(t);
+      osc(t + 0.62, { type: 'sine', f: 49, f1: 28, glide: 1.3, release: 2, gain: 0.14, dests: S });
+      [110, 155.6, 164.8].forEach((f) => osc(t + 0.65, { type: 'triangle', f, attack: 0.2, release: 1.7, gain: 0.035, dests: S }));
+    },
+    bossGather(t) {
+      osc(t, { type: 'triangle', f: 90, f1: 160, glide: 0.35, attack: 0.1, release: 0.35, gain: 0.055, dests: S });
+    },
+    bossCast(t) {
+      osc(t, { type: 'sine', f: 120, f1: 48, glide: 0.12, release: 0.32, gain: 0.11, dests: S });
+      noise(t, { filter: { type: 'bandpass', f: 1400, f1: 400, time: 0.2 }, release: 0.22, gain: 0.06, dests: S });
+    },
+    bossPulse(t) {
+      SOUNDS.bossCast(t);
+      [146.8, 293.6, 421].forEach((f, i) => osc(t, { type: 'sine', f, release: 0.7, gain: 0.045 / (i + 1), dests: S }));
+    },
+    bossRush(t) {
+      noise(t, { filter: { type: 'bandpass', f: 220, f1: 2400, time: 0.35 }, attack: 0.03, release: 0.5, gain: 0.1, dests: S });
+      osc(t, { type: 'sine', f: 98, f1: 40, release: 0.5, gain: 0.1, dests: S });
+    },
+    bossRage(t) {
+      SOUNDS.bossPulse(t);
+      osc(t, { type: 'sawtooth', f: 73.4, f1: 110, glide: 0.65, attack: 0.08, release: 0.9, gain: 0.065, filter: { type: 'lowpass', f: 350, f1: 900, time: 0.6 }, dests: S });
+    },
+    bossBreak(t) {
+      osc(t, { type: 'sine', f: 82, f1: 36, release: 1.1, gain: 0.12, dests: S });
+      [660, 932, 1244].forEach((f, i) => osc(t + i * 0.09, { type: 'sine', f, release: 0.8, gain: 0.025, dests: S }));
+    },
     boss(t) {
       osc(t, { type: 'sawtooth', f: 62, f1: 46, release: 1.4, gain: 0.12, filter: { type: 'lowpass', f: 700, f1: 160, time: 1.3 }, dests: S });
       osc(t, { type: 'sawtooth', f: 93, f1: 69, detune: 9, release: 1.4, gain: 0.07, filter: { type: 'lowpass', f: 700, f1: 160, time: 1.3 }, dests: S });
@@ -452,6 +490,9 @@
     },
   };
   const SMALL = { p: 1, g: 1 }, BIG = { p: 0.72, g: 1.45 };
+  // 숨결의 반복 발사도 저음이 겹쳐 쌓이지 않도록 연출 소리만 제한한다.
+  Object.assign(GAP, { bossGather: 0.8, bossCast: 0.32, bossPulse: 0.4, bossRush: 0.6, bossRage: 1.2, bossArrival: 1, bossFinalArrival: 1, bossBreak: 1 });
+  Object.assign(MINOR, { bossGather: 1, bossCast: 1 });
   Object.keys(WEAPON_SOUNDS).forEach((k) => {
     SOUNDS['w_' + k] = (t) => WEAPON_SOUNDS[k](t, SMALL);
     SOUNDS['w_' + k + '_big'] = (t) => WEAPON_SOUNDS[k](t, BIG);

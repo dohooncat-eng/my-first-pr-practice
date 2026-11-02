@@ -57,7 +57,7 @@
     };
     Object.keys(G.ENEMY_TYPES || {}).forEach((k) => { LIST[k] = ROLE_SPEC[G.ENEMY_TYPES[k].role]; });
     Object.keys(G.BOSS_TYPES || {}).forEach((k) => {
-      LIST['boss_' + k] = { frames: 4, w: 120, h: 120, ax: 0.5, ay: 180 / 192, res: 2.5 };
+      LIST['boss_' + k] = { frames: 4, w: G.BOSS_SPRITE.w, h: G.BOSS_SPRITE.h, ax: 0.5, ay: 180 / 192, res: 2.5 };
     });
     // 바닥 타일과 장식
     (G.STAGES || []).forEach((st) => {

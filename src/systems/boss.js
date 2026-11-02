@@ -43,12 +43,7 @@
     game.boss = e;
     if (silent) return e;
     G.fx.boss(game, e);
-    const hasBatchim = (bt.name.charCodeAt(bt.name.length - 1) - 0xac00) % 28 !== 0;
-    G.announce(game, final ? bt.name + (hasBatchim ? '이' : '가') + ' 깨어났습니다! 쓰러뜨리면 새벽이 옵니다' : bt.name + (hasBatchim ? '이' : '가') + ' 나타났습니다!');
-    G.addShake(game, 10);
-    G.screenFlash(game, '200, 40, 50', 0.28, 0.9);
-    G.ring(game, e.x, e.y, 20, 260, 0.9, 'rgba(255, 80, 80, 0.9)', 6);
-    if (G.sfx) G.sfx.play('boss');
+    G.beginBossIntro(game, e);
     return e;
   };
 
@@ -69,6 +64,7 @@
   };
 
   function ring(game, e, n, speed, dmg, color, offset) {
+    G.bossCue(game, e, 'nova', true);
     for (let i = 0; i < n; i++) G.fireEnemyBullet(game, e.x, e.y - 10, (offset || 0) + (i / n) * Math.PI * 2, speed, dmg, color);
     if (G.sfx) G.sfx.play('bossShot');
   }
@@ -78,6 +74,7 @@
   const EXTRAS = {
     // 부채꼴 조준 탄
     aimed(game, e, p) {
+      G.bossCue(game, e, 'aimed', true);
       const n = e.final ? 7 : 5;
       const a = Math.atan2(p.y - e.y, p.x - e.x);
       for (let i = 0; i < n; i++) G.fireEnemyBullet(game, e.x, e.y - 10, a + (i - (n - 1) / 2) * 0.15, 240, e.damage * 0.45, 'rgba(255, 150, 70, 0.95)');
@@ -91,6 +88,7 @@
     },
     // 플레이어 주위에 떨어지는 장판
     rain(game, e, p) {
+      G.bossCue(game, e, 'rain', true);
       for (let i = 0; i < 5; i++) {
         const x = p.x + G.rand(-170, 170), y = p.y + G.rand(-170, 170);
         telegraphCircle(game, x, y, 62, 1.1 + i * 0.12, e.damage * 0.9, () => G.burst(game, x, y, 'rgba(255, 120, 90, 0.9)', 10, 200));
@@ -99,6 +97,7 @@
     },
     // 빠른 부하를 둥글게 부른다
     summon(game, e) {
+      G.bossCue(game, e, 'summon', true);
       const kind = game.stage.enemies.fast;
       for (let i = 0; i < 12; i++) {
         const a = (i / 12) * Math.PI * 2;
@@ -115,10 +114,12 @@
     if (stage > e.stage) {
       e.stage = stage;
       const bt = G.BOSS_TYPES[e.type];
-      G.announce(game, bt.name + (stage === 2 ? '이(가) 마지막 힘을 끌어냅니다!' : '이(가) 분노합니다!'));
-      G.screenFlash(game, '200, 40, 50', 0.25, 0.7);
+      e.rageLife = 1.6;
+      G.bossCue(game, e, 'nova', true);
+      G.announce(game, stage === 2 ? '최후의 격노 · 패턴 가속' : '분노 · 패턴 가속');
+      G.screenFlash(game, '235, 170, 110', 0.16, 0.55);
       G.addShake(game, 9);
-      if (G.sfx) G.sfx.play('elite');
+      if (G.sfx) G.sfx.play('bossRage');
     }
     return [1, 1.35, 1.75][e.stage];
   }
@@ -126,6 +127,7 @@
   // ---------- 스테이지 보스 고유 패턴 ----------
   // 부채꼴로 탄을 뿌린다 (가운데가 플레이어 쪽)
   function cone(game, e, p, n, spread, speed, dmg, color) {
+    G.bossCue(game, e, 'aimed', true);
     const a = Math.atan2(p.y - e.y, p.x - e.x);
     for (let i = 0; i < n; i++) G.fireEnemyBullet(game, e.x, e.y - 10, a + (i / (n - 1) - 0.5) * spread, speed * G.rand(0.9, 1.1), dmg, color);
     if (G.sfx) G.sfx.play('bossShot');
@@ -352,11 +354,23 @@
       return;
     }
     const tempo = bossTempo(game, e);
+    // 기존 쿨다운의 끝만 읽어 예고 자세를 만든다. 발사 시각과 탄 수에는 관여하지 않는다.
+    const modeBefore = e.ai.mode, timerA = e.ai.timerA, timerB = e.ai.timerB;
+    if (e.ai.mode === 'walk') {
+      const next = Math.min(timerA, timerB);
+      if (next > 0 && next < 0.55 * tempo && !e.cuePreparing) {
+        e.cuePreparing = true; G.bossCue(game, e, 'gather', false);
+      }
+      if (next > tempo) e.cuePreparing = false;
+    }
     const move = e.stun > 0 ? 0 : PATTERNS[G.BOSS_TYPES[e.type].pattern](game, e, dt * tempo, p);
+    if (e.ai.mode !== modeBefore) G.bossCue(game, e, e.ai.mode === 'charge' ? 'charge' : e.ai.mode, e.ai.mode !== 'aim' && e.ai.mode !== 'aimc');
+    else if (e.ai.timerA > timerA || e.ai.timerB > timerB) G.bossCue(game, e, 'cast', true);
     if (e.stun <= 0 && !e.lift) {
       for (const x of e.extras || []) {
+        if (!x.cue && x.cd > 0 && x.cd <= 0.55 * tempo) { x.cue = true; G.bossCue(game, e, x.k, false); }
         x.cd -= dt * tempo;
-        if (x.cd <= 0) x.cd = EXTRAS[x.k](game, e, p);
+        if (x.cd <= 0) { x.cd = EXTRAS[x.k](game, e, p); x.cue = false; }
       }
     }
     if (move > 0) {
@@ -375,7 +389,6 @@
 
   G.updateBossFx = function (game, dt) {
     const p = game.player;
-    if (game.bossDeath) updateBossDeath(game, dt);
     for (const t of game.telegraphs) {
       t.life -= dt;
       if (t.life <= 0) {
@@ -409,32 +422,50 @@
     if (game.boss === e) game.boss = null;
     if (e.final) game.finalBossDown = true; // 저장돼도 이어하면 바로 클리어로 끝나게 먼저 표시한다
     clearField(game);
+    game.banner = null;
+    for (const n of game.numbers) n.life = 0; // 효과 풀로 정상 반납되도록 수명만 끝낸다
     const sp = G.BOSS_SPRITE;
-    game.bossDeath = { e, t: 0, max: e.final ? 3 : 2, next: 0, feet: sp.feet * e.scale, frame: Math.floor(game.fx.anim * sp.fps + e.phase) % 4, flip: game.player.x < e.x };
+    game.bossIntro = null;
+    G.syncBossIntro(game);
+    if (!game.defeatedBosses) game.defeatedBosses = [];
+    game.defeatedBosses.push({ type: e.type, index: e.index, final: e.final });
+    game.bossDeath = { e, t: 0, max: G.fx.quiet(game) ? 1.15 : e.final ? 3.6 : 2.8, next: 0, feet: sp.feet * e.scale, frame: Math.floor(game.fx.anim * sp.fps + e.phase) % 4, flip: game.player.x < e.x };
     G.screenFlash(game, '255, 240, 210', 0.35, 0.4);
     G.addShake(game, 8);
-    if (G.sfx) G.sfx.play('elite');
+    if (G.sfx) G.sfx.play('bossBreak');
   };
 
-  function updateBossDeath(game, dt) {
+  G.updateBossDeath = function (game, dt) {
     const d = game.bossDeath, e = d.e;
     d.t += dt;
     d.next -= dt;
-    if (d.next <= 0 && d.t < d.max) {
+    if (d.next <= 0 && d.t < d.max * 0.57 && !game.fx.quiet) {
       const k = d.t / d.max;
       d.next = 0.26 - k * 0.16; // 끝으로 갈수록 빠르게
-      const x = e.x + G.rand(-e.r, e.r), y = e.y + G.rand(-e.r * 1.4, e.r * 0.4);
+      const x = e.x + (G.fx.random() * 2 - 1) * e.r, y = e.y + (G.fx.random() * 1.8 - 1.4) * e.r;
       G.burst(game, x, y, G.BOSS_TYPES[e.type].color, 8, 200);
       G.burst(game, x, y, 'rgba(255, 215, 130, 0.95)', 6, 170, true);
       G.ring(game, x, y, 6, 50 + k * 50, 0.3, 'rgba(255, 225, 160, 0.9)', 3);
       G.addShake(game, 2 + k * 3);
       if (G.sfx) G.sfx.play('killBig');
     }
+    if (!d.exploded && d.t >= d.max * 0.57) {
+      d.exploded = true;
+      const color = G.bossPresentation(e.type).color;
+      if (!game.fx.quiet) {
+        G.burst(game, e.x, e.y - 20, color, game.fx.low ? 22 : 55, 310, true);
+        G.ring(game, e.x, e.y, 15, e.final ? 440 : 320, 0.85, color, 8);
+        G.ring(game, e.x, e.y, 10, 240, 0.6, '#fff0c9', 3);
+      }
+      G.screenFlash(game, '255, 235, 190', game.fx.quiet ? 0.08 : 0.32, 0.4);
+      G.addShake(game, 13);
+      if (G.sfx) G.sfx.play('bossDie');
+    }
     if (d.t >= d.max) {
       game.bossDeath = null;
       finishBoss(game, e);
     }
-  }
+  };
 
   function finishBoss(game, e) {
     const st = game.stage;
@@ -442,14 +473,8 @@
     G.dropItem(game, e.x + 30, e.y, 'coin', Math.round(30 * st.goldMul));
     G.dropItem(game, e.x - 30, e.y, 'heal');
     G.dropGem(game, e.x, e.y - 20, 40);
-    G.burst(game, e.x, e.y, G.BOSS_TYPES[e.type].color, 50, 340);
-    G.burst(game, e.x, e.y, 'rgba(255, 210, 120, 0.95)', 40, 300, true);
-    G.addShake(game, 14);
-    G.screenFlash(game, '255, 240, 210', 0.45, 0.6);
-    G.ring(game, e.x, e.y, 20, 340, 0.8, 'rgba(255, 220, 150, 0.95)', 8);
-    G.ring(game, e.x, e.y, 10, 200, 0.6, 'rgba(255, 255, 240, 0.9)', 4);
+    if (!game.fx.quiet) G.ring(game, e.x, e.y, 15, 100, 0.5, '#e9ca86', 2);
     G.announce(game, e.final ? '새벽이 밝아옵니다!' : e.name + ' 처치! 상자를 떨어뜨렸습니다');
-    if (G.sfx) G.sfx.play('bossDie');
   }
 
   G.drawBossDeath = function (ctx, game) {
@@ -457,14 +482,28 @@
     if (!d) return;
     const e = d.e, k = d.t / d.max;
     const spr = G.art.get('boss_' + e.type, d.frame);
-    if (!spr) return;
-    const shake = game.fx.quiet ? 0 : 2 + k * 7;
-    const a = ctx.globalAlpha;
-    ctx.globalAlpha = k < 0.8 ? 1 : (1 - k) / 0.2;
-    // 조금 부풀면서 점점 하얗게 타오른다
-    G.drawSprite(ctx, G.unitSprite(spr, G.BOSS_SPRITE), e.x + G.rand(-shake, shake), e.y + d.feet + G.rand(-shake, shake),
-      e.scale * (1 + k * 0.14), d.flip, Math.min(1, k * 1.15 + Math.max(0, Math.sin(d.t * 22)) * 0.2));
-    ctx.globalAlpha = a;
+    ctx.save();
+    const visible = G.clamp((0.64 - k) / 0.1, 0, 1), quiet = game.fx.quiet;
+    const shake = quiet ? 0 : Math.sin(d.t * 41) * k * 5;
+    const scale = e.scale * (quiet ? 1 : 1 + k * 0.1);
+    ctx.globalAlpha = visible;
+    if (spr) {
+      G.drawSprite(ctx, G.unitSprite(spr, G.BOSS_SPRITE), e.x + shake, e.y + d.feet, scale, d.flip, quiet ? 0 : Math.max(0, k - 0.4) * 2);
+      G.drawBossFractures(ctx, game, e, spr, e.x + shake, e.y + d.feet, scale, d.flip, Math.min(1, k * 3) * visible);
+    } else {
+      ctx.fillStyle = G.BOSS_TYPES[e.type].color; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill();
+    }
+    if (k > 0.57) {
+      // 실제 보상은 finishBoss에서 한 번만 생성. 낙하하는 그림은 보상 미리보기다.
+      const fall = G.clamp((k - 0.57) / 0.43, 0, 1);
+      ctx.globalAlpha = Math.min(1, fall * 5);
+      const gold = G.art.get('coin'), heal = G.art.get('item_heal'), chest = G.art.get('chest_boss');
+      const lift = quiet ? 0 : (1 - fall) * 105;
+      if (gold) G.drawSprite(ctx, gold, e.x + 30 * fall, e.y - lift, 1.4, false, 0);
+      if (heal) G.drawSprite(ctx, heal, e.x - 30 * fall, e.y - lift * 0.8, 1, false, 0);
+      if (chest && !e.final) G.drawSprite(ctx, chest, e.x, e.y + 10 - lift * 1.2, 1, false, 0);
+    }
+    ctx.restore();
   };
 
   // ---------- 그리기 ----------
@@ -493,6 +532,14 @@
       } else {
         ctx.translate(t.x, t.y);
         ctx.rotate(t.angle);
+        // 원거리 잡몹의 가는 조준선: 길이와 사거리·판정은 그대로다.
+        if (t.width <= 5) {
+          ctx.strokeStyle = 'rgba(255, 137, 144, ' + (0.18 + k * 0.22) + ')'; ctx.lineWidth = 0.9;
+          ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(t.len, 0); ctx.stroke();
+          ctx.strokeStyle = 'rgba(255, 224, 196, ' + (0.25 + k * 0.2) + ')'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(t.len - 5, -3); ctx.lineTo(t.len, 0); ctx.lineTo(t.len - 5, 3); ctx.stroke();
+          ctx.restore(); continue;
+        }
         ctx.fillStyle = 'rgba(255, 65, 90, ' + (0.12 + k * 0.16) + ')';
         ctx.fillRect(0, -t.width / 2, t.len, t.width);
         ctx.strokeStyle = '#240915'; ctx.lineWidth = 5;

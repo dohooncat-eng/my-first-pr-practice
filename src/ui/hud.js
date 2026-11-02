@@ -72,6 +72,18 @@
     let total = 0;
     for (const k in stats) { total += stats[k]; dpsRows.push(k); }
     if (!total) return;
+    if (narrow) {
+      // 폰에서는 화면 아래의 두 줄 요약만 남겨 전장과 보스 예고를 비운다.
+      const x = R - 112, by = game.h - (game.safe.b || 0) - 51;
+      ctx.save(); ctx.globalAlpha = 0.72;
+      ctx.fillStyle = '#081510a6'; ctx.fillRect(x, by, 112, 38);
+      ctx.textAlign = 'right'; ctx.font = '600 11px ' + BODY; ctx.fillStyle = '#cccfb4';
+      const secs = Math.max(1, game.time);
+      ctx.fillText(mode === 'rate' ? '초당 피해' : '누적 피해', R - 6, by + 14);
+      ctx.fillStyle = '#dec58c';
+      ctx.fillText(mode === 'rate' ? compact(Math.round(total / secs)) + '/초' : compact(Math.round(total)) + (mode === 'both' ? ' · ' + compact(Math.round(total / secs)) + '/초' : ''), R - 6, by + 30);
+      ctx.restore(); return;
+    }
     dpsRows.sort((a, b) => stats[b] - stats[a]);
     const n = Math.min(narrow ? 4 : 6, dpsRows.length);
     const bw = narrow ? Math.min(174, Math.floor(game.w / 2) - 44) : 214, rowH = 34, x = R - bw;
@@ -111,14 +123,14 @@
   // 피해 숫자의 화면 위쪽 경계. 칸·미니맵·보스 이름까지 HUD 공간으로 남긴다.
   G.hudNumberTop = function (game) {
     const p = game.player, s = game.safe || SAFE;
-    if (game.h < 500) return s.t + 140;
+    if (game.h < 500) return s.t + (game.boss ? 96 : 140);
     const narrow = game.w < 840, cols = narrow ? 6 : 10;
     const L = Math.max(12, s.l + 10), R = game.w - Math.max(12, s.r + 10);
     const mapR = narrow ? 33 : 42;
     const available = narrow ? R - L - mapR * 2 - 14 : Math.min(400, game.w * 0.38);
     const size = Math.max(20, Math.min(34, Math.floor((available - 4 * (cols - 1)) / cols)));
     const end = 87 + Math.ceil(G.weaponSlots(p) / cols) * (size + 4) + Math.ceil(G.passiveSlots(p) / cols) * 29;
-    return s.t + Math.max(end, 75 + mapR * 2) + (game.boss && !game.boss.dead ? 58 : game.banner ? 34 : 8);
+    return s.t + Math.max(end, 75 + mapR * 2) + (game.boss && !game.boss.dead ? 92 : game.banner ? 58 : 32);
   };
 
   G.drawHUD = function (ctx, game) {
@@ -153,13 +165,15 @@
       G.roundRect(ctx, L - 2, T + 18, 48, 47, 5); ctx.stroke(); ctx.globalAlpha = 1;
     }
     const win = G.runTime(game);
-    plate(ctx, w / 2 - 72, T + 19, 144, 62, '#8d9867');
+    const timerX = flat && game.boss ? L + 122 : w / 2;
+    const timerW = flat && game.boss ? 124 : 144;
+    plate(ctx, timerX - timerW / 2, T + 19, timerW, 62, '#8d9867');
     ctx.textAlign = 'center'; ctx.fillStyle = game.time >= win - 60 ? '#f5ca83' : '#f0e8cd';
-    ctx.font = '28px ' + DISPLAY; ctx.fillText(G.formatTime(game.time), w / 2, T + 51);
+    ctx.font = '28px ' + DISPLAY; ctx.fillText(G.formatTime(game.time), timerX, T + 51);
     ctx.font = '600 11px ' + BODY; ctx.fillStyle = '#c2d1b7';
-    ctx.fillText('/ ' + G.formatTime(win) + '  ·  처치 ' + compact(game.kills), w / 2, T + 72);
+    ctx.fillText('/ ' + G.formatTime(win) + '  ·  처치 ' + compact(game.kills), timerX, T + 72);
     const speed = G.speedMul();
-    if (speed > 1) { plate(ctx, w / 2 + 76, T + 29, 28, 23); ctx.fillStyle = '#e4c17a'; ctx.font = '11px ' + DISPLAY; ctx.fillText('×' + speed, w / 2 + 90, T + 46); }
+    if (speed > 1) { const speedX = flat && game.boss ? w / 2 + 170 : timerX + 76; plate(ctx, speedX, T + 29, 28, 23); ctx.fillStyle = '#e4c17a'; ctx.font = '11px ' + DISPLAY; ctx.fillText('×' + speed, speedX + 14, T + 46); }
     const gold = Math.floor(game.runGold || 0), coin = G.art && G.art.get('coin');
     const gx = L + 1, gy = T + 70;
     plate(ctx, L - 1, T + 64, Math.min(w / 2 - 78 - L, 84), 18, '#526344');
@@ -192,16 +206,43 @@
     let bannerY = flat ? T + 111 : narrow ? Math.max(inventoryEnd, mapY + mapR) + 20 : T + 125;
     const boss = game.boss;
     if (boss && !boss.dead) {
-      const bw = flat ? Math.min(270, w - 250) : narrow ? R - L : 400;
-      const bx = (w - bw) / 2, by = flat ? T + 99 : narrow ? bannerY + 4 : T + 103;
-      const name = boss.name || (G.BOSS_TYPES && G.BOSS_TYPES[boss.type] && G.BOSS_TYPES[boss.type].name) || '보스';
-      ctx.font = (flat ? 12 : 14) + 'px ' + DISPLAY; ctx.textAlign = 'center'; ctx.fillStyle = '#efb3a0'; ctx.fillText(name, w / 2, by - 7, bw);
-      plate(ctx, bx, by, bw, 10, '#a66b59');
+      const info = G.bossPresentation(boss.type);
+      const bw = flat ? Math.min(320, w - 350) : narrow ? R - L : 470;
+      const bx = (w - bw) / 2, by = flat ? T + 19 : narrow ? bannerY - 12 : T + 101;
+      const bh = flat ? 63 : 72, barY = by + (flat ? 42 : 48);
+      plate(ctx, bx, by, bw, bh, boss.final ? '#e0bb76' : '#a59063');
+      ctx.fillStyle = info.color + '18'; ctx.fillRect(bx + 3, by + 3, bw - 6, 37);
+      diamond(ctx, bx + 15, by + 21, boss.final ? 7 : 5, info.color);
+      ctx.font = (flat ? 16 : 18) + 'px ' + DISPLAY; ctx.textAlign = 'left'; ctx.fillStyle = '#f5e6c4';
+      ctx.fillText(G.BOSS_TYPES[boss.type].name, bx + 30, by + 23, bw - 120);
+      ctx.font = '600 11px ' + BODY; ctx.textAlign = 'right'; ctx.fillStyle = info.color;
+      ctx.fillText(boss.stage === 2 ? '최후의 격노' : boss.stage === 1 ? '분노' : boss.final ? '최종 보스' : '보스', bx + bw - 12, by + 22);
+      ctx.textAlign = 'left'; ctx.fillStyle = '#cabc9c';
+      ctx.fillText(info.title, bx + 12, by + (flat ? 37 : 40), bw - 60);
       const ratio = G.clamp(boss.hp / boss.maxHp, 0, 1);
-      ctx.fillStyle = '#b54f52'; ctx.fillRect(bx + 2, by + 2, (bw - 4) * ratio, 6);
-      ctx.fillStyle = '#ed9c88'; ctx.fillRect(bx + 2, by + 2, (bw - 4) * ratio, 2);
-      diamond(ctx, bx, by + 5, 4, '#d6ab81'); diamond(ctx, bx + bw, by + 5, 4, '#d6ab81');
-      bannerY = by + 34;
+      const barW = bw - 24, barX = bx + 12;
+      ctx.fillStyle = '#060d0f'; ctx.fillRect(barX - 1, barY - 1, barW + 2, 15);
+      ctx.fillStyle = '#efd4a5'; ctx.fillRect(barX, barY, barW * (boss.showHp === undefined ? ratio : boss.showHp), 13);
+      ctx.fillStyle = boss.stage ? '#c4675e' : info.color; ctx.fillRect(barX, barY, barW * ratio, 13);
+      ctx.fillStyle = '#fff4d080'; ctx.fillRect(barX, barY, barW * ratio, 2);
+      ctx.fillStyle = '#15222066'; ctx.fillRect(barX, barY + 9, barW * ratio, 4);
+      for (let i = 1; i <= (boss.final ? 2 : 1); i++) {
+        const mark = i === 1 ? 0.5 : 0.25, mx = barX + barW * mark;
+        ctx.fillStyle = '#101618'; ctx.fillRect(mx - 1, barY, 2, 13);
+        diamond(ctx, mx, barY - 2, 3, ratio <= mark ? '#695b48' : '#fff0bd');
+      }
+      ctx.textAlign = 'right'; ctx.fillStyle = '#d8c9a8'; ctx.font = '11px ' + BODY;
+      ctx.fillText(Math.ceil(ratio * 100) + '%', bx + bw - 12, by + (flat ? 37 : 40));
+      diamond(ctx, bx, barY + 6, 4, '#d6b77d'); diamond(ctx, bx + bw, barY + 6, 4, '#d6b77d');
+      bannerY = by + bh + 22;
+    } else if (!game.bossDeath && !game.finalBossDown) {
+      const index = Math.min(2, game.director.bossIndex || 0);
+      const left = Math.max(0, G.BOSS_TIMES[index] * G.runTime(game) / G.WIN_TIME - game.time);
+      const label = (index === 2 ? '최종 보스까지 ' : '다음 보스까지 ') + G.formatTime(Math.ceil(left));
+      const cy = flat ? T + 99 : bannerY - 4, cw = 174;
+      plate(ctx, w / 2 - cw / 2, cy - 13, cw, 24, '#777651');
+      ctx.textAlign = 'center'; ctx.font = '600 11px ' + BODY; ctx.fillStyle = left < 30 ? '#f1c18b' : '#bac7ae';
+      ctx.fillText(label, w / 2, cy + 3); bannerY = cy + 33;
     }
     // 화면 밖 보스: 가장자리에 붉은 화살표
     if (boss && !boss.dead) {

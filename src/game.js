@@ -51,6 +51,9 @@
     game.pendingLevelUps = 0;
     game.chestQueue = []; // 주운 상자의 출처 'elite' | 'boss'
     game.bossDeath = null;
+    game.bossIntro = null;
+    game.defeatedBosses = [];
+    if (G.syncBossIntro) G.syncBossIntro(game);
     game.currentChoices = null;
     game.lastSettle = null;
     game.shake = 0;
@@ -107,6 +110,10 @@
     try {
       resetWorld(d.stageId, d.player.champion, d.difficultyId);
       G.restoreRun(game, d);
+      // 저장 형식은 그대로 두고 등장 순서에서 지난 보스의 표시 기록만 복원한다.
+      for (let i = 0; i < Math.min(3, game.director.bossIndex || 0); i++) {
+        if (!game.boss || game.boss.index !== i) game.defeatedBosses.push({ type: game.stage.boss, index: i, final: i === 2 });
+      }
     } catch (e) {
       // 망가진 저장은 버리고 타이틀로 (계속 같은 곳에서 멈추지 않게)
       console.warn('이어하기 실패', e);
@@ -181,6 +188,8 @@
   game.toTitle = function () {
     leaveEnd();
     game.state = 'menu';
+    game.bossIntro = null;
+    if (G.syncBossIntro) G.syncBossIntro(game);
     G.input.clear();
     music('setBoss', false);
     music('duck', false);
@@ -190,7 +199,10 @@
 
   // 레벨업·상자 창이 닫힌 뒤: 남은 상자 → 남은 레벨업 → 플레이 순서
   function continueAfterModal() {
-    if (game.chestQueue.length) openChest();
+    if (game.bossIntro || game.bossDeath) {
+      game.state = 'playing'; music('duck', !!game.bossIntro); G.ui.hideAll();
+    }
+    else if (game.chestQueue.length) openChest();
     else if (game.pendingLevelUps > 0) openLevelUp();
     else {
       game.state = 'playing';
@@ -262,6 +274,19 @@
   }
 
   function update(realDt) {
+    // 연출 시계만 진행한다. 피해·판 시계·무기·줍기·선택 창은 모두 기다린다.
+    if (game.bossIntro) {
+      G.fx.tick(game, realDt); G.updateBossIntro(game, realDt);
+      return;
+    }
+    if (game.bossDeath) {
+      G.fx.tick(game, realDt);
+      G.updateBossDeath(game, realDt);
+      G.updateEffects(game, realDt * (G.fx.quiet(game) ? 1 : 0.45));
+      G.fx.camera(game, realDt);
+      if (!game.bossDeath && game.finalBossDown) endRun(true);
+      return;
+    }
     const dt = G.fx.tick(game, realDt);
     // 배속: 판 시간과 적 등장만 빨라지고, 움직임·공격은 그대로
     // 히트스톱·감속에도 판 시계와 등장 일정은 실제 간격을 따른다.
@@ -274,6 +299,7 @@
       game.grid.clear();
       for (const e of game.enemies) game.grid.insert(e);
       G.updateSpawner(game, tdt);
+      if (game.bossIntro) return; // 이번 프레임에 등장한 보스도 공격 전에 멈춘다
       G.updateEnemies(game, dt);
       G.updateDots(game, dt);
       G.updateWeapons(game, dt);
@@ -283,6 +309,7 @@
       G.updatePickups(game, dt);
     } else G.updateSpawner(game, tdt);
     G.updateEffects(game, realDt);
+    G.updateBossPresentation(game, realDt);
     game.retaliateFx = Math.max(0, game.retaliateFx - dt);
 
     music('setIntensity', G.curveTime(game) / G.WIN_TIME);
@@ -403,6 +430,7 @@
     const fx = G.fx.prepare(game), zoom = game.zoom * fx.zoom, sx = fx.sx, sy = fx.sy;
     worldTransform(ctx, dpr, zoom, sx, sy);
     drawGround(ctx);
+    G.drawBossGround(ctx, game);
     G.drawPickups(ctx, game);
     G.drawWeaponsUnder(ctx, game);
     G.drawRings(ctx, game);
@@ -449,6 +477,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     G.drawScreenFlash(ctx, game);
     if (HUD_STATES.indexOf(game.state) !== -1) G.drawHUD(ctx, game);
+    if (game.state === 'playing') G.drawBossDeathTitle(ctx, game);
   }
 
   // ---------- 화면 크기와 루프 ----------
@@ -505,7 +534,7 @@
     const dt = Math.min(0.05, raw);
     last = ts;
     if (raw > 0) game.fps = game.fps * 0.93 + (1 / raw) * 0.07;
-    game.clock += dt;
+    if (!game.bossIntro) game.clock += dt;
     autoQuality(dt);
     if (game.state === 'playing') {
       // 느린 폰(20fps 미만)에서도 게임 시간이 실제 시간을 따라가게 나눠서 진행한다. 0.1초 넘게 멈춘 프레임은 버린다.
@@ -553,7 +582,7 @@
 
   // 테스트용: 고정 시간 간격으로 직접 진행
   game.step = function (dt, n) {
-    for (let i = 0; i < (n || 1); i++) if (game.state === 'playing') { game.clock += dt; update(dt); }
+    for (let i = 0; i < (n || 1); i++) if (game.state === 'playing') { if (!game.bossIntro) game.clock += dt; update(dt); }
   };
 
   game.render = render; // 테스트·성능 측정용
